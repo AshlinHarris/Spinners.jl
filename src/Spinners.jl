@@ -1,3 +1,10 @@
+#Issues:
+# Reliance on ANSI escape sequences
+# What if the task also prints?
+# Isn't there a better way to work with Unicode in Julia
+# Display multiple spinners
+# Display larger spinners (at least wider)
+
 module Spinners
 
 using IterTools: nth
@@ -48,6 +55,8 @@ function spinner(
 	v_string = collect(raw_string)
 
 	# Make cursor invisible
+	# Notice that the code depends on some particular ANSI escape sequences.
+	# Is that an issue?
 	ESC = "\u001B"
 	print("$ESC[?25l")
 

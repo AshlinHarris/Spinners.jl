@@ -2,7 +2,18 @@ module Spinners
 
 export spinner
 
-	function spinner(string, time)
+	function spinner(
+		string::Union{String, Nothing}=nothing,
+		time::Union{AbstractFloat, Nothing}=nothing,
+		)
+
+	if isnothing(string)
+		string = "\\|/-"
+	end
+
+	if isnothing(time)
+		time = 0.1
+	end
 
 		t = @async sleep(4)
 

@@ -1,4 +1,5 @@
 #Issues:
+# Fix the final cleanup step
 # Reliance on ANSI escape sequences
 # What if the task also prints?
 # Isn't there a better way to work with Unicode in Julia

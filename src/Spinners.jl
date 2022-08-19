@@ -1,5 +1,7 @@
 module Spinners
 
-greet() = print("Hello World!")
+export spinner
+
+spinner() = println("X")
 
 end # module Spinners

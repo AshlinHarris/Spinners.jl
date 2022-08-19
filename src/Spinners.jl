@@ -44,7 +44,6 @@ function spinner(
 	if mode == :spin
 		# Spinner
 		i = 0
-		sleep(time)
 		while !istaskdone(t)
 			print("\b", get_element(string, ( i % length(string)  ) + 1 ))
 			sleep(time)
@@ -72,6 +71,7 @@ function spinner(
 		# Spinner
 		# prime the loop
 		print("\b", get_element(string, 1))
+		sleep(time)
 		i = 1
 		while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the string at the end
 			m = ( i % l + 1)

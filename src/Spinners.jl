@@ -3,9 +3,15 @@ module Spinners
 export spinner
 
 	function spinner(string)
+
+		#a = sleep(7)
+		#t = Task(a)
+		t = @async sleep(4)
+		#schedule(t)
+		#yield()
+
 		i = 0
-		while true
-		#for i in 1:length(string)
+		while !istaskdone(t)
 			print(string[ ( i % length(string)  ) + 1 ])
 			sleep(0.5)
 			print("\b")

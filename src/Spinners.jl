@@ -45,7 +45,11 @@ function spinner(
 		cleanup = true
 	end
 
-v_string = collect(raw_string)
+	v_string = collect(raw_string)
+
+	# Make cursor invisible
+	ESC = "\u001B"
+	print("$ESC[?25l")
 
 	l = length(v_string)
 
@@ -112,6 +116,9 @@ v_string = collect(raw_string)
 	else
 		println("\n",after)
 	end
+
+	# Make cursor visibile
+	print("$ESC[0J$ESC[?25h")
 end
 
 end # module Spinners

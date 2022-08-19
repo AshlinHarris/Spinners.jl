@@ -7,6 +7,7 @@ function spinner(
 	string::Union{String, Nothing}=nothing,
 	time::Union{AbstractFloat, Nothing}=nothing;
 	mode::Union{Symbol, Nothing}=nothing,
+	final::Union{String, Nothing}=nothing,
 	)
 
 	# Assign missing arguments
@@ -23,6 +24,8 @@ function spinner(
 		mode = :spin
 	end
 
+	l = length(string)
+
 	if mode == :spin
 		# Spinner
 		i = 0
@@ -31,12 +34,13 @@ function spinner(
 			sleep(time)
 			i = i + 1
 		end
-		println()
+		if isnothing(final)
+			final = string[1];
+		end
 	elseif mode == :unfurl
 		# Spinner
 		i = 0
 		while !istaskdone(t)
-			l = length(string)
 			m = ( i % l + 1)
 			if m == 1
 				sleep(time*3)
@@ -46,8 +50,14 @@ function spinner(
 			sleep(time)
 			i = i + 1
 		end
-		println()
+		if isnothing(final)
+			final = string;
+		end
 	end
+
+	# Print final string
+	
+	println("\b" ^ l, final)
 end
 
 end # module Spinners

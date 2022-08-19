@@ -9,6 +9,7 @@ function spinner(
 	mode::Union{Symbol, Nothing}=nothing,
 	before::Union{String, Nothing}=nothing,
 	after::Union{String, Nothing}=nothing,
+	cleanup::Union{Bool, Nothing}=nothing,
 	)
 
 	# Assign missing arguments
@@ -29,6 +30,10 @@ function spinner(
 	else
 		print(before)
 	end
+	if isnothing(cleanup)
+		cleanup = true
+	end
+	
 
 	l = length(string)
 
@@ -38,6 +43,7 @@ function spinner(
 		# Spinner
 		i = 0
 		print(" ")
+		sleep(time)
 		while !istaskdone(t)
 			print("\b", string[ ( i % length(string)  ) + 1 ])
 			sleep(time)
@@ -66,7 +72,7 @@ function spinner(
 		# prime the loop
 		print("\b", string[1])
 		i = 1
-		while !istaskdone(t)
+		while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the string at the end
 			m = ( i % l + 1)
 			if m == 1
 				sleep(time*3)
@@ -83,7 +89,11 @@ function spinner(
 
 	# Print after string
 	
-	println("\b" ^ ( l + length(before)), after)
+	if cleanup == true
+		println("\b" ^ ( l + length(before)), after)
+	else
+		println("\n",after)
+	end
 end
 
 end # module Spinners

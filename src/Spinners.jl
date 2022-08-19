@@ -56,7 +56,7 @@ v_string = collect(raw_string)
 		# Spinner
 		i = 0
 		while !istaskdone(t)
-			next_char = get_element(v_string, ( i % l)  + 1 )
+			next_char = get_element(v_string, ( i % l)  + 1 ) * " "
 			print("\b"^sizeof(STR_TO_DELETE), next_char)
 			sleep(time)
 			STR_TO_DELETE = next_char
@@ -70,8 +70,10 @@ v_string = collect(raw_string)
 			# Spinner
 			i = rand(1:l)
 			while !istaskdone(t)
-				print("\b", get_element(v_string, i))
+				next_char = get_element(v_string, i) * " "
+				print("\b"^sizeof(STR_TO_DELETE), next_char)
 				sleep(time)
+				STR_TO_DELETE = next_char
 				i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 			end
 			if isnothing(after)

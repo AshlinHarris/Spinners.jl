@@ -89,14 +89,14 @@ function spinner(
 	elseif mode == :unfurl
 		# Spinner
 		# prime the loop
-		print("\b", get_element(v_string, 1))
+		print("\b"^sizeof(STR_TO_DELETE), get_element(v_string, 1))
 		sleep(time)
 		i = 1
 		while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
 			m = ( i % l + 1)
 			if m == 1
 				sleep(time*3)
-				print("\b" ^ l * " " ^ l * "\b" ^ l)
+				print("\b" ^ sizeof(raw_string) * " " ^ sizeof(raw_string) * "\b" ^ sizeof(raw_string))
 			end
 			print(get_element(v_string, m))
 			sleep(time)

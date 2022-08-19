@@ -2,6 +2,8 @@ module Spinners
 
 export spinner
 
+get_element(s::String, i::Int) = s[i]
+
 function spinner(
 	t::Union{Task, Nothing}=nothing,
 	string::Union{String, Nothing}=nothing,
@@ -42,35 +44,34 @@ function spinner(
 	if mode == :spin
 		# Spinner
 		i = 0
-		print(" ")
 		sleep(time)
 		while !istaskdone(t)
-			print("\b", string[ ( i % length(string)  ) + 1 ])
+			print("\b", get_element(string, ( i % length(string)  ) + 1 ))
 			sleep(time)
 			i = i + 1
 		end
 		if isnothing(after)
-			after = string[1];
+			after = get_element(string, 1);
 		end
 	elseif mode == :random || mode == :haphazard
 		if l > 1
 			# Spinner
 			i = rand(1:l)
 			while !istaskdone(t)
-				print("\b", string[ i ])
+				print("\b", get_element(string, i))
 				sleep(time)
 				i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 			end
 			if isnothing(after)
-				after = string[1];
+				after = get_element(string, 1);
 			end
 		else
-			print(string[1])
+			print(get_element(string, 1))
 		end
 	elseif mode == :unfurl
 		# Spinner
 		# prime the loop
-		print("\b", string[1])
+		print("\b", get_element(string, 1))
 		i = 1
 		while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the string at the end
 			m = ( i % l + 1)
@@ -78,13 +79,15 @@ function spinner(
 				sleep(time*3)
 				print("\b" ^ l * " " ^ l * "\b" ^ l)
 			end
-			print(string[ m  ])
+			print(get_element(string, m))
 			sleep(time)
 			i = i + 1
 		end
 		if isnothing(after)
 			after = string;
 		end
+	else
+		#error
 	end
 
 	# Print after string

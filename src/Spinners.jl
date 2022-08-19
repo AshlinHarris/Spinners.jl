@@ -39,6 +39,7 @@ function spinner(
 			l = length(string)
 			m = ( i % l + 1)
 			if m == 1
+				sleep(time*3)
 				print("\b" ^ l * " " ^ l * "\b" ^ l)
 			end
 			print(string[ m  ])

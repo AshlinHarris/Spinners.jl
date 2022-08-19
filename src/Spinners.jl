@@ -37,6 +37,21 @@ function spinner(
 		if isnothing(final)
 			final = string[1];
 		end
+	elseif mode == :random || mode == :haphazard
+		if l > 1
+			# Spinner
+			i = rand(1:l)
+			while !istaskdone(t)
+				print("\b", string[ i ])
+				sleep(time)
+				i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
+			end
+			if isnothing(final)
+				final = string[1];
+			end
+		else
+			print(string[1])
+		end
 	elseif mode == :unfurl
 		# Spinner
 		i = 0

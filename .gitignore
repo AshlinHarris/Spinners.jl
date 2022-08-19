@@ -1,0 +1,11 @@
+# Directories
+docs/build/
+
+# Files
+*.jl.*.cov
+*.jl.cov
+*.swo
+*.swp
+.DS_Store
+Manifest.toml
+

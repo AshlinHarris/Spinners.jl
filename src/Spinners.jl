@@ -1,12 +1,21 @@
 module Spinners
 
+using IterTools: nth
+using Unicode: graphemes
+
 export spinner
 
-get_element(s::String, i::Int) = s[i]
+function get_element(s::Vector, i::Int)
+	s[i]
+end
+function get_element(s::String, i::Int)
+	u = graphemes(s)
+	return nth(u, i)
+end
 
 function spinner(
 	t::Union{Task, Nothing}=nothing,
-	string::Union{String, Nothing}=nothing,
+	raw_string::Union{String, Nothing}=nothing,
 	time::Union{AbstractFloat, Nothing}=nothing;
 	mode::Union{Symbol, Nothing}=nothing,
 	before::Union{String, Nothing}=nothing,
@@ -18,8 +27,8 @@ function spinner(
 	if isnothing(t)
 		t = @async sleep(3)
 	end
-	if isnothing(string)
-		string = "\\|/-"
+	if isnothing(raw_string)
+		raw_string = "\\|/-"
 	end
 	if isnothing(time)
 		time = 0.25
@@ -35,56 +44,60 @@ function spinner(
 	if isnothing(cleanup)
 		cleanup = true
 	end
-	
 
-	l = length(string)
+v_string = collect(raw_string)
 
-	print(" ") # initial blank (deleted within loop)
+	l = length(v_string)
+
+	STR_TO_DELETE = " "
+	print(STR_TO_DELETE) # initial blank (deleted within loop)
 
 	if mode == :spin
 		# Spinner
 		i = 0
 		while !istaskdone(t)
-			print("\b", get_element(string, ( i % length(string)  ) + 1 ))
+			next_char = get_element(v_string, ( i % l)  + 1 )
+			print("\b"^sizeof(STR_TO_DELETE), next_char)
 			sleep(time)
+			STR_TO_DELETE = next_char
 			i = i + 1
 		end
 		if isnothing(after)
-			after = get_element(string, 1);
+			after = get_element(v_string, 1);
 		end
-	elseif mode == :random || mode == :haphazard
+	elseif mode == :random || mode == :haphazard || mode == :rand
 		if l > 1
 			# Spinner
 			i = rand(1:l)
 			while !istaskdone(t)
-				print("\b", get_element(string, i))
+				print("\b", get_element(v_string, i))
 				sleep(time)
 				i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 			end
 			if isnothing(after)
-				after = get_element(string, 1);
+				after = get_element(v_string, 1);
 			end
 		else
-			print(get_element(string, 1))
+			print(get_element(v_string, 1))
 		end
 	elseif mode == :unfurl
 		# Spinner
 		# prime the loop
-		print("\b", get_element(string, 1))
+		print("\b", get_element(v_string, 1))
 		sleep(time)
 		i = 1
-		while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the string at the end
+		while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
 			m = ( i % l + 1)
 			if m == 1
 				sleep(time*3)
 				print("\b" ^ l * " " ^ l * "\b" ^ l)
 			end
-			print(get_element(string, m))
+			print(get_element(v_string, m))
 			sleep(time)
 			i = i + 1
 		end
 		if isnothing(after)
-			after = string;
+			after = v_string;
 		end
 	else
 		#error
@@ -93,7 +106,7 @@ function spinner(
 	# Print after string
 	
 	if cleanup == true
-		println("\b" ^ ( l + length(before)), after)
+		println("\b" ^ ( sizeof(string) + sizeof(before)), after)
 	else
 		println("\n",after)
 	end

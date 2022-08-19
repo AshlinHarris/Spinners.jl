@@ -7,7 +7,8 @@ function spinner(
 	string::Union{String, Nothing}=nothing,
 	time::Union{AbstractFloat, Nothing}=nothing;
 	mode::Union{Symbol, Nothing}=nothing,
-	final::Union{String, Nothing}=nothing,
+	before::Union{String, Nothing}=nothing,
+	after::Union{String, Nothing}=nothing,
 	)
 
 	# Assign missing arguments
@@ -23,19 +24,27 @@ function spinner(
 	if isnothing(mode)
 		mode = :spin
 	end
+	if isnothing(before)
+		before = ""
+	else
+		print(before)
+	end
 
 	l = length(string)
+
+	print(" ") # initial blank (deleted within loop)
 
 	if mode == :spin
 		# Spinner
 		i = 0
+		print(" ")
 		while !istaskdone(t)
 			print("\b", string[ ( i % length(string)  ) + 1 ])
 			sleep(time)
 			i = i + 1
 		end
-		if isnothing(final)
-			final = string[1];
+		if isnothing(after)
+			after = string[1];
 		end
 	elseif mode == :random || mode == :haphazard
 		if l > 1
@@ -46,15 +55,17 @@ function spinner(
 				sleep(time)
 				i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 			end
-			if isnothing(final)
-				final = string[1];
+			if isnothing(after)
+				after = string[1];
 			end
 		else
 			print(string[1])
 		end
 	elseif mode == :unfurl
 		# Spinner
-		i = 0
+		# prime the loop
+		print("\b", string[1])
+		i = 1
 		while !istaskdone(t)
 			m = ( i % l + 1)
 			if m == 1
@@ -65,14 +76,14 @@ function spinner(
 			sleep(time)
 			i = i + 1
 		end
-		if isnothing(final)
-			final = string;
+		if isnothing(after)
+			after = string;
 		end
 	end
 
-	# Print final string
+	# Print after string
 	
-	println("\b" ^ l, final)
+	println("\b" ^ ( l + length(before)), after)
 end
 
 end # module Spinners

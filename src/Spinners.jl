@@ -1,5 +1,6 @@
 #Issues:
 # Fix the final cleanup step
+# The cursor should always be set back to visible, even if there's an interruption.
 # Reliance on ANSI escape sequences
 # What if the task also prints?
 # Isn't there a better way to work with Unicode in Julia

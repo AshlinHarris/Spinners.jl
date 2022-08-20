@@ -1,5 +1,8 @@
 #Issues:
+# Add moving spinner?
+# Add mode=:flip (playing cards)
 # Fix the final cleanup step
+# 	Differentiate between character to end on and ending message?
 # The cursor should always be set back to visible, even if there's an interruption.
 # Reliance on ANSI escape sequences
 # What if the task also prints?
@@ -24,7 +27,7 @@ end
 
 function spinner(
 	t::Union{Task, Nothing}=nothing,
-	raw_string::Union{String, Nothing}=nothing,
+	string::Union{String, Symbol, Nothing}=nothing,
 	time::Union{AbstractFloat, Nothing}=nothing;
 	mode::Union{Symbol, Nothing}=nothing,
 	before::Union{String, Nothing}=nothing,
@@ -36,8 +39,14 @@ function spinner(
 	if isnothing(t)
 		t = @async sleep(3)
 	end
-	if isnothing(raw_string)
+	if isnothing(string)
 		raw_string = "\\|/-"
+	elseif typeof(string) == String
+		raw_string = string
+	elseif string == :braille
+		raw_string = braille="⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊⠋⠌⠍⠎⠏⠐⠑⠒⠓⠔⠕⠖⠗⠘⠙⠚⠛⠜⠝⠞⠟⠠⠡⠢⠣⠤⠥⠦⠧⠨⠩⠪⠫⠬⠭⠮⠯⠰⠱⠲⠳⠴⠵⠶⠷⠸⠹⠺⠻⠼⠽⠾⠿⡀⡁⡂⡃⡄⡅⡆⡇⡈⡉⡊⡋⡌⡍⡎⡏⡐⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡟⡠⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡯⡰⡱⡲⡳⡴⡵⡶⡷⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⢈⢉⢊⢋⢌⢍⢎⢏⢐⢑⢒⢓⢔⢕⢖⢗⢘⢙⢚⢛⢜⢝⢞⢟⢠⢡⢢⢣⢤⢥⢦⢧⢨⢩⢪⢫⢬⢭⢮⢯⢰⢱⢲⢳⢴⢵⢶⢷⢸⢹⢺⢻⢼⢽⢾⢿⣀⣁⣂⣃⣄⣅⣆⣇⣈⣉⣊⣋⣌⣍⣎⣏⣐⣑⣒⣓⣔⣕⣖⣗⣘⣙⣚⣛⣜⣝⣞⣟⣠⣡⣢⣣⣤⣥⣦⣧⣨⣩⣪⣫⣬⣭⣮⣯⣰⣱⣲⣳⣴⣵⣶⣷⣸⣹⣺⣻⣼⣽⣾⣿"
+	else
+		#error
 	end
 	if isnothing(time)
 		time = 0.25
@@ -53,6 +62,7 @@ function spinner(
 	if isnothing(cleanup)
 		cleanup = true
 	end
+
 
 	v_string = collect(raw_string)
 
@@ -78,7 +88,8 @@ function spinner(
 			i = i + 1
 		end
 		if isnothing(after)
-			after = get_element(v_string, 1);
+			#after = get_element(v_string, 1);
+			after = "✔️"
 		end
 	elseif mode == :random || mode == :haphazard || mode == :rand
 		if l > 1
@@ -92,7 +103,8 @@ function spinner(
 				i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 			end
 			if isnothing(after)
-				after = get_element(v_string, 1);
+				#after = get_element(v_string, 1);
+				after = ✔️
 			end
 		else
 			print(get_element(v_string, 1))
@@ -114,7 +126,8 @@ function spinner(
 			i = i + 1
 		end
 		if isnothing(after)
-			after = v_string;
+			#after = v_string;
+			after = "✔️"
 		end
 	else
 		#error
@@ -123,7 +136,10 @@ function spinner(
 	# Print after string
 	
 	if cleanup == true
-		println("\b" ^ ( sizeof(string) + sizeof(before)), after)
+		println("\b" ^ ( sizeof(raw_string) + sizeof(before)),
+		        " " ^ ( length(v_string)),
+		        "\b" ^ ( length(v_string)),
+		        after)
 	else
 		println("\n",after)
 	end

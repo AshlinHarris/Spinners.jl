@@ -8,21 +8,19 @@
 # Isn't there a better way to work with Unicode in Julia
 # Display multiple spinners
 # Display larger spinners (at least wider)
+# Does this slow down computation significantly?
 
 module Spinners
 
-#using IterTools: nth
-#using Unicode: graphemes
-
 export spinner
+
+function erase_display(s::Vector)
+	print("\b"^sizeof(s), " "^length(s), "\b"^length(s))
+end
 
 function get_element(s::Vector, i::Int)
 	s[i]
 end
-#function get_element(s::String, i::Int)
-#	u = graphemes(s)
-#	return nth(u, i)
-#end
 
 function spinner(
 	t::Union{Task, Nothing}=nothing,
@@ -81,77 +79,77 @@ function spinner(
 	print("$ESC[?25l")
 	try
 
-	l = length(v_string)
+		l = length(v_string)
 
-	STR_TO_DELETE = " "
-	print(STR_TO_DELETE) # initial blank (deleted within loop)
+		STR_TO_DELETE = " "
+		print(STR_TO_DELETE) # initial blank (deleted within loop)
 
-	if mode == :spin
-		# Spinner
-		i = 0
-		while !istaskdone(t)
-			next_char = get_element(v_string, ( i % l)  + 1 ) * " "
-			print("\b"^sizeof(STR_TO_DELETE), next_char)
-			sleep(time)
-			STR_TO_DELETE = next_char
-			i = i + 1
-		end
-		if isnothing(after)
-			#after = get_element(v_string, 1);
-			after = "✔️"
-		end
-	elseif mode == :random || mode == :haphazard || mode == :rand
-		if l > 1
+		if mode == :spin
 			# Spinner
-			i = rand(1:l)
+			i = 0
 			while !istaskdone(t)
-				next_char = get_element(v_string, i) * " "
+				next_char = get_element(v_string, ( i % l)  + 1 ) * " "
 				print("\b"^sizeof(STR_TO_DELETE), next_char)
 				sleep(time)
 				STR_TO_DELETE = next_char
-				i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
+				i = i + 1
 			end
 			if isnothing(after)
 				#after = get_element(v_string, 1);
-				after = ✔️
+				after = "✔️"
+			end
+		elseif mode == :random || mode == :haphazard || mode == :rand
+			if l > 1
+				# Spinner
+				i = rand(1:l)
+				while !istaskdone(t)
+					next_char = get_element(v_string, i) * " "
+					print("\b"^sizeof(STR_TO_DELETE), next_char)
+					sleep(time)
+					STR_TO_DELETE = next_char
+					i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
+				end
+				if isnothing(after)
+					#after = get_element(v_string, 1);
+					after = ✔️
+				end
+			else
+				print(get_element(v_string, 1))
+			end
+		elseif mode == :unfurl
+			# Spinner
+			# prime the loop
+			print("\b"^sizeof(STR_TO_DELETE), get_element(v_string, 1))
+			sleep(time)
+			i = 1
+			while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
+				m = ( i % l + 1)
+				if m == 1
+					sleep(time*3)
+					print("\b" ^ sizeof(raw_string) * " " ^ sizeof(raw_string) * "\b" ^ sizeof(raw_string))
+				end
+				print(get_element(v_string, m))
+				sleep(time)
+				i = i + 1
+			end
+			if isnothing(after)
+				#after = v_string;
+				after = "✔️"
 			end
 		else
-			print(get_element(v_string, 1))
+			#error
 		end
-	elseif mode == :unfurl
-		# Spinner
-		# prime the loop
-		print("\b"^sizeof(STR_TO_DELETE), get_element(v_string, 1))
-		sleep(time)
-		i = 1
-		while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
-			m = ( i % l + 1)
-			if m == 1
-				sleep(time*3)
-				print("\b" ^ sizeof(raw_string) * " " ^ sizeof(raw_string) * "\b" ^ sizeof(raw_string))
-			end
-			print(get_element(v_string, m))
-			sleep(time)
-			i = i + 1
-		end
-		if isnothing(after)
-			#after = v_string;
-			after = "✔️"
-		end
-	else
-		#error
-	end
 
-	# Print after string
-	
-	if cleanup == true
-		println("\b" ^ ( sizeof(raw_string) + sizeof(before)),
-		        " " ^ ( length(v_string)),
-		        "\b" ^ ( length(v_string)),
-		        after)
-	else
-		println("\n",after)
-	end
+		# Print after string
+		
+		if cleanup == true
+			println("\b" ^ ( sizeof(raw_string) + sizeof(before)),
+				" " ^ ( length(v_string)),
+				"\b" ^ ( length(v_string)),
+				after)
+		else
+			println("\n",after)
+		end
 
 	#The cursor should always be set back to visible, even if there's an interruption.
 	finally

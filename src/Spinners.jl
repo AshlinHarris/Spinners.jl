@@ -22,6 +22,10 @@ function get_element(s::Vector, i::Int)
 	s[i]
 end
 
+function overwrite_display(old::Vector, new::String)
+	print("\b"^sizeof(s), new, "\b"^max(0,length(new)-length(old))
+end
+
 function spinner(
 	t::Union{Task, Nothing}=nothing,
 	string::Union{String, Symbol, Nothing}=nothing,

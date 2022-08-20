@@ -14,16 +14,16 @@ module Spinners
 
 export spinner
 
-function erase_display(s::Vector)
+function erase_display(s::String)
 	print("\b"^sizeof(s), " "^length(s), "\b"^length(s))
 end
 
 function get_element(s::Vector, i::Int)
-	s[i]
+	return string(s[i])
 end
 
-function overwrite_display(old::Vector, new::String)
-	print("\b"^sizeof(s), new, "\b"^max(0,length(new)-length(old))
+function overwrite_display(old::String, new::String)
+	print("\b"^sizeof(old), new, "\b"^max(0,length(new)-length(old)))
 end
 
 function spinner(
@@ -93,7 +93,7 @@ function spinner(
 			i = 0
 			while !istaskdone(t)
 				next_char = get_element(v_string, ( i % l)  + 1 ) * " "
-				print("\b"^sizeof(STR_TO_DELETE), next_char)
+				overwrite_display(STR_TO_DELETE, next_char)
 				sleep(time)
 				STR_TO_DELETE = next_char
 				i = i + 1
@@ -108,14 +108,14 @@ function spinner(
 				i = rand(1:l)
 				while !istaskdone(t)
 					next_char = get_element(v_string, i) * " "
-					print("\b"^sizeof(STR_TO_DELETE), next_char)
+					overwrite_display(STR_TO_DELETE, next_char)
 					sleep(time)
 					STR_TO_DELETE = next_char
 					i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 				end
 				if isnothing(after)
 					#after = get_element(v_string, 1);
-					after = ✔️
+					after = "✔️"
 				end
 			else
 				print(get_element(v_string, 1))
@@ -123,14 +123,14 @@ function spinner(
 		elseif mode == :unfurl
 			# Spinner
 			# prime the loop
-			print("\b"^sizeof(STR_TO_DELETE), get_element(v_string, 1))
+			overwrite_display(STR_TO_DELETE, get_element(v_string, 1))
 			sleep(time)
 			i = 1
 			while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
 				m = ( i % l + 1)
 				if m == 1
 					sleep(time*3)
-					print("\b" ^ sizeof(raw_string) * " " ^ sizeof(raw_string) * "\b" ^ sizeof(raw_string))
+					erase_display(raw_string)
 				end
 				print(get_element(v_string, m))
 				sleep(time)
@@ -147,10 +147,7 @@ function spinner(
 		# Print after string
 		
 		if cleanup == true
-			println("\b" ^ ( sizeof(raw_string) + sizeof(before)),
-				" " ^ ( length(v_string)),
-				"\b" ^ ( length(v_string)),
-				after)
+			overwrite_display(before*raw_string, after)
 		else
 			println("\n",after)
 		end

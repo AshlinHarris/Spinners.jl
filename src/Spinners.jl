@@ -3,7 +3,6 @@
 # Add mode=:flip (playing cards)
 # Fix the final cleanup step
 # 	Differentiate between character to end on and ending message?
-# The cursor should always be set back to visible, even if there's an interruption.
 # Reliance on ANSI escape sequences
 # What if the task also prints?
 # Isn't there a better way to work with Unicode in Julia
@@ -12,18 +11,18 @@
 
 module Spinners
 
-using IterTools: nth
-using Unicode: graphemes
+#using IterTools: nth
+#using Unicode: graphemes
 
 export spinner
 
 function get_element(s::Vector, i::Int)
 	s[i]
 end
-function get_element(s::String, i::Int)
-	u = graphemes(s)
-	return nth(u, i)
-end
+#function get_element(s::String, i::Int)
+#	u = graphemes(s)
+#	return nth(u, i)
+#end
 
 function spinner(
 	t::Union{Task, Nothing}=nothing,
@@ -39,10 +38,10 @@ function spinner(
 	if isnothing(t)
 		t = @async sleep(3)
 	end
-	if isnothing(string) || string == :pinwheel
-		raw_string = "\\|/-"
-	elseif typeof(string) == String
+	if typeof(string) == String
 		raw_string = string
+	elseif isnothing(string) || string == :pinwheel
+		raw_string = "\\|/-"
 	elseif string == :arrows
 		raw_string = "←↖↑↗→↘↓↙"
 	elseif string == :bars
@@ -80,6 +79,7 @@ function spinner(
 	# Is that an issue?
 	ESC = "\u001B"
 	print("$ESC[?25l")
+	try
 
 	l = length(v_string)
 
@@ -153,8 +153,11 @@ function spinner(
 		println("\n",after)
 	end
 
+	#The cursor should always be set back to visible, even if there's an interruption.
+	finally
 	# Make cursor visibile
 	print("$ESC[0J$ESC[?25h")
+	end
 end
 
 end # module Spinners

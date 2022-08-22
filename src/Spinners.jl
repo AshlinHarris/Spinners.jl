@@ -1,4 +1,5 @@
 #Issues:
+#Loadin
 # Add moving spinner?
 # Add mode=:flip (playing cards)
 # Fix the final cleanup step
@@ -18,6 +19,7 @@
 # Avoid ANSI with Base.transcode
 # Write const functions with backspace and escape sequences
 # Ensure that input string is UTF-8
+	# Notice that the code depends on some particular ANSI escape sequences.
 
 module Spinners
 
@@ -26,24 +28,21 @@ export spinner
 const BACKSPACE = '\b' # '\U8' == '\b'
 const ANSI_ESCAPE = '\u001B'
 
-function erase_display(s::String)
-	print(BACKSPACE^sizeof(s), " "^length(s), BACKSPACE^length(s))
+# duplicate of overwrite?
+function erase_display(s::String, blank::String)
+	print(BACKSPACE^sizeof(s), blank^length(s), BACKSPACE^length(s))
 end
 
 function get_element(s::Vector, i::Int)
 	return string(s[i])
 end
 
-const hide_cursor() = println(ANSI_ESCAPE, "[?25l")
-	# Make cursor invisible
-	# Notice that the code depends on some particular ANSI escape sequences.
-	# Is that an issue?
+const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 
 function overwrite_display(old::String, new::String)
 	print(BACKSPACE^sizeof(old), new, BACKSPACE^max(0,length(new)-length(old)))
 end
 
-	# Make cursor visibile
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 function spinner(
@@ -53,6 +52,7 @@ function spinner(
 	mode::Union{Symbol, Nothing}=nothing,
 	before::Union{String, Nothing}=nothing,
 	after::Union{String, Nothing}=nothing,
+	blank::Union{String, Nothing}=nothing,
 	cleanup::Union{Bool, Nothing}=nothing,
 	)
 
@@ -90,6 +90,9 @@ function spinner(
 	else
 		print(before)
 	end
+	if isnothing(blank)
+		blank = " "
+	end
 	if isnothing(cleanup)
 		cleanup = true
 	end
@@ -98,10 +101,9 @@ function spinner(
 
 	hide_cursor()
 	try
+		l = length(raw_string)
 
-		l = length(v_string)
-
-		STR_TO_DELETE = " "
+		STR_TO_DELETE = ""
 		print(STR_TO_DELETE) # initial blank (deleted within loop)
 
 		if mode == :spin
@@ -146,7 +148,7 @@ function spinner(
 				m = ( i % l + 1)
 				if m == 1
 					sleep(time*3)
-					erase_display(raw_string)
+					erase_display(raw_string, blank)
 				end
 				print(get_element(v_string, m))
 				sleep(time)
@@ -170,7 +172,7 @@ function spinner(
 
 	#The cursor should always be set back to visible, even if there's an interruption.
 	finally
-	show_cursor()
+		show_cursor()
 	end
 end
 

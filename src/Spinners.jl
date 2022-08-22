@@ -1,5 +1,3 @@
-#  t = @async sleep(5); spinner(t, "🂫🂬🂭🂮🂡", mode=:unfurl, blank = "🂠", cleanup=false)
-
 # https://docs.julialang.org/en/v1/manual/strings/
 
 #Issues:
@@ -31,6 +29,10 @@ export spinner
 
 const BACKSPACE = '\b' # '\U8' == '\b'
 const ANSI_ESCAPE = '\u001B'
+
+function clear_field(s::String, blank::String)
+	print(blank^length(s), BACKSPACE^length(s))
+end
 
 function erase_display(s::String, blank::String)
 	print(BACKSPACE^sizeof(s), blank^length(s), BACKSPACE^length(s))
@@ -106,6 +108,9 @@ function spinner(
 
 	hide_cursor()
 	try
+
+		clear_field(raw_string, blank)
+
 		l = length(raw_string)
 
 		STR_TO_DELETE = ""

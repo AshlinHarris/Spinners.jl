@@ -23,8 +23,8 @@ module Spinners
 
 export spinner
 
-const BACKSPACE = '\b'
-# '\U8' == '\b'
+const BACKSPACE = '\b' # '\U8' == '\b'
+const ANSI_ESCAPE = '\u001B'
 
 function erase_display(s::String)
 	print(BACKSPACE^sizeof(s), " "^length(s), BACKSPACE^length(s))
@@ -34,9 +34,17 @@ function get_element(s::Vector, i::Int)
 	return string(s[i])
 end
 
+const hide_cursor() = println(ANSI_ESCAPE, "[?25l")
+	# Make cursor invisible
+	# Notice that the code depends on some particular ANSI escape sequences.
+	# Is that an issue?
+
 function overwrite_display(old::String, new::String)
 	print(BACKSPACE^sizeof(old), new, BACKSPACE^max(0,length(new)-length(old)))
 end
+
+	# Make cursor visibile
+const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 function spinner(
 	t::Union{Task, Nothing}=nothing,
@@ -88,11 +96,7 @@ function spinner(
 
 	v_string = collect(raw_string)
 
-	# Make cursor invisible
-	# Notice that the code depends on some particular ANSI escape sequences.
-	# Is that an issue?
-	ESC = "\u001B"
-	print("$ESC[?25l")
+	hide_cursor()
 	try
 
 		l = length(v_string)
@@ -166,8 +170,7 @@ function spinner(
 
 	#The cursor should always be set back to visible, even if there's an interruption.
 	finally
-	# Make cursor visibile
-	print("$ESC[0J$ESC[?25h")
+	show_cursor()
 	end
 end
 

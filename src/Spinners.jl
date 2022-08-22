@@ -9,6 +9,15 @@
 # Display multiple spinners
 # Display larger spinners (at least wider)
 # Does this slow down computation significantly?
+# Documentation
+#	\U, escape forms, s[begin], s[end]
+#	use length(s) for number of characers
+#	collect(eachindex(s))
+#	careful with concatenation
+# Look into PartialFunctions.jl
+# Avoid ANSI with Base.transcode
+# Write const functions with backspace and escape sequences
+# Ensure that input string is UTF-8
 
 module Spinners
 

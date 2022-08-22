@@ -23,8 +23,11 @@ module Spinners
 
 export spinner
 
+const BACKSPACE = '\b'
+# '\U8' == '\b'
+
 function erase_display(s::String)
-	print("\b"^sizeof(s), " "^length(s), "\b"^length(s))
+	print(BACKSPACE^sizeof(s), " "^length(s), BACKSPACE^length(s))
 end
 
 function get_element(s::Vector, i::Int)
@@ -32,7 +35,7 @@ function get_element(s::Vector, i::Int)
 end
 
 function overwrite_display(old::String, new::String)
-	print("\b"^sizeof(old), new, "\b"^max(0,length(new)-length(old)))
+	print(BACKSPACE^sizeof(old), new, BACKSPACE^max(0,length(new)-length(old)))
 end
 
 function spinner(

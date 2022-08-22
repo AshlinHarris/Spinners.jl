@@ -1,7 +1,6 @@
 # https://docs.julialang.org/en/v1/manual/strings/
 
 #Issues:
-#Loadin
 # Add moving spinner?
 # Add mode=:flip (playing cards)
 # Fix the final cleanup step

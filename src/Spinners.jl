@@ -32,7 +32,6 @@ export spinner
 const BACKSPACE = '\b' # '\U8' == '\b'
 const ANSI_ESCAPE = '\u001B'
 
-# duplicate of overwrite?
 function erase_display(s::String, blank::String)
 	print(BACKSPACE^sizeof(s), blank^length(s), BACKSPACE^length(s))
 end
@@ -43,8 +42,10 @@ end
 
 const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 
-function overwrite_display(old::String, new::String)
-	print(BACKSPACE^sizeof(old), new, BACKSPACE^max(0,length(new)-length(old)))
+function overwrite_display(old::String, new::String, blank::String)
+	#print(BACKSPACE^sizeof(old), new, BACKSPACE^max(0,length(new)-length(old)))
+	erase_display(old, blank)
+	print(new)
 end
 
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
@@ -115,7 +116,7 @@ function spinner(
 			i = 0
 			while !istaskdone(t)
 				next_char = get_element(v_string, ( i % l)  + 1 ) * " "
-				overwrite_display(STR_TO_DELETE, next_char)
+				overwrite_display(STR_TO_DELETE, next_char, blank)
 				sleep(time)
 				STR_TO_DELETE = next_char
 				i = i + 1
@@ -130,7 +131,7 @@ function spinner(
 				i = rand(1:l)
 				while !istaskdone(t)
 					next_char = get_element(v_string, i) * " "
-					overwrite_display(STR_TO_DELETE, next_char)
+					overwrite_display(STR_TO_DELETE, next_char, blank)
 					sleep(time)
 					STR_TO_DELETE = next_char
 					i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
@@ -145,7 +146,7 @@ function spinner(
 		elseif mode == :unfurl
 			# Spinner
 			# prime the loop
-			overwrite_display(STR_TO_DELETE, get_element(v_string, 1))
+			overwrite_display(STR_TO_DELETE, get_element(v_string, 1), blank)
 			sleep(time)
 			i = 1
 			while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
@@ -169,7 +170,7 @@ function spinner(
 		# Print after string
 		
 		if cleanup == true
-			overwrite_display(before*raw_string, after)
+			overwrite_display(before*raw_string, after, blank)
 		else
 			println("\n",after)
 		end

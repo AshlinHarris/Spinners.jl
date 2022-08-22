@@ -2,6 +2,7 @@
 # https://docs.julialang.org/en/v1/manual/strings/
 
 #Issues for 0.1
+# Some issues with Unicode may be due to Windows terminal
 # Reliance on ANSI escape sequences
 # Avoid ANSI with Base.transcode?
 # What if the task also prints?

@@ -1,27 +1,24 @@
 
 # https://docs.julialang.org/en/v1/manual/strings/
 
-#Issues:
+#Issues for 0.1
+# Reliance on ANSI escape sequences
+# Avoid ANSI with Base.transcode?
+# What if the task also prints?
+# Does this slow down computation significantly?
+# Ensure that input string is UTF-8
+	# Notice that the code depends on some particular ANSI escape sequences.
+
+#Issues for later versions:
 # Add moving spinner?
 # Add mode=:flip (playing cards)
-# Fix the final cleanup step
-# 	Differentiate between character to end on and ending message?
-# Reliance on ANSI escape sequences
-# What if the task also prints?
-# Isn't there a better way to work with Unicode in Julia
 # Display multiple spinners
 # Display larger spinners (at least wider)
-# Does this slow down computation significantly?
 # Documentation
 #	\U, escape forms, s[begin], s[end]
 #	use length(s) for number of characers
 #	collect(eachindex(s))
 #	careful with concatenation
-# Look into PartialFunctions.jl
-# Avoid ANSI with Base.transcode
-# Write const functions with backspace and escape sequences
-# Ensure that input string is UTF-8
-	# Notice that the code depends on some particular ANSI escape sequences.
 
 module Spinners
 
@@ -142,10 +139,6 @@ function spinner(
 					STR_TO_DELETE = next_char
 					i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 				end
-				if isnothing(after)
-					#after = get_element(v_string, 1);
-					after = "✔️"
-				end
 			else
 				print(get_element(v_string, 1))
 			end
@@ -186,5 +179,11 @@ function spinner(
 		show_cursor()
 	end
 end
+
+# spinner()
+# julia> t = @async sleep(5); spinner(t, :moon, before="👀:")
+# julia> t = @async sleep(5); spinner(t, :braille, 0.05, mode=:rand, after="⣿")
+# t = @async sleep(5); spinner(t, :braille, 0.05, mode=:rand, after="⣿")
+# julia> t = @async sleep(5); spinner(t, "........", 0.08, mode=:unfurl, before="Loading", after="Finished", cleanup=false)
 
 end # module Spinners

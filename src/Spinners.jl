@@ -1,3 +1,5 @@
+#  t = @async sleep(5); spinner(t, "🂫🂬🂭🂮🂡", mode=:unfurl, blank = "🂠", cleanup=false)
+
 # https://docs.julialang.org/en/v1/manual/strings/
 
 #Issues:

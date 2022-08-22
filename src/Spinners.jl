@@ -1,3 +1,4 @@
+
 # https://docs.julialang.org/en/v1/manual/strings/
 
 #Issues:
@@ -24,6 +25,8 @@
 
 module Spinners
 
+using Unicode: transcode
+
 export spinner
 
 const BACKSPACE = '\b' # '\U8' == '\b'
@@ -34,7 +37,7 @@ function clear_field(s::String, blank::String)
 end
 
 function erase_display(s::String, blank::String)
-	print(BACKSPACE^sizeof(s), blank^length(s), BACKSPACE^length(s))
+	print(BACKSPACE^length(transcode(UInt16, s)), blank^length(s), BACKSPACE^(length(transcode(UInt16, blank^length(s) ))))
 end
 
 function get_element(s::Vector, i::Int)
@@ -44,7 +47,6 @@ end
 const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 
 function overwrite_display(old::String, new::String, blank::String)
-	#print(BACKSPACE^sizeof(old), new, BACKSPACE^max(0,length(new)-length(old)))
 	erase_display(old, blank)
 	print(new)
 end

@@ -11,7 +11,7 @@ Documentation for [Spinners.jl](https://github.com/AshlinHarris/Spinners.jl).
 
 # Examples
 
-```@example
+```@raw
 (rd, wr) = redirect_stdout() # hide
 using Spinners
 
@@ -37,7 +37,7 @@ Order = [:function]
 # Limitations
 The intended use case is for visible ASCII characters and emojis.
 These should hopefully work on most any modern ANSI terminal, regardless of operating system.
-Windows terminal will have issues with some UTF-8 characters.
+Windows terminal will have issues with some UTF-8 characters, which it displays with additional space.
 Certain character sets (UTF-16, alphabets that print right to left, etc.) are not currently supported.
 
 

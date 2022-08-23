@@ -12,7 +12,7 @@ Documentation for [Spinners.jl](https://github.com/AshlinHarris/Spinners.jl).
 # Examples
 
 ```@example
-using Spinner
+using Spinners
 
 spinner()
 t = @async sleep(5); spinner(t, :moon)

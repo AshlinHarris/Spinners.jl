@@ -51,6 +51,21 @@ end
 
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
+"""
+	function spinner(t, string, time)
+Add column to a DataFrame based on symbol presence in the target DataFrame
+# Arguments
+- `t::Union{Task, Nothing}`: The spinner is shown until this task terminates.
+- `string::Union{String, Symbol, Nothing}`: Cycle through the characters in this string. For convenience, some example strings can be selected with a symbol: :arrow, :bar, :blink, :dots, :moon, :pinwheel, :shutter
+- `time::Union{Number, Nothing}`: Number of seconds per frame
+# Options
+- `mode::Union{Symbol, Nothing}`: :spin, :random, or :unfurl
+- `before::Union{String, Nothing}`: Text to display in front of the spinner
+- `after::Union{String, Nothing}`: Text to display after the spinner has finished
+- `blank::Union{String, Nothing}`: Character to be treated as a blank
+- `cleanup::Union{Bool, Nothing}`: Erase the spinner after it has finished?
+"""
+
 function spinner(
 	t::Union{Task, Nothing}=nothing,
 	string::Union{String, Symbol, Nothing}=nothing,
@@ -73,15 +88,15 @@ function spinner(
 		raw_string = "\\|/-"
 	elseif string == :arrows
 		raw_string = "←↖↑↗→↘↓↙"
-	elseif string == :bars
+	elseif string == :bar
 		raw_string = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
-	elseif string == :dots
-		raw_string = dots="⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊⠋⠌⠍⠎⠏⠐⠑⠒⠓⠔⠕⠖⠗⠘⠙⠚⠛⠜⠝⠞⠟⠠⠡⠢⠣⠤⠥⠦⠧⠨⠩⠪⠫⠬⠭⠮⠯⠰⠱⠲⠳⠴⠵⠶⠷⠸⠹⠺⠻⠼⠽⠾⠿⡀⡁⡂⡃⡄⡅⡆⡇⡈⡉⡊⡋⡌⡍⡎⡏⡐⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡟⡠⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡯⡰⡱⡲⡳⡴⡵⡶⡷⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⢈⢉⢊⢋⢌⢍⢎⢏⢐⢑⢒⢓⢔⢕⢖⢗⢘⢙⢚⢛⢜⢝⢞⢟⢠⢡⢢⢣⢤⢥⢦⢧⢨⢩⢪⢫⢬⢭⢮⢯⢰⢱⢲⢳⢴⢵⢶⢷⢸⢹⢺⢻⢼⢽⢾⢿⣀⣁⣂⣃⣄⣅⣆⣇⣈⣉⣊⣋⣌⣍⣎⣏⣐⣑⣒⣓⣔⣕⣖⣗⣘⣙⣚⣛⣜⣝⣞⣟⣠⣡⣢⣣⣤⣥⣦⣧⣨⣩⣪⣫⣬⣭⣮⣯⣰⣱⣲⣳⣴⣵⣶⣷⣸⣹⣺⣻⣼⣽⣾⣿"
 	elseif string == :blink
 		raw_string="⊙⊙⊙⊙⊙⊙⊙⊙⊙◡"
+	elseif string == :dots
+		raw_string = dots="⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊⠋⠌⠍⠎⠏⠐⠑⠒⠓⠔⠕⠖⠗⠘⠙⠚⠛⠜⠝⠞⠟⠠⠡⠢⠣⠤⠥⠦⠧⠨⠩⠪⠫⠬⠭⠮⠯⠰⠱⠲⠳⠴⠵⠶⠷⠸⠹⠺⠻⠼⠽⠾⠿⡀⡁⡂⡃⡄⡅⡆⡇⡈⡉⡊⡋⡌⡍⡎⡏⡐⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡟⡠⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡯⡰⡱⡲⡳⡴⡵⡶⡷⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⢈⢉⢊⢋⢌⢍⢎⢏⢐⢑⢒⢓⢔⢕⢖⢗⢘⢙⢚⢛⢜⢝⢞⢟⢠⢡⢢⢣⢤⢥⢦⢧⢨⢩⢪⢫⢬⢭⢮⢯⢰⢱⢲⢳⢴⢵⢶⢷⢸⢹⢺⢻⢼⢽⢾⢿⣀⣁⣂⣃⣄⣅⣆⣇⣈⣉⣊⣋⣌⣍⣎⣏⣐⣑⣒⣓⣔⣕⣖⣗⣘⣙⣚⣛⣜⣝⣞⣟⣠⣡⣢⣣⣤⣥⣦⣧⣨⣩⣪⣫⣬⣭⣮⣯⣰⣱⣲⣳⣴⣵⣶⣷⣸⣹⣺⣻⣼⣽⣾⣿"
 	elseif string == :moon
 		raw_string="🌑🌒🌓🌔🌕🌖🌗🌘"
-	elseif string == :shutters
+	elseif string == :shutter
 		raw_string = "▉▊▋▌▍▎▏▎▍▌▋▊▉"
 	else
 		#error

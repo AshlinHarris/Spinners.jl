@@ -12,6 +12,8 @@ Documentation for [Spinners.jl](https://github.com/AshlinHarris/Spinners.jl).
 # Examples
 
 ```@example
+using Spinner
+
 spinner()
 t = @async sleep(5); spinner(t, :moon)
 t = @async sleep(5); spinner(t, "........", 0.08, mode=:unfurl, before="Loading", after="Finished", cleanup=false)

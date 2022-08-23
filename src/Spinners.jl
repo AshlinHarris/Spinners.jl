@@ -66,6 +66,7 @@ function spinner(
 	if isnothing(t)
 		t = @async sleep(3)
 	end
+	# Declare raw_string in this scope?
 	if typeof(string) == String
 		raw_string = string
 	elseif isnothing(string) || string == :pinwheel

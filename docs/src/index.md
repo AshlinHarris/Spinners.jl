@@ -12,6 +12,7 @@ Documentation for [Spinners.jl](https://github.com/AshlinHarris/Spinners.jl).
 # Examples
 
 ```@example
+(rd, wr) = redirect_stdout() # hide
 using Spinners
 
 spinner()

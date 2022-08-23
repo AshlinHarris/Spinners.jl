@@ -69,7 +69,7 @@ Add column to a DataFrame based on symbol presence in the target DataFrame
 function spinner(
 	t::Union{Task, Nothing}=nothing,
 	string::Union{String, Symbol, Nothing}=nothing,
-	time::Union{AbstractFloat, Nothing}=nothing;
+	time::Union{Number, Nothing}=nothing;
 	mode::Union{Symbol, Nothing}=nothing,
 	before::Union{String, Nothing}=nothing,
 	after::Union{String, Nothing}=nothing,

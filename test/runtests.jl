@@ -33,6 +33,11 @@ output_test(
 )
 
 output_test(
+	:(t=@async Task(:); spinner(t, "1234567890", 2)),
+	"\e[?25l          \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b          \b\b\b\b\b\b\b\b\b\b✔️\e[0J\e[?25h"
+)
+
+output_test(
 	:(t=@async Task(:); spinner(t, "🌑🌒🌓🌔🌕🌖🌗🌘")),
 	"\e[?25l        \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b        \b\b\b\b\b\b\b\b✔️\e[0J\e[?25h"
 )

@@ -44,6 +44,10 @@ end
 
 const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 
+function task_is_still_running(t::Task)
+	return !istaskdone(t)
+end
+
 function overwrite_display(old::String, new::String, blank::String)
 	erase_display(old, blank)
 	print(new)
@@ -134,7 +138,7 @@ function spinner(
 		if mode == :spin
 			# Spinner
 			i = 0
-			while !istaskdone(t)
+			while task_is_still_running(t)
 				next_char = get_element(v_string, ( i % l)  + 1 ) * " "
 				overwrite_display(STR_TO_DELETE, next_char, blank)
 				sleep(time)
@@ -149,7 +153,7 @@ function spinner(
 			if l > 1
 				# Spinner
 				i = rand(1:l)
-				while !istaskdone(t)
+				while task_is_still_running(t)
 					next_char = get_element(v_string, i) * " "
 					overwrite_display(STR_TO_DELETE, next_char, blank)
 					sleep(time)
@@ -165,7 +169,7 @@ function spinner(
 			overwrite_display(STR_TO_DELETE, get_element(v_string, 1), blank)
 			sleep(time)
 			i = 1
-			while !istaskdone(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
+			while task_is_still_running(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
 				m = ( i % l + 1)
 				if m == 1
 					sleep(time*3)

@@ -122,6 +122,10 @@ function spinner(
 	if isnothing(cleanup)
 		cleanup = true
 	end
+	if isnothing(after)
+		#after = get_element(v_string, 1);
+		after = "✔️"
+	end
 
 	v_string = collect(raw_string)
 
@@ -144,10 +148,6 @@ function spinner(
 				sleep(time)
 				STR_TO_DELETE = next_char
 				i = i + 1
-			end
-			if isnothing(after)
-				#after = get_element(v_string, 1);
-				after = "✔️"
 			end
 		elseif mode == :random || mode == :haphazard || mode == :rand
 			if l > 1

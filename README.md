@@ -10,6 +10,13 @@ Draw a string animation cycle (spinner) until a given task completes.
 This tool is designed primarily for visible ASCII characters, emojis, or a mix of both.
 See the [documentation](https://ashlinharris.github.io/Spinners.jl/stable/#Examples) for examples, and for further information.
 
+The current version is a working prototype with some Unicode support. The emphasis of v0.2 will be running the spinner on its own process and adding a macro for ease of use, and I might focus on performance for v0.3.
+
+`Spinners.jl` (once it's mature) might be most useful for displaying elements while files are being downloaded or written to disk.
+They serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted.
+It isn't advisable to add terminal elements that are overly distracting unless there is a need.
+For optimal performance and minimal energy consumption, it might be better to use a static message, or nothing at all.
+
 # At a glance
 
 ![spinner](https://user-images.githubusercontent.com/90787010/186546184-33b4a8af-779a-439b-a41c-ae84cedae4f1.gif)

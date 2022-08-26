@@ -53,6 +53,10 @@ function overwrite_display(old::String, new::String, blank::String)
 	print(new)
 end
 
+function pause_animation(s)
+	sleep(s)
+end
+
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 """
@@ -145,7 +149,7 @@ function spinner(
 			while task_is_still_running(t)
 				next_char = get_element(v_string, ( i % l)  + 1 ) * " "
 				overwrite_display(STR_TO_DELETE, next_char, blank)
-				sleep(time)
+				pause_animation(time)
 				STR_TO_DELETE = next_char
 				i = i + 1
 			end
@@ -156,7 +160,7 @@ function spinner(
 				while task_is_still_running(t)
 					next_char = get_element(v_string, i) * " "
 					overwrite_display(STR_TO_DELETE, next_char, blank)
-					sleep(time)
+					pause_animation(time)
 					STR_TO_DELETE = next_char
 					i = rand(filter((x) -> x!= i, 1:l)) # Don't allow repeats
 				end
@@ -167,16 +171,16 @@ function spinner(
 			# Spinner
 			# prime the loop
 			overwrite_display(STR_TO_DELETE, get_element(v_string, 1), blank)
-			sleep(time)
+			pause_animation(time)
 			i = 1
 			while task_is_still_running(t) || i % l + 1 != 1 # Print the remainder of the v_string at the end
 				m = ( i % l + 1)
 				if m == 1
-					sleep(time*3)
+					pause_animation(time*3)
 					erase_display(raw_string, blank)
 				end
 				print(get_element(v_string, m))
-				sleep(time)
+				pause_animation(time)
 				i = i + 1
 			end
 			if isnothing(after)

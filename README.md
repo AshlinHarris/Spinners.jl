@@ -30,4 +30,8 @@ For optimal performance and minimal energy consumption, it might be better to us
 ## Related Packages
 
 - [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)
+  - Includes feature from [Spinner.jl](https://github.com/rahulkp220/Spinner.jl)
 - [ProgressBars.jl](https://github.com/cloud-oak/ProgressBars.jl)
+- Pkg.jl spinners:
+  - [MiniProgressBars.jl](https://github.com/JuliaLang/Pkg.jl/blob/master/src/MiniProgressBars.jl)
+  - [API.jl](https://github.com/JuliaLang/Pkg.jl/blob/master/src/API.jl)

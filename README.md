@@ -9,7 +9,6 @@ Command line spinners in Julia with decent Unicode support
 ## Description
 
 Draw a string animation cycle (spinner) until a given command completes.
-This tool is designed primarily for visible ASCII characters, emojis, or a mix of both.
 See the [documentation](https://ashlinharris.github.io/Spinners.jl/stable/#Examples) for examples, and for further information.
 
 Currently, the `\@spinners` macro doesn't allow customization, but this is will be the development focus for v0.3.

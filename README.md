@@ -25,8 +25,14 @@ I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.j
 
 ## At a glance
 ```
-@spinner sleep(4)
+# Usage: 
 # @spinner result = some_long_function(); println(result)
+
+# Features available in the stable release:
+@spinner sleep(4)
+
+# Features available in the development version
+@spinner "🌑🌒🌓🌔🌕🌖🌗🌘" sleep(4) # Customize the character set
 ```
 
 ![spinner](https://user-images.githubusercontent.com/90787010/186546184-33b4a8af-779a-439b-a41c-ae84cedae4f1.gif)

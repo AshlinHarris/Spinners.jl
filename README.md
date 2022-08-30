@@ -11,7 +11,7 @@ Command line spinners in Julia with decent Unicode support
 Draw a string animation cycle (spinner) until a given command completes.
 See the [documentation](https://ashlinharris.github.io/Spinners.jl/stable/#Examples) for examples, and for further information.
 
-Currently, the `\@spinner` macro doesn't allow customization, but this is will be the development focus for v0.3.
+Currently, the `\@spinner` macro doesn't allow customization, but this feature is available in the current development version (and the upcoming tagged release).
 The function `spinner()` allows customization but doesn't actually run the spinner as a separate process and will be deprecated in v0.3.
 The API might change drastically until v1.0.  
 
@@ -28,10 +28,10 @@ I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.j
 # Usage: 
 # @spinner result = some_long_function(); println(result)
 
-# Features available in the stable release:
+# Features available in v0.2:
 @spinner sleep(4)
 
-# Features available in the development version
+# Features available in the development version (upcoming v0.3)
 @spinner "🌑🌒🌓🌔🌕🌖🌗🌘" sleep(4) # Customize the character set
 ```
 

@@ -25,7 +25,7 @@ module Spinners
 
 using Unicode: transcode
 
-export spinner
+export spinner, @spinner
 
 const BACKSPACE = '\b' # '\U8' == '\b'
 const ANSI_ESCAPE = '\u001B'
@@ -211,5 +211,28 @@ end
 # julia> t = @async sleep(5); spinner(t, :dots, 0.05, mode=:rand, after="⣿")
 # t = @async sleep(5); spinner(t, :dots, 0.05, mode=:rand, after="⣿")
 # julia> t = @async sleep(5); spinner(t, "........", 0.08, mode=:unfurl, before="Loading", after="Finished", cleanup=false)
+
+function before()
+	c = "while true;" *
+	"for i in \"\\\\|/-\";" *
+	"print(\"\\b\$i\");" *
+	"sleep(0.1);" *
+	"end;" *
+	"end"
+
+	# Display the spinner as an external program
+	return run(pipeline(` julia -e $c`, stdout), wait=false)
+end
+
+function after(p)
+	kill(p)
+	print("\b")
+end
+
+macro spinner(f)
+
+	:( p = before(); $f; kill(p); print("\b") )
+
+end
 
 end # module Spinners

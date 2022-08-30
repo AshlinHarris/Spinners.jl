@@ -1,4 +1,3 @@
-
 # https://docs.julialang.org/en/v1/manual/strings/
 
 #Issues for 0.1
@@ -6,8 +5,7 @@
 # Reliance on ANSI escape sequences
 # Avoid ANSI with Base.transcode?
 # What if the task also prints?
-# Does this slow down computation significantly?
-# Ensure that input string is UTF-8
+# Ensure that input string is UTF-16
 	# Notice that the code depends on some particular ANSI escape sequences.
 
 #Issues for later versions:
@@ -214,9 +212,10 @@ end
 
 function before()
 	c = "while true;" *
-	"for i in \"\\\\|/-\";" *
-	"print(\"\\b\$i\");" *
-	"sleep(0.1);" *
+	"for i in collect(\"◒◐◓◑\");" *
+	"print(\"\$i\");" *
+	"sleep(0.2);" *
+	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *
 	"end;" *
 	"end"
 
@@ -236,3 +235,5 @@ macro spinner(f)
 end
 
 end # module Spinners
+
+

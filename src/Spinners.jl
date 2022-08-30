@@ -231,7 +231,7 @@ end
 
 macro spinner(f)
 
-	:( p = before(); $f; kill(p); print("\b") )
+	:( p = before(); $(esc(f)); kill(p); print("\b") )
 
 end
 

@@ -14,6 +14,7 @@ See the [documentation](https://ashlinharris.github.io/Spinners.jl/stable/#Examp
 
 Currently, the `\@spinners` macro doesn't allow customization, but this is will be the development focus for v0.3.
 The function `spinner()` allows customization but doesn't actually run the spinner as a separate process and will be deprecated in v0.3.
+The API might change drastically until v1.0.  
 
 `Spinners.jl` (once it's mature) might be most useful for displaying elements while files are being downloaded or written to disk.
 They serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted.

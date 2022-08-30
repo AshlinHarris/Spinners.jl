@@ -20,6 +20,10 @@ It isn't advisable to add terminal elements that are overly distracting unless t
 For optimal performance and minimal energy consumption, it might be better to use a static message, or nothing at all.
 
 ## At a glance
+```
+ @spinner result = some_long_function(); println(result)
+ ```
+
 
 ![spinner](https://user-images.githubusercontent.com/90787010/186546184-33b4a8af-779a-439b-a41c-ae84cedae4f1.gif)
 ![cards](https://user-images.githubusercontent.com/90787010/186546176-442681d3-0584-48c0-9452-912c844a5112.gif)

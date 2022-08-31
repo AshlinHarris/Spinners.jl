@@ -241,6 +241,9 @@ function after(p)
 	print("\b")
 end
 
+macro spinner()
+	:( @spinner sleep(4) )
+end
 macro spinner(s, f)
 	:( p = before($s); $(esc(f)); kill(p); print("\b") )
 end

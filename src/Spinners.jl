@@ -69,8 +69,6 @@ function get_named_string(x::Symbol)
 
 	elseif x == :moon
 		s="🌑🌒🌓🌔🌕🌖🌗🌘"
-#=
-	# Ask for Sindre's permission
 	elseif x == :pong # https://github.com/sindresorhus/cli-spinners
 		s = [
 			"▐⠂       ▌",
@@ -104,7 +102,6 @@ function get_named_string(x::Symbol)
 			"▐ ⡀      ▌",
 			"▐⠠       ▌"
 		]
-=#
 	elseif x == :shutter
 		s = "▉▊▋▌▍▎▏▎▍▌▋▊▉"
 	elseif x == :snail

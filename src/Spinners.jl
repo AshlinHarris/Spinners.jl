@@ -1,26 +1,3 @@
-# https://docs.julialang.org/en/v1/manual/strings/
-
-#Issues
-# Can't use multiple spinners
-#	@spinner :moon @spinner
-# Some issues with Unicode may be due to Windows terminal
-# Reliance on ANSI escape sequences
-# Avoid ANSI with Base.transcode?
-# What if the task also prints?
-# Ensure that input string is UTF-16
-	# Notice that the code depends on some particular ANSI escape sequences.
-
-#Issues for later versions:
-# Add moving spinner?
-# Add mode=:flip (playing cards)
-# Display multiple spinners
-# Display larger spinners (at least wider)
-# Documentation
-#	\U, escape forms, s[begin], s[end]
-#	use length(s) for number of characers
-#	collect(eachindex(s))
-#	careful with concatenation
-
 module Spinners
 
 using Unicode: transcode

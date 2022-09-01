@@ -234,13 +234,19 @@ function after(p)
 end
 
 macro spinner()
-	:( @spinner sleep(4) )
+	quote
+		@spinner sleep(4)
+	end
 end
 macro spinner(s, f)
-	:( p = before($s); $(esc(f)); kill(p); print("\b") )
+	quote
+		p = before($s); $(esc(f)); kill(p); print("\b")
+	end
 end
 macro spinner(f)
-	:( p = before(); $(esc(f)); kill(p); print("\b") )
+	quote
+		p = before(); $(esc(f)); kill(p); print("\b")
+	end
 end
 
 end # module Spinners

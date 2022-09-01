@@ -212,8 +212,9 @@ end
 
 function get_named_string(x::Symbol)::String
 	if x == :pinwheel
-		s = "\\|/-"
-	elseif x == :arrows
+		#s = "\\|/-"
+		s = join(Char.([92, 124, 47, 45]))
+	if x == :arrow
 		s = "←↖↑↗→↘↓↙"
 	elseif x == :bar
 		s = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"

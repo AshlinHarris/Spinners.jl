@@ -252,31 +252,37 @@ function __start_up(s)
 	return run(pipeline(` julia -e $c`, stdout), wait=false)
 end
 
-function __clean_up(p)
+function __clean_up(p, s)
 	kill(p)
+
+	# Calculate the number of spaces needed to overwrite the printed character
+	# Notice that this might exceed the required number, which could delete preceding characters
+	amount = maximum(length.(transcode.(UInt8, "$x" for x in collect(s))))
+	print("\b"^amount * " "^amount * "\b"^amount)
 	show_cursor()
-	print("\b")
 end
 
 macro spinner(x::QuoteNode)
 	quote
 		local p
+		local s = get_named_string($x)
 		try
-			p = __start_up(get_named_string($x))
+			p = __start_up(s)
 			sleep(4)
 		finally
-			__clean_up(p)
+			__clean_up(p, s)
 		end
 	end
 end
 macro spinner(x::QuoteNode, f)
 	quote
 		local p
+		local s = get_named_string($x)
 		try
-			p = __start_up(get_named_string($x))
+			p = __start_up(s)
 			$(esc(f))
 		finally
-			__clean_up(p)
+			__clean_up(p,s)
 		end
 	end
 end

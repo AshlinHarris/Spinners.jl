@@ -182,7 +182,7 @@ macro spinner(s::String, f)
 			p = __start_up($s)
 			$(esc(f))
 		finally
-			__clean_up(p,s)
+			__clean_up(p,$s)
 		end
 	end
 end

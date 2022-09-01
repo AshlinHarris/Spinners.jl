@@ -234,7 +234,7 @@ macro spinner()
 		@spinner sleep(4)
 	end
 end
-macro spinner(s, f)
+macro spinner(s::String, f)
 	quote
 		p = before($s)
 		$(esc(f))
@@ -245,6 +245,11 @@ end
 macro spinner(f)
 	quote
 		@spinner "◒◐◓◑" $(esc(f))
+	end
+end
+macro spinner(s::String)
+	quote
+		@spinner $s sleep(4)
 	end
 end
 

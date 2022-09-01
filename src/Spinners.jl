@@ -214,7 +214,7 @@ function before(s)
 	c = "while true;" *
 	"for i in collect(\"$s\");" *
 	"print(\"\$i\");" *
-	"sleep(0.2);" *
+	"sleep(0.125);" *
 	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *
 	"end;" *
 	"end"
@@ -227,7 +227,7 @@ function before()
 	c = "while true;" *
 	"for i in collect(\"◒◐◓◑\");" *
 	"print(\"\$i\");" *
-	"sleep(0.2);" *
+	"sleep(0.125);" *
 	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *
 	"end;" *
 	"end"

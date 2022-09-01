@@ -42,10 +42,16 @@ I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.j
 ![moon](https://user-images.githubusercontent.com/90787010/186546183-81ecd202-eb44-44d0-9ec3-36092af0b0f8.gif)
 
 ## Related Packages
-
+In Julia:
 - [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)
   - Includes feature from [Spinner.jl](https://github.com/rahulkp220/Spinner.jl)
 - [ProgressBars.jl](https://github.com/cloud-oak/ProgressBars.jl)
 - Pkg.jl spinners:
   - [MiniProgressBars.jl](https://github.com/JuliaLang/Pkg.jl/blob/master/src/MiniProgressBars.jl)
   - [API.jl](https://github.com/JuliaLang/Pkg.jl/blob/master/src/API.jl)
+  
+Other projects:
+- [cli-spinners](https://github.com/sindresorhus/cli-spinners)
+  - Some assets in Spinners.jl come from here.
+  
+

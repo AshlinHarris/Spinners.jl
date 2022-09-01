@@ -236,7 +236,9 @@ function get_named_string(x::Symbol)::String
 	return s
 end
 
-function before(s)
+function __start_up(s)
+
+	hide_cursor()
 
 	c = "while true;" *
 	"for i in collect(\"$s\");" *
@@ -250,8 +252,9 @@ function before(s)
 	return run(pipeline(` julia -e $c`, stdout), wait=false)
 end
 
-function after(p)
+function __clean_up(p)
 	kill(p)
+	show_cursor()
 	print("\b")
 end
 
@@ -259,13 +262,10 @@ macro spinner(x::QuoteNode)
 	quote
 		local p
 		try
-			hide_cursor()
-			p = before(get_named_string($x))
+			p = __start_up(get_named_string($x))
 			sleep(4)
 		finally
-			kill(p)
-			print("\b")
-			show_cursor()
+			__clean_up(p)
 		end
 	end
 end
@@ -273,13 +273,10 @@ macro spinner(x::QuoteNode, f)
 	quote
 		local p
 		try
-			hide_cursor()
-			p = before(get_named_string($x))
+			p = __start_up(get_named_string($x))
 			$(esc(f))
 		finally
-			kill(p)
-			print("\b")
-			show_cursor()
+			__clean_up(p)
 		end
 	end
 end
@@ -292,12 +289,10 @@ macro spinner(s::String, f)
 	quote
 		local p
 		try
-			hide_cursor()
-			p = before($s)
+			p = __start_up($s)
 			$(esc(f))
 		finally
 			kill(p)
-			print("\b")
 			show_cursor()
 		end
 	end

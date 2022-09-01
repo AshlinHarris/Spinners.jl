@@ -210,22 +210,14 @@ end
 # t = @async sleep(5); spinner(t, :dots, 0.05, mode=:rand, after="⣿")
 # julia> t = @async sleep(5); spinner(t, "........", 0.08, mode=:unfurl, before="Loading", after="Finished", cleanup=false)
 
-function before(s)
+function before(s=nothing)
+
+	if isnothing(s)
+		s = "◒◐◓◑"
+	end
+
 	c = "while true;" *
 	"for i in collect(\"$s\");" *
-	"print(\"\$i\");" *
-	"sleep(0.125);" *
-	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *
-	"end;" *
-	"end"
-
-	# Display the spinner as an external program
-	return run(pipeline(` julia -e $c`, stdout), wait=false)
-end
-
-function before()
-	c = "while true;" *
-	"for i in collect(\"◒◐◓◑\");" *
 	"print(\"\$i\");" *
 	"sleep(0.125);" *
 	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *

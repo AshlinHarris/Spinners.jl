@@ -210,11 +210,7 @@ end
 # t = @async sleep(5); spinner(t, :dots, 0.05, mode=:rand, after="⣿")
 # julia> t = @async sleep(5); spinner(t, "........", 0.08, mode=:unfurl, before="Loading", after="Finished", cleanup=false)
 
-function before(s=nothing)
-
-	if isnothing(s)
-		s = "◒◐◓◑"
-	end
+function before(s)
 
 	c = "while true;" *
 	"for i in collect(\"$s\");" *
@@ -240,12 +236,15 @@ macro spinner()
 end
 macro spinner(s, f)
 	quote
-		p = before($s); $(esc(f)); kill(p); print("\b")
+		p = before($s)
+		$(esc(f))
+		kill(p)
+		print("\b")
 	end
 end
 macro spinner(f)
 	quote
-		p = before(); $(esc(f)); kill(p); print("\b")
+		@spinner "◒◐◓◑" $(esc(f))
 	end
 end
 

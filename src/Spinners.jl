@@ -1,6 +1,8 @@
 # https://docs.julialang.org/en/v1/manual/strings/
 
-#Issues for 0.1
+#Issues
+# Can't use multiple spinners
+#	@spinner :moon @spinner
 # Some issues with Unicode may be due to Windows terminal
 # Reliance on ANSI escape sequences
 # Avoid ANSI with Base.transcode?
@@ -25,35 +27,13 @@ using Unicode: transcode
 
 export @spinner
 
-const BACKSPACE = '\b' # '\U8' == '\b'
+const BACKSPACE = '\b'
 const ANSI_ESCAPE = '\u001B'
 
-function clear_field(s::String, blank::String)
-	print(blank^length(s), BACKSPACE^length(s))
-end
-
-function erase_display(s::String, blank::String)
-	print(BACKSPACE^length(transcode(UInt16, s)), blank^length(s), BACKSPACE^(length(transcode(UInt16, blank^length(s) ))))
-end
-
-function get_element(s::Vector, i::Int)
-	return string(s[i])
-end
-
 const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
-
-function task_is_still_running(t::Task)
-	return !istaskdone(t)
-end
-
-function overwrite_display(old::String, new::String, blank::String)
-	erase_display(old, blank)
-	print(new)
-end
+const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 const default_user_function() = sleep(3)
-
-const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 function get_named_string(x::Symbol)::String
 	if x == :arrow
@@ -156,5 +136,4 @@ macro spinner(s::String)
 end
 
 end # module Spinners
-
 

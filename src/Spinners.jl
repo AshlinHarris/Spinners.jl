@@ -12,13 +12,32 @@ const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 const default_user_function() = sleep(3)
 
-function get_named_string(x::Symbol)::String
+function get_named_string(x::Symbol)
 	if x == :arrow
 		s = "←↖↑↗→↘↓↙"
 	elseif x == :bar
 		s = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
 	elseif x == :blink
 		s="⊙⊙⊙⊙⊙⊙⊙◡"
+	elseif x == :cards
+		s=["🂠🂠🂠🂠🂠",
+		"🂪🂠🂠🂠🂠",
+		"🂪🂫🂠🂠🂠",
+		"🂪🂫🂭🂠🂠",
+		"🂪🂫🂭🂮🂠",
+		"🂪🂫🂭🂮🂱",
+		"🂪🂫🂭🂮🂱",
+		"🂪🂫🂭🂮🂱",
+		"🂪🂫🂭🂮🂱",
+		"🂠🂫🂭🂮🂱",
+		"🂠🂠🂭🂮🂱",
+		"🂠🂠🂠🂮🂱",
+		"🂠🂠🂠🂠🂱",
+		"🂠🂠🂠🂠🂠",
+		"🂠🂠🂠🂠🂠",
+		"🂠🂠🂠🂠🂠",
+		"🂠🂠🂠🂠🂠",
+		]
 	elseif x == :dots
 		s = join([Char(i) for i in 0x2801:0x28ff])
 		#  @show map(Unicode.julia_chartransform, x for x in s)
@@ -37,8 +56,14 @@ function __start_up(s)
 
 	hide_cursor()
 
+	if typeof(s) == String
+		text = "for i in collect(\"$s\");"
+	elseif typeof(s) == Vector{String}
+		text = "for i in $s;"
+	end
+
 	c = "while true;" *
-	"for i in collect(\"$s\");" *
+	text *
 	"print(\"\$i\");" *
 	"sleep(0.125);" *
 	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *

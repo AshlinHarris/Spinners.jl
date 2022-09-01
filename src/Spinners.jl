@@ -50,6 +50,8 @@ function get_named_string(x::Symbol)
 			"🂠🂠🂠🂠🂠",
 			"🂠🂠🂠🂠🂠",
 		]
+	elseif x == :clock
+		s = join([Char(i) for i in 0x1f550:0x1f55b])
 	elseif x == :dots
 		s = join([Char(i) for i in 0x2801:0x28ff])
 		#  @show map(Unicode.julia_chartransform, x for x in s)

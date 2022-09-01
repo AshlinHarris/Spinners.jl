@@ -51,9 +51,7 @@ function overwrite_display(old::String, new::String, blank::String)
 	print(new)
 end
 
-function default_user_function()
-	sleep(3)
-end
+const default_user_function() = sleep(3)
 
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
@@ -100,7 +98,7 @@ function __clean_up(p, s)
 	# Calculate the number of spaces needed to overwrite the printed character
 	# Notice that this might exceed the required number, which could delete preceding characters
 	amount = maximum(length.(transcode.(UInt8, "$x" for x in collect(s))))
-	print("\b"^amount * " "^amount * "\b"^amount)
+	print(BACKSPACE^amount * " "^amount * BACKSPACE^amount)
 
 	show_cursor()
 end

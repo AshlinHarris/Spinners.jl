@@ -2,6 +2,10 @@ using Random
 using Spinners
 using Test
 
+usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
+precise_sleep(x) = usleep(Int(x * 1_000_000))
+const short() = precise_sleep(1.5)
+
 # Look at this
 function output_test(command::Expr, expected::String)
 	Random.seed!(37) # Make this depend on the version?
@@ -16,24 +20,33 @@ end
 
 # Don't look at this
 
+
+# These tests rely on sleep(), which is imprecise
+#=
 output_test(
 	:( @spinner ),
 	"\e[?25l◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b\b\b   \b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner sleep(1) ),
-	"\e[?25l◒\b◐\b◓\b◑\b◒\b◐\b\b\b   \b\b\b\e[0J\e[?25h"
+	:( @spinner "1234" ),
+	"\e[?25l◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b\b\b   \b\b\b\e[0J\e[?25h"
+)
+=#
+
+output_test(
+	:( @spinner short() ),
+	"\e[?25l◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b\b\b   \b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner "1234567890" sleep(0.5) ),
-	"\e[?25l1\b2\b \b\e[0J\e[?25h"
+	:( @spinner "1234567890" short() ),
+	"\e[?25l1\b2\b3\b4\b5\b6\b7\b8\b9\b \b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner "abcdefg" sleep(1) ),
-	"\e[?25la\bb\bc\bd\be\bf\b \b\e[0J\e[?25h"
+	:( @spinner "abcdefg" short() ),
+	"\e[?25la\bb\bc\bd\be\bf\bg\ba\bb\b \b\e[0J\e[?25h"
 )
 
 # hexagrams
@@ -45,14 +58,14 @@ output_test(
 # tetragrams
 output_test(
 	:( @spinner "𝌆 𝌇 𝌈 𝌉 𝌊 𝌋 𝌌 𝌍 𝌎 𝌏 𝌐 𝌑 𝌒 𝌓 𝌔 𝌕 𝌖 𝌗 𝌘 𝌙 𝌚 𝌛 𝌜 𝌝 𝌞 𝌟 𝌠 𝌡 𝌢 𝌣 𝌤 𝌥 𝌦 𝌧 𝌨 𝌩 𝌪 𝌫 𝌬 𝌭 𝌮 𝌯 𝌰 𝌱 𝌲 𝌳 𝌴 𝌵 𝌶 𝌷 𝌸 𝌹 𝌺 𝌻 𝌼 𝌽 𝌾
-𝌿 𝍀 𝍁 𝍂 𝍃 𝍄 𝍅 𝍆 𝍇 𝍈 𝍉 𝍊 𝍋 𝍌 𝍍 𝍎 𝍏 𝍐 𝍑 𝍒 𝍓 𝍔 𝍕 𝍖 " sleep(0.5) ),
-	"\e[?25l𝌆\b\b \b\b\b\b    \b\b\b\b\e[0J\e[?25h"
+𝌿 𝍀 𝍁 𝍂 𝍃 𝍄 𝍅 𝍆 𝍇 𝍈 𝍉 𝍊 𝍋 𝍌 𝍍 𝍎 𝍏 𝍐 𝍑 𝍒 𝍓 𝍔 𝍕 𝍖 " short() ),
+	"\e[?25l𝌆\b\b \b𝌇\b\b \b𝌈\b\b \b𝌉\b\b \b𝌊\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
 )
 
 # trigrams
 output_test(
-	:( @spinner "☰☱☲☳☴☵☶☷" sleep(0.5) ),
-	"\e[?25l☰\b☱\b\b\b   \b\b\b\e[0J\e[?25h"
+	:( @spinner "☰☱☲☳☴☵☶☷" short() ),
+	"\e[?25l☰\b☱\b☲\b☳\b☴\b☵\b☶\b☷\b☰\b\b\b   \b\b\b\e[0J\e[?25h"
 )
 
 output_test(
@@ -71,59 +84,54 @@ output_test(
 )
 
 output_test(
-	:( @spinner :bounce sleep(0.1) ),
-	"\e[?25l\b\b\b\b\b\b\b\b\b         \b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
-	#"\e[?25l(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b\b\b         \b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
-	#"\e[?25l(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b\b\b         \b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
+	:( @spinner :bounce precise_sleep(3) ),
+	"\e[?25l(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(●    )\b\b\b\b\b\b\b( ●   )\b\b\b\b\b\b\b(  ●  )\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b(    ●)\b\b\b\b\b\b\b(   ● )\b\b\b\b\b\b\b\b\b         \b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :cards sleep(0.2) ),
-	"\e[?25l\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b                    \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
+	:( @spinner :cards short() ),
+	"\e[?25l🂠🂠🂠🂠🂠\b\b\b\b\b\b\b\b\b\b🂪🂠🂠🂠🂠\b\b\b\b\b\b\b\b\b\b🂪🂫🂠🂠🂠\b\b\b\b\b\b\b\b\b\b🂪🂫🂭🂠🂠\b\b\b\b\b\b\b\b\b\b🂪🂫🂭🂮🂠\b\b\b\b\b\b\b\b\b\b🂪🂫🂭🂮🂱\b\b\b\b\b\b\b\b\b\b🂪🂫🂭🂮🂱\b\b\b\b\b\b\b\b\b\b🂪🂫🂭🂮🂱\b\b\b\b\b\b\b\b\b\b🂪🂫🂭🂮🂱\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b                    \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :clock sleep(0.5) ),
-	"\e[?25l🕐\b\b🕑\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
-	#"\e[?25l🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b🕗\b\b🕘\b\b🕙\b\b🕚\b\b🕛\b\b🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b🕗\b\b🕘\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
-	#"\e[?25l🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b🕗\b\b🕘\b\b🕙\b\b🕚\b\b🕛\b\b🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
-	#"\e[?25l🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b🕗\b\b🕘\b\b🕙\b\b🕚\b\b🕛\b\b🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b🕗\b\b🕘\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
+	:( @spinner :clock precise_sleep(3) ),
+	"\e[?25l🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b🕗\b\b🕘\b\b🕙\b\b🕚\b\b🕛\b\b🕐\b\b🕑\b\b🕒\b\b🕓\b\b🕔\b\b🕕\b\b🕖\b\b🕗\b\b🕘\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :dots sleep(0.5) ),
-	"\e[?25l⠁\b⠂\b\b\b   \b\b\b\e[0J\e[?25h"
+	:( @spinner :dots short() ),
+	"\e[?25l⠁\b⠂\b⠃\b⠄\b⠅\b⠆\b⠇\b⠈\b⠉\b\b\b   \b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :loading sleep(0.5) ),
-	"\e[?25lLoading.    \b\b\b\b\b\b\b\b\b\b\b\bLoading..   \b\b\b\b\b\b\b\b\b\b\b\b            \b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
+	:( @spinner :loading short() ),
+	"\e[?25lLoading.    \b\b\b\b\b\b\b\b\b\b\b\bLoading..   \b\b\b\b\b\b\b\b\b\b\b\bLoading...  \b\b\b\b\b\b\b\b\b\b\b\bLoading.... \b\b\b\b\b\b\b\b\b\b\b\bLoading.....\b\b\b\b\b\b\b\b\b\b\b\bLoading.....\b\b\b\b\b\b\b\b\b\b\b\bLoading.....\b\b\b\b\b\b\b\b\b\b\b\bLoading.....\b\b\b\b\b\b\b\b\b\b\b\bLoading.    \b\b\b\b\b\b\b\b\b\b\b\b            \b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :moon sleep(0.5) ),
-	"\e[?25l🌑\b\b🌒\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
+	:( @spinner :moon short() ),
+	"\e[?25l🌑\b\b🌒\b\b🌓\b\b🌔\b\b🌕\b\b🌖\b\b🌗\b\b🌘\b\b🌑\b\b\b\b    \b\b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :pong sleep(0.5) ),
-	"\e[?25l▐⠂       ▌\b\b\b\b\b\b\b\b\b\b▐⠈       ▌\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b                \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
+	:( @spinner :pong short() ),
+	"\e[?25l▐⠂       ▌\b\b\b\b\b\b\b\b\b\b▐⠈       ▌\b\b\b\b\b\b\b\b\b\b▐ ⠂      ▌\b\b\b\b\b\b\b\b\b\b▐ ⠠      ▌\b\b\b\b\b\b\b\b\b\b▐  ⡀     ▌\b\b\b\b\b\b\b\b\b\b▐  ⠠     ▌\b\b\b\b\b\b\b\b\b\b▐   ⠂    ▌\b\b\b\b\b\b\b\b\b\b▐   ⠈    ▌\b\b\b\b\b\b\b\b\b\b▐    ⠂   ▌\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b                \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :shutter sleep(0.5) ),
-	"\e[?25l▉\b▊\b\b\b   \b\b\b\e[0J\e[?25h"
+	:( @spinner :shutter short() ),
+	"\e[?25l▉\b▊\b▋\b▌\b▍\b▎\b▏\b▎\b▍\b\b\b   \b\b\b\e[0J\e[?25h"
 )
 
 output_test(
-	:( @spinner :snail sleep(0.5) ),
-	"\e[?25l🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b                \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
+	:( @spinner :snail short() ),
+	"\e[?25l🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b🐌        🏁\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b                \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[0J\e[?25h"
 
 )
 
 output_test(
-	:( @spinner :a125🐌125yvg35hfddyu sleep(0.5) ),
-	"\e[?25l?\b \b \b\e[0J\e[?25h"
+	:( @spinner :a125🐌125yvg35hfddyu short() ),
+	"\e[?25l?\b \b?\b \b?\b \b?\b \b?\b \b\e[0J\e[?25h"
 )
 
 

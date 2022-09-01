@@ -23,7 +23,7 @@ module Spinners
 
 using Unicode: transcode
 
-export spinner, @spinner
+export @spinner
 
 const BACKSPACE = '\b' # '\U8' == '\b'
 const ANSI_ESCAPE = '\u001B'
@@ -252,6 +252,34 @@ function after(p)
 	print("\b")
 end
 
+macro spinner(x::QuoteNode)
+	quote
+		local p
+		try
+			hide_cursor()
+			p = before(get_named_string($x))
+			sleep(4)
+		finally
+			kill(p)
+			print("\b")
+			show_cursor()
+		end
+	end
+end
+macro spinner(x::QuoteNode, f)
+	quote
+		local p
+		try
+			hide_cursor()
+			p = before(get_named_string($x))
+			$(esc(f))
+		finally
+			kill(p)
+			print("\b")
+			show_cursor()
+		end
+	end
+end
 macro spinner()
 	quote
 		@spinner sleep(4)

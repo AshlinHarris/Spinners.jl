@@ -253,6 +253,27 @@ macro spinner(s::String)
 	end
 end
 
+function get_named_string(x::Symbol)
+	if x == :pinwheel
+		raw_string = "\\|/-"
+	elseif x == :arrows
+		raw_string = "←↖↑↗→↘↓↙"
+	elseif x == :bar
+		raw_string = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
+	elseif x == :blink
+		raw_string="⊙⊙⊙⊙⊙⊙⊙◡"
+	elseif x == :dots
+		raw_string = join([Char(i) for i in 0x2801:0x28ff])
+		#  @show map(Unicode.julia_chartransform, x for x in s)
+	elseif x == :moon
+		raw_string="🌑🌒🌓🌔🌕🌖🌗🌘"
+	elseif x == :shutter
+		raw_string = "▉▊▋▌▍▎▏▎▍▌▋▊▉"
+	else
+		raw_string = "? "
+	end
+end
+
 end # module Spinners
 
 

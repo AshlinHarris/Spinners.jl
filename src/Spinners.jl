@@ -72,7 +72,7 @@ Add column to a DataFrame based on symbol presence in the target DataFrame
 - `cleanup::Union{Bool, Nothing}`: Erase the spinner after it has finished?
 """
 
-function spinner(
+function deprecated_spinner(
 	t::Union{Task, Nothing}=nothing,
 	string::Union{String, Symbol, Nothing}=nothing,
 	time::Union{Number, Nothing}=nothing;

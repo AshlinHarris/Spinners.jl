@@ -4,7 +4,7 @@ using Test
 
 usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
 precise_sleep(x) = usleep(Int(x * 1_000_000))
-const short() = precise_sleep(1.495)
+const short() = precise_sleep(1.45)
 
 # Look at this
 function output_test(command::Expr, expected::String)

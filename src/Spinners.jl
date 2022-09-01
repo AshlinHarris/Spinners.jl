@@ -210,6 +210,29 @@ end
 # t = @async sleep(5); spinner(t, :dots, 0.05, mode=:rand, after="⣿")
 # julia> t = @async sleep(5); spinner(t, "........", 0.08, mode=:unfurl, before="Loading", after="Finished", cleanup=false)
 
+function get_named_string(x::Symbol)::String
+	if x == :pinwheel
+		s = "\\|/-"
+	elseif x == :arrows
+		s = "←↖↑↗→↘↓↙"
+	elseif x == :bar
+		s = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
+	elseif x == :blink
+		s="⊙⊙⊙⊙⊙⊙⊙◡"
+	elseif x == :dots
+		s = join([Char(i) for i in 0x2801:0x28ff])
+		#  @show map(Unicode.julia_chartransform, x for x in s)
+	elseif x == :moon
+		s="🌑🌒🌓🌔🌕🌖🌗🌘"
+	elseif x == :shutter
+		s = "▉▊▋▌▍▎▏▎▍▌▋▊▉"
+	else
+		s = "? "
+	end
+
+	return s
+end
+
 function before(s)
 
 	c = "while true;" *
@@ -236,10 +259,16 @@ macro spinner()
 end
 macro spinner(s::String, f)
 	quote
-		p = before($s)
-		$(esc(f))
-		kill(p)
-		print("\b")
+		local p
+		try
+			hide_cursor()
+			p = before($s)
+			$(esc(f))
+		finally
+			kill(p)
+			print("\b")
+			show_cursor()
+		end
 	end
 end
 macro spinner(f)
@@ -250,27 +279,6 @@ end
 macro spinner(s::String)
 	quote
 		@spinner $s sleep(4)
-	end
-end
-
-function get_named_string(x::Symbol)
-	if x == :pinwheel
-		raw_string = "\\|/-"
-	elseif x == :arrows
-		raw_string = "←↖↑↗→↘↓↙"
-	elseif x == :bar
-		raw_string = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
-	elseif x == :blink
-		raw_string="⊙⊙⊙⊙⊙⊙⊙◡"
-	elseif x == :dots
-		raw_string = join([Char(i) for i in 0x2801:0x28ff])
-		#  @show map(Unicode.julia_chartransform, x for x in s)
-	elseif x == :moon
-		raw_string="🌑🌒🌓🌔🌕🌖🌗🌘"
-	elseif x == :shutter
-		raw_string = "▉▊▋▌▍▎▏▎▍▌▋▊▉"
-	else
-		raw_string = "? "
 	end
 end
 

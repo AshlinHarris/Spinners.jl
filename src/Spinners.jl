@@ -123,11 +123,15 @@ function __start_up(s)
 		text = "for i in $s;"
 	end
 
-	c = "while true;" *
+	first = s[1]
+
+	c = 
+	"print(\"$first\");"
+	"while true;" *
 	text *
+	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *
 	"print(\"\$i\");" *
 	"sleep(0.125);" *
-	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *
 	"end;" *
 	"end"
 

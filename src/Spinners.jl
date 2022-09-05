@@ -117,21 +117,24 @@ function __start_up(s)
 
 	hide_cursor()
 
+	# Modify for statement based on input type
 	if typeof(s) == String
-		text = "for i in collect(\"$s\");"
+		for_statement = "for i in collect(\"$s\");"
 	elseif typeof(s) == Vector{String}
-		text = "for i in $s;"
+		for_statement = "for i in $s;"
 	end
 
+	# Prime the loop so that print steps can be consolidated
 	first = s[1]
 
+	# Assemble command to produce spinner
 	c = 
 	"print(\"$first\");"
 	"while true;" *
-	text *
-	"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
-	"sleep(0.125);" *
-	"end;" *
+		for_statement *
+			"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
+			"sleep(0.125);" *
+		"end;" *
 	"end"
 
 	# Display the spinner as an external program

@@ -45,13 +45,32 @@ let rex = r"^(\e\[\?25l)([𝌆 𝌇 𝌈 𝌉 𝌊 𝌋 𝌌 𝌍 𝌎 𝌏 𝌐
 end
 =#
 
-#=
-)
 
-# trigrams
-output_test(
-	:( @spinner "☰☱☲☳☴☵☶☷" short() ),
-	"\e[?25l☰\b☱\b☲\b☳\b☴\b☵\b☶\b☷\b☰\b\b\b   \b\b\b\e[0J\e[?25h"
+#trigrams
+let rex = r"^(\e\[\?25l)([☰☱☲☳☴☵☶☷][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
+	regex_test(rex, :( @spinner "☰☱☲☳☴☵☶☷" sleep(1) ) )
+end
+
+# Built-in character sets
+let rex = r"^(\e\[\?25l)([←↖↑↗→↘↓↙][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
+	regex_test(rex, :( @spinner :arrow sleep(1) ) )
+end
+
+let rex = r"^(\e\[\?25l)([▁▂▃▄▅▆▇█][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
+	regex_test(rex, :( @spinner :bar sleep(1) ) )
+end
+
+let rex = r"^(\e\[\?25l)([⊙◡][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
+	regex_test(rex, :( @spinner :blink sleep(1) ) )
+end
+
+let rex = r"^(\e\[\?25l)([🌑🌒🌓🌔🌕🌖🌗🌘][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
+	regex_test(rex, :( @spinner :moon sleep(1) ) )
+end
+
+
+
+#=
 )
 
 output_test(

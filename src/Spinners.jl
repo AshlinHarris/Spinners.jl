@@ -129,8 +129,7 @@ function __start_up(s)
 	"print(\"$first\");"
 	"while true;" *
 	text *
-	"print(\"\\b\"^length(transcode(UInt16, \"\$i\")));" *
-	"print(\"\$i\");" *
+	"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
 	"sleep(0.125);" *
 	"end;" *
 	"end"

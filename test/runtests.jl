@@ -19,6 +19,10 @@ function regex_test(rex, expr)
 	@test occursin(rex, out)
 end
 
+# Scope test
+@spinner "abc" new_variable = 4
+@test new_variable == 4
+
 let rex = r"^(\e\[\?25l)([◒◐◓◑◒◐◓◑][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
 	regex_test(rex, :( @spinner ) )
 	regex_test(rex, :( @spinner sleep(1) ) )

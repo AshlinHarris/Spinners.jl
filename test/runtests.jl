@@ -6,40 +6,30 @@ usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
 precise_sleep(x) = usleep(Int(x * 1_000_000))
 const short() = precise_sleep(1.45)
 
-# Look at this
-function get_stdout(command::Expr, expected::String)
-	Random.seed!(37) # Make this depend on the version?
+function get_stdout(command::Expr)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
 	eval(command)
 	redirect_stdout(os);
 	close(wr);
 	output = read(rd, String)
-	@test output == expected
+	return output
 end
 
-# Don't look at this
+rex = r"^(\e\[\?25l)([◒◐◓◑◒◐◓◑][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
 
-@test true
+out = get_stdout( :( @spinner ) )
+@test occursin(rex, out)
 
+#out = get_stdout( :( @spinner short() )
 
-
-# These tests rely on sleep(), which is imprecise
 #=
-output_test(
-	:( @spinner ),
-	"\e[?25l◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b\b\b   \b\b\b\e[0J\e[?25h"
-)
 
 output_test(
 	:( @spinner "1234" ),
 	"\e[?25l◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b\b\b   \b\b\b\e[0J\e[?25h"
 )
 
-output_test(
-	:( @spinner short() ),
-	"\e[?25l◒\b◐\b◓\b◑\b◒\b◐\b◓\b◑\b◒\b◐\b\b\b   \b\b\b\e[0J\e[?25h"
-)
 
 output_test(
 	:( @spinner "1234567890" short() ),

@@ -137,6 +137,7 @@ end
 
 function __clean_up(p, s)
 	kill(p)
+	flush(stdout)
 
 	# Calculate the number of spaces needed to overwrite the printed character
 	# Notice that this might exceed the required number, which could delete preceding characters

@@ -150,24 +150,18 @@ macro spinner(x::QuoteNode)
 	quote
 		local p
 		local s = get_named_string($x)
-		try
-			p = __start_up(s)
-			default_user_function()
-		finally
-			__clean_up(p, s)
-		end
+		p = __start_up(s)
+		default_user_function()
+		__clean_up(p, s)
 	end
 end
 macro spinner(x::QuoteNode, f)
 	quote
 		local p
 		local s = get_named_string($x)
-		try
-			p = __start_up(s)
-			$(esc(f))
-		finally
-			__clean_up(p,s)
-		end
+		p = __start_up(s)
+		$(esc(f))
+		__clean_up(p,s)
 	end
 end
 macro spinner()
@@ -178,12 +172,9 @@ end
 macro spinner(s::String, f)
 	quote
 		local p
-		try
-			p = __start_up($s)
-			$(esc(f))
-		finally
-			__clean_up(p,$s)
-		end
+		p = __start_up($s)
+		$(esc(f))
+		__clean_up(p,$s)
 	end
 end
 macro spinner(f)

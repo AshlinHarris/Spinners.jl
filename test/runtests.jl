@@ -22,6 +22,8 @@ end
 # Scope test
 @spinner "abc" new_variable = 4
 @test new_variable == 4
+@spinner new_variable_2 = 5
+@test new_variable_2 == 5
 
 let rex = r"^(\e\[\?25l)([◒◐◓◑◒◐◓◑][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
 	regex_test(rex, :( @spinner ) )

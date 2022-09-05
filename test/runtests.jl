@@ -2,9 +2,7 @@ using Random
 using Spinners
 using Test
 
-usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
-precise_sleep(x) = usleep(Int(x * 1_000_000))
-const short() = precise_sleep(1.45)
+#usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
 
 function get_stdout(command::Expr)
 	os = stdout;
@@ -16,12 +14,15 @@ function get_stdout(command::Expr)
 	return output
 end
 
+function regex_test(rex, expr)
+	out = get_stdout(expr)
+	@test occursin(rex, out)
+end
+
 rex = r"^(\e\[\?25l)([◒◐◓◑◒◐◓◑][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
 
-out = get_stdout( :( @spinner ) )
-@test occursin(rex, out)
-
-#out = get_stdout( :( @spinner short() )
+regex_test(rex, :( @spinner ) )
+regex_test(rex, :( @spinner sleep(2) ) )
 
 #=
 

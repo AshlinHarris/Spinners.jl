@@ -64,7 +64,7 @@ let rex = r"^(\e\[\?25l)([⊙◡][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
 	regex_test(rex, :( @spinner :blink sleep(1) ) )
 end
 
-let rex = r"^(\e\[\?25l)([🌑🌒🌓🌔🌕🌖🌗🌘][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
+let rex = r"^(\e\[\?25l)([🌑🌒🌓🌔🌕🌖🌗🌘][\b][\b])*([\b ])*(\e\[0J\e\[\?25h)$"
 	regex_test(rex, :( @spinner :moon sleep(1) ) )
 end
 

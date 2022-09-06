@@ -18,7 +18,7 @@ function get_named_string(x::Symbol)
 	elseif x == :bar
 		s = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
 	elseif x == :blink
-		s="⊙⊙⊙⊙⊙⊙⊙◡"
+		s="⊙⊙⊙⊙⊙⊙⊙⊙◡⊙⊙◡"
 	elseif x == :bounce
 		s=[
 			"(●    )"

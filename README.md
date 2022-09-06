@@ -4,15 +4,69 @@ Command line spinners in Julia with decent Unicode support
 
 | **Documentation** | **Build Status** |
 |---|---|
-| [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ashlinharris.github.io/Spinners.jl/stable/) [![](https://img.shields.io/badge/docs-development-blue.svg)](https://ashlinharris.github.io/Spinners.jl/dev/) | [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) |
+| [![](https://img.shields.io/badge/docs-stable-red.svg)](https://ashlinharris.github.io/Spinners.jl/stable/) [![](https://img.shields.io/badge/docs-development-blue.svg)](https://ashlinharris.github.io/Spinners.jl/dev/) | [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) |
+
+## Notes for users
+Try these:
+```
+using Spinners
+@spinner                   # no arguments
+@spinner sleep(4)          # just an expressions
+@spinner :moon             # just a character set (or symbol)
+@spinner :bounce sleep(4)  # character set and expressions
+
+```
+Some explanations:
+```
+using Spinners
+
+@spinner # For testing, it runs on a default function (sleep(3))
+
+# Put @spinner in front of your code - this shouldn't affect the scope
+do_some_calculations(x) = sum(map(i -> BigInt(999)^10_000_000 % i, 1:x))
+@spinner x = do_some_calculations(10);
+println(x)
+
+# You can provide a character set...
+@spinner "🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛" do_some_calculations(15)
+# ...but note that the following is not yet supported
+# my_string = "🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛"
+# @spinner my_string do_some_calculations(15)
+# There is some Unicode support.
+# For now, it's best if all the characters have the same transcode length
+
+# There are several character sets built in
+# For instance, @spinner :clock do_some_calculations(15)
+@spinner :loading
+@spinner :shutter
+@spinner :blink
+
+# Currently, users cannot input their own string vector.
+# However, there are some that are already built in:
+@spinner :loading
+@spinner :pong
+@spinner :cards
+
+# This documentation isn't complete, I hope to finish it up soon! -Ashlin 
+```
+
+## Notes for developers
+Here are any aspects of the code that were especially tricky for me to conceive and implement, so they might be confusing to others:
+- Source code
+  - The main julia process generates the code for the spinner and shells out (with julia) to make the spinner process. This is the only way I could find for the spinner to act completely independently of the user's functions.
+  - The processes don't communicate until the main process sends a kill signal to the spinner process.
+  - To erase a character, the spinner process prints a number of backspaces depending on the length of the character's transcode.
+- Tests
+  - I capture stdout to see what the spinner process has printed.
+  - The spinner isn't guranteed to start or stop at a particular moment, so I use regular expressions to make sure the printout is reasonable.
+
+# Older (and outdated) documentation
 
 ## Description
 
 Draw a string animation cycle (spinner) until a given command completes.
 See the [documentation](https://ashlinharris.github.io/Spinners.jl/stable/#Examples) for examples, and for further information.
 
-Currently, the `\@spinner` macro doesn't allow customization, but this feature is available in the current development version (and the upcoming tagged release).
-The function `spinner()` allows customization but doesn't actually run the spinner as a separate process and will be deprecated in v0.3.
 The API might change drastically until v1.0.  
 
 `Spinners.jl` (once it's mature) might be most useful for displaying elements while files are being downloaded or written to disk.
@@ -27,12 +81,6 @@ I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.j
 ```
 # Usage: 
 # @spinner result = some_long_function(); println(result)
-
-# Features available in v0.2:
-@spinner sleep(4)
-
-# Features available in the development version (upcoming v0.3)
-@spinner "🌑🌒🌓🌔🌕🌖🌗🌘" sleep(4) # Customize the character set
 ```
 
 ![spinner](https://user-images.githubusercontent.com/90787010/186546184-33b4a8af-779a-439b-a41c-ae84cedae4f1.gif)

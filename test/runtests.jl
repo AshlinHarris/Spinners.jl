@@ -20,10 +20,12 @@ function regex_test(rex, expr)
 end
 
 # Scope test
-@spinner "abc" new_variable = 4
-@test new_variable == 4
-@spinner new_variable_2 = 5
-@test new_variable_2 == 5
+let
+	@spinner "abc" new_variable = 4
+	@test new_variable == 4
+	@spinner new_variable_2 = 5
+	@test new_variable_2 == 5
+end
 
 let rex = r"^(\e\[\?25l)([◒◐◓◑◒◐◓◑][\b]){8,40}([\b ])*(\e\[0J\e\[\?25h)$"
 	regex_test(rex, :( @spinner ) )

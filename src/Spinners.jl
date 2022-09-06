@@ -13,6 +13,15 @@ const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 const default_user_function() = sleep(3)
 
 function get_named_string(x::Symbol)
+
+# Design principles
+# Respect the attention and focus of the user
+#	Spinners are designed to grab attention, so use them judiciously.
+# Animation should begin immediately
+# 	If there is a long pause at the start, the user might think there is an issue.
+#	:snail might need to be removed for this reason...
+
+
 	if x == :arrow
 		s = "←↖↑↗→↘↓↙"
 	elseif x == :bar

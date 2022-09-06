@@ -165,6 +165,11 @@ function __clean_up(p, s)
 			sleep(0.1)
 			if process_running(p)
 				sleep(1)
+				if process_running(p)
+					sleep(2)
+					# Then just give up
+					# I don't think any Julia release from this decade will typically end up here.
+				end
 			end
 		end
 	end

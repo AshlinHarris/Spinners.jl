@@ -130,7 +130,7 @@ function __start_up(s)
 
 	# Assemble command to produce spinner
 	c = 
-	"print(\"$first\");"
+	"print(\"$first\");" *
 	"while true;" *
 		for_statement *
 			"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *

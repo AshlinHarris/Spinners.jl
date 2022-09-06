@@ -158,9 +158,15 @@ end
 function __clean_up(p, s)
 	kill(p)
 
-	# Guarantee that this terminates?
-	while process_running(p)
-		sleep(0.1)
+	# Wait for process to terminate, if needed.
+	if process_running(p)
+		sleep(0.01)
+		if process_running(p)
+			sleep(0.1)
+			if process_running(p)
+				sleep(1)
+			end
+		end
 	end
 
 	flush(stdout)

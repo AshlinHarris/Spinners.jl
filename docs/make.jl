@@ -3,7 +3,7 @@ DocMeta.setdocmeta!(Spinners, :DocTestSetup, :(using DataFrames, Spinners); recu
 
 makedocs(;
 	modules=[Spinners],
-	authors="Ashlin Harri",
+	authors="Ashlin Harris",
 	repo="https://github.com/AshlinHarris/Spinners.jl/blob/{commit}{path}#L{line}",
 	sitename="Spinners.jl",
 	pages=["Home" => "index.md"],

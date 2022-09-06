@@ -157,6 +157,12 @@ end
 
 function __clean_up(p, s)
 	kill(p)
+
+	# Guarantee that this terminates?
+	while process_running(p)
+		sleep(0.1)
+	end
+
 	flush(stdout)
 
 	# Calculate the number of spaces needed to overwrite the printed character

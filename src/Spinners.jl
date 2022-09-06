@@ -133,7 +133,11 @@ function __start_up(s)
 	"print(\"$first\");" *
 	"while true;" *
 		for_statement *
-			"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
+			"try;" *
+				"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
+			"finally;" *
+				"flush(stdout);" *
+			"end;" *
 			"sleep(0.125);" *
 		"end;" *
 	"end"

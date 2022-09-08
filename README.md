@@ -2,9 +2,7 @@
 
 Command line spinners in Julia with decent Unicode support.
 
-| **Documentation** | **Build Status** |
-|---|---|
-| [![](https://img.shields.io/badge/docs-development-blue.svg)](https://ashlinharris.github.io/Spinners.jl/dev/) | [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) |
+[![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml)
 
 ## Notes for users
 Try these:

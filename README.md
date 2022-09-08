@@ -13,6 +13,29 @@ using Spinners
 @spinner :moon             # just a character set (or symbol)
 @spinner :bounce sleep(4)  # character set and expressions
 ```
+
+Internal docs:
+```
+julia> using Spinners
+help?> @spinner
+  @spinner
+  ≡≡≡≡≡≡≡≡≡≡
+
+  Create a command line spinner
+
+  Usage
+  =======
+
+  @spinner expression          # Use the default spinner
+  @spinner "string" expression # Iterate through the graphemes of a string
+  @spinner :symbol expression  # Use a built-in spinner
+
+  Available symbols
+  ===================
+
+  :arrow, :bar, :blink, :bounce, :cards, :clock, :dots, :loading, :moon, :pong, :shutter, :snail
+```
+
 Some explanations:
 ```
 using Spinners

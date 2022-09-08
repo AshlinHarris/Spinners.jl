@@ -1,8 +1,8 @@
 """
 # Exported names:
-@spinner
+- `@spinner`
 
-Please see ?@spinner for more information.
+Please see `?@spinner` for more information.
 """
 module Spinners
 
@@ -198,6 +198,25 @@ function __clean_up(p, s)
 	show_cursor()
 end
 
+"""
+# @spinner
+Create a command line spinner
+
+## Usage
+```
+@spinner expression          # Use the default spinner
+@spinner "string" expression # Iterate through the graphemes of a string
+@spinner :symbol expression  # Use a built-in spinner
+```
+
+## Available symbols
+`:arrow`, `:bar`, `:blink`, `:bounce`, `:cards`, `:clock`, `:dots`, `:loading`, `:moon`, `:pong`, `:shutter`, `:snail`
+"""
+macro spinner()
+	quote
+		@spinner default_user_function()
+	end
+end
 macro spinner(x::QuoteNode)
 	quote
 		local s = get_named_string($x)
@@ -212,11 +231,6 @@ macro spinner(x::QuoteNode, f)
 		local p = __start_up(s)
 		$(esc(f))
 		__clean_up(p,s)
-	end
-end
-macro spinner()
-	quote
-		@spinner default_user_function()
 	end
 end
 macro spinner(s::String, f)

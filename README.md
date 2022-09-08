@@ -1,10 +1,10 @@
 # Spinners.jl
 
-Command line spinners in Julia with decent Unicode support
+Command line spinners in Julia with decent Unicode support.
 
 | **Documentation** | **Build Status** |
 |---|---|
-| [![](https://img.shields.io/badge/docs-stable-red.svg)](https://ashlinharris.github.io/Spinners.jl/stable/) [![](https://img.shields.io/badge/docs-development-blue.svg)](https://ashlinharris.github.io/Spinners.jl/dev/) | [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) |
+| [![](https://img.shields.io/badge/docs-development-blue.svg)](https://ashlinharris.github.io/Spinners.jl/dev/) | [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) |
 
 ## Notes for users
 Try these:
@@ -14,13 +14,13 @@ using Spinners
 @spinner sleep(4)          # just an expressions
 @spinner :moon             # just a character set (or symbol)
 @spinner :bounce sleep(4)  # character set and expressions
-
 ```
 Some explanations:
 ```
 using Spinners
 
-@spinner # For testing, it runs on a default function (sleep(3))
+# For testing, a default function (sleep(3)) is used
+@spinner 
 
 # Put @spinner in front of your code - this shouldn't affect the scope
 do_some_calculations(x) = sum(map(i -> BigInt(999)^10_000_000 % i, 1:x))
@@ -46,9 +46,19 @@ println(x)
 @spinner :loading
 @spinner :pong
 @spinner :cards
-
-# This documentation isn't complete, I hope to finish it up soon! -Ashlin 
 ```
+
+Spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
+It isn't advisable to add terminal elements that are overly distracting unless there is a need.
+For improved performance and energy use, it might be better to use a static message, or nothing at all.
+
+`Spinners.jl` supports all modern Julia releases for Linux, MacOS, and Windows.
+However, Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
+
+The `Spinners.jl` API is unstable until v1.0.  
+
+I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which already has its own version of spinners, albeit with a different use case.
+[This thread on the Julia Discourse](https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285) gives some technical details, but essentially those spinners are still progress meters, which must be updated at points with the function being measured. In contrast, I'm developing spinners that update independently and only need a signal to terminate after a function call elapses.
 
 ## Notes for developers
 Here are any aspects of the code that were especially tricky for me to conceive and implement, so they might be confusing to others:
@@ -60,36 +70,7 @@ Here are any aspects of the code that were especially tricky for me to conceive 
   - I capture stdout to see what the spinner process has printed.
   - The spinner isn't guranteed to start or stop at a particular moment, so I use regular expressions to make sure the printout is reasonable.
 
-# Older (and outdated) documentation
-
-## Description
-
-Draw a string animation cycle (spinner) until a given command completes.
-See the [documentation](https://ashlinharris.github.io/Spinners.jl/stable/#Examples) for examples, and for further information.
-
-The API might change drastically until v1.0.  
-
-`Spinners.jl` (once it's mature) might be most useful for displaying elements while files are being downloaded or written to disk.
-They serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted.
-It isn't advisable to add terminal elements that are overly distracting unless there is a need.
-For optimal performance and minimal energy consumption, it might be better to use a static message, or nothing at all.
-
-I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which already has its own version of spinners, albeit with a different use case.
-[This thread on the Julia Discourse](https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285) gives some technical details, but essentially those spinners are still progress meters, which must be updated at points with the function being measured. In contrast, I'm developing spinners that update independently and only need a signal to terminate after a function call elapses.
-
-## At a glance
-```
-# Usage: 
-# @spinner result = some_long_function(); println(result)
-```
-
-![spinner](https://user-images.githubusercontent.com/90787010/186546184-33b4a8af-779a-439b-a41c-ae84cedae4f1.gif)
-![cards](https://user-images.githubusercontent.com/90787010/186546176-442681d3-0584-48c0-9452-912c844a5112.gif)
-![dots](https://user-images.githubusercontent.com/90787010/186546179-b84beac9-5cc9-485f-a435-2515532ef856.gif)
-![loading](https://user-images.githubusercontent.com/90787010/186546182-f2d4e191-c360-4497-b089-46ff442bd568.gif)
-![moon](https://user-images.githubusercontent.com/90787010/186546183-81ecd202-eb44-44d0-9ec3-36092af0b0f8.gif)
-
-## Related Packages
+## Related Works
 In Julia:
 - [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)
   - Includes feature from [Spinner.jl](https://github.com/rahulkp220/Spinner.jl)
@@ -102,4 +83,3 @@ Other projects:
 - [cli-spinners](https://github.com/sindresorhus/cli-spinners)
   - Some assets in Spinners.jl come from here.
   
-

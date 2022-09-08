@@ -1,42 +1,27 @@
 # Spinners.jl
 
-Command line spinners in Julia with decent Unicode support.
+Command line spinners in Julia with decent Unicode support
 
 [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml)
 
-## Notes for users
-Try these:
-```
-using Spinners
-@spinner                   # no arguments
-@spinner sleep(4)          # just an expressions
-@spinner :moon             # just a character set (or symbol)
-@spinner :bounce sleep(4)  # character set and expressions
-```
+![spinners](https://user-images.githubusercontent.com/90787010/189241813-9ff87134-7b57-4e53-829b-32c6bc660851.gif)
 
-Internal docs:
-```
-julia> using Spinners
-help?> @spinner
-  @spinner
-  ≡≡≡≡≡≡≡≡≡≡
+## Description
 
-  Create a command line spinner
+`Spinners.jl` provides a single macro (`@spinner`), which generates a terminal spinner.
+The spinner runs as a separate process that is terminated once the user code has finished running.
+For user instructions, see the internal documentation (`?@spinner`).
 
-  Usage
-  =======
+The package is supported on all modern Julia releases for Linux, MacOS, and Windows.
+However, Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
 
-  @spinner expression          # Use the default spinner
-  @spinner "string" expression # Iterate through the graphemes of a string
-  @spinner :symbol expression  # Use a built-in spinner
+The API should be considered unstable until v1.0.
 
-  Available symbols
-  ===================
+Spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
+It isn't advisable to add terminal elements that are overly distracting unless there is a need.
+For improved performance and energy use, it might be better to use a static message, or nothing at all.
 
-  :arrow, :bar, :blink, :bounce, :cards, :clock, :dots, :loading, :moon, :pong, :shutter, :snail
-```
-
-Some explanations:
+## Tutorial:
 ```
 using Spinners
 
@@ -69,18 +54,6 @@ println(x)
 @spinner :cards
 ```
 
-Spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
-It isn't advisable to add terminal elements that are overly distracting unless there is a need.
-For improved performance and energy use, it might be better to use a static message, or nothing at all.
-
-`Spinners.jl` supports all modern Julia releases for Linux, MacOS, and Windows.
-However, Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
-
-The `Spinners.jl` API is unstable until v1.0.  
-
-I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which already has its own version of spinners, albeit with a different use case.
-[This thread on the Julia Discourse](https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285) gives some technical details, but essentially those spinners are still progress meters, which must be updated at points with the function being measured. In contrast, I'm developing spinners that update independently and only need a signal to terminate after a function call elapses.
-
 ## Notes for developers
 Here are any aspects of the code that were especially tricky for me to conceive and implement, so they might be confusing to others:
 - Source code
@@ -90,8 +63,34 @@ Here are any aspects of the code that were especially tricky for me to conceive 
 - Tests
   - I capture stdout to see what the spinner process has printed.
   - The spinner isn't guranteed to start or stop at a particular moment, so I use regular expressions to make sure the printout is reasonable.
+  
+## Internal documentation:
+```
+julia> using Spinners
+help?> @spinner
+  @spinner
+  ≡≡≡≡≡≡≡≡≡≡
+
+  Create a command line spinner
+
+  Usage
+  =======
+
+  @spinner expression          # Use the default spinner
+  @spinner "string" expression # Iterate through the graphemes of a string
+  @spinner :symbol expression  # Use a built-in spinner
+
+  Available symbols
+  ===================
+
+  :arrow, :bar, :blink, :bounce, :cards, :clock, :dots, :loading, :moon, :pong, :shutter, :snail
+```
 
 ## Related Works
+
+I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which already has its own version of spinners, albeit with a different use case.
+[This thread on the Julia Discourse](https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285) gives some technical details, but essentially those spinners are still progress meters, which must be updated at points with the function being measured. In contrast, I'm developing spinners that update independently and only need a signal to terminate after a function call elapses.
+
 In Julia:
 - [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)
   - Includes feature from [Spinner.jl](https://github.com/rahulkp220/Spinner.jl)

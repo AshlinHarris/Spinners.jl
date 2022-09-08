@@ -1,3 +1,9 @@
+"""
+# Exported names:
+@spinner
+
+Please see ?@spinner for more information.
+"""
 module Spinners
 
 using Unicode: transcode

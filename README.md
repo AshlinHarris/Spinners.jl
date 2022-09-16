@@ -2,6 +2,10 @@
 
 Command line spinners in Julia with decent Unicode support
 
+## Warning for Windows users
+
+__Important:__ `Spinners.jl` creates a process which __no longer terminates on Windows__. The issue first appeared in the past several days and applies regardless of Julia version or package version.
+
 [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml)
 
 ![spinners](https://user-images.githubusercontent.com/90787010/189241813-9ff87134-7b57-4e53-829b-32c6bc660851.gif)

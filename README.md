@@ -98,6 +98,8 @@ I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.j
 In Julia:
 - [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)
   - Includes feature from [Spinner.jl](https://github.com/rahulkp220/Spinner.jl)
+- [Term.jl](https://github.com/FedeClaudi/Term.jl)
+  - https://fedeclaudi.github.io/Term.jl/stable/adv/progressbars/
 - [ProgressBars.jl](https://github.com/cloud-oak/ProgressBars.jl)
 - Pkg.jl spinners:
   - [MiniProgressBars.jl](https://github.com/JuliaLang/Pkg.jl/blob/master/src/MiniProgressBars.jl)

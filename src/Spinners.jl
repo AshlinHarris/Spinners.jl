@@ -18,6 +18,7 @@ const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 const default_user_function() = sleep(3)
 
+
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 function __start_up(s)

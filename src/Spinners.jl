@@ -18,116 +18,8 @@ const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 const default_user_function() = sleep(3)
 
-function get_named_string(x::Symbol)
 
-# Design principles
-# Respect the attention and focus of the user
-#	Spinners are designed to grab attention, so use them judiciously.
-# Animation should begin immediately
-# 	If there is a long pause at the start, the user might think there is an issue.
-#	:snail might need to be removed for this reason...
-
-
-	if x == :arrow
-		s = "←↖↑↗→↘↓↙"
-	elseif x == :bar
-		s = "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
-	elseif x == :blink
-		s="⊙◡⊙⊙◡⊙⊙⊙⊙⊙⊙⊙"
-	elseif x == :bounce
-		s=[
-			"(●    )"
-			"( ●   )"
-			"(  ●  )"
-			"(   ● )"
-			"(    ●)"
-			"(   ● )"
-			"(  ●  )"
-			"( ●   )"
-		]
-	elseif x == :cards
-		s=[
-			"🂠🂠🂠🂠🂠",
-			"🂪🂠🂠🂠🂠",
-			"🂪🂫🂠🂠🂠",
-			"🂪🂫🂭🂠🂠",
-			"🂪🂫🂭🂮🂠",
-			"🂪🂫🂭🂮🂱",
-			"🂪🂫🂭🂮🂱",
-			"🂪🂫🂭🂮🂱",
-			"🂪🂫🂭🂮🂱",
-			"🂠🂫🂭🂮🂱",
-			"🂠🂠🂭🂮🂱",
-			"🂠🂠🂠🂮🂱",
-			"🂠🂠🂠🂠🂱",
-			"🂠🂠🂠🂠🂠",
-			"🂠🂠🂠🂠🂠",
-			"🂠🂠🂠🂠🂠",
-			"🂠🂠🂠🂠🂠",
-		]
-	elseif x == :clock
-		s = join([Char(i) for i in 0x1f550:0x1f55b])
-	elseif x == :dots
-		s = join([Char(i) for i in 0x2800:0x28ff])
-		#  @show map(Unicode.julia_chartransform, x for x in s)
-		# or just collect(s)
-	elseif x == :loading
-		s=[
-			"Loading.    ",
-			"Loading..   ",
-			"Loading...  ",
-			"Loading.... ",
-			"Loading.....",
-			"Loading.....",
-			"Loading.....",
-			"Loading.....",
-		]
-
-	elseif x == :moon
-		s="🌑🌒🌓🌔🌕🌖🌗🌘"
-	elseif x == :pong # https://github.com/sindresorhus/cli-spinners
-		s = [
-			"▐⠂       ▌",
-			"▐⠈       ▌",
-			"▐ ⠂      ▌",
-			"▐ ⠠      ▌",
-			"▐  ⡀     ▌",
-			"▐  ⠠     ▌",
-			"▐   ⠂    ▌",
-			"▐   ⠈    ▌",
-			"▐    ⠂   ▌",
-			"▐    ⠠   ▌",
-			"▐     ⡀  ▌",
-			"▐     ⠠  ▌",
-			"▐      ⠂ ▌",
-			"▐      ⠈ ▌",
-			"▐       ⠂▌",
-			"▐       ⠠▌",
-			"▐       ⡀▌",
-			"▐      ⠠ ▌",
-			"▐      ⠂ ▌",
-			"▐     ⠈  ▌",
-			"▐     ⠂  ▌",
-			"▐    ⠠   ▌",
-			"▐    ⡀   ▌",
-			"▐   ⠠    ▌",
-			"▐   ⠂    ▌",
-			"▐  ⠈     ▌",
-			"▐  ⠂     ▌",
-			"▐ ⠠      ▌",
-			"▐ ⡀      ▌",
-			"▐⠠       ▌"
-		]
-	elseif x == :shutter
-		s = "▉▊▋▌▍▎▏▎▍▌▋▊▉"
-	elseif x == :snail
-		s = ["🐌        🏁"]
-	else
-		s = "? "
-	end
-
-	return s
-end
+get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 function __start_up(s)
 
@@ -144,7 +36,7 @@ function __start_up(s)
 	first = s[1]
 
 	# Assemble command to produce spinner
-	c = 
+	c =
 	"print(\"$first\");" *
 	"while true;" *
 		for_statement *
@@ -251,5 +143,97 @@ macro spinner(s::String)
 	end
 end
 
-end # module Spinners
+SPINNERS = Dict(
+    # Design principles
+    # Respect the attention and focus of the user
+    #	Spinners are designed to grab attention, so use them judiciously.
+    # Animation should begin immediately
+    # 	If there is a long pause at the start, the user might think there is an issue.
+    #	:snail might need to be removed for this reason...
 
+
+	:arrow => "←↖↑↗→↘↓↙",
+	:bar => "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁",
+	:blink => "⊙◡⊙⊙◡⊙⊙⊙⊙⊙⊙⊙",
+	:bounce => [
+			"(●    )"
+			"( ●   )"
+			"(  ●  )"
+			"(   ● )"
+			"(    ●)"
+			"(   ● )"
+			"(  ●  )"
+			"( ●   )"
+		],
+	:cards => [
+			"🂠🂠🂠🂠🂠",
+			"🂪🂠🂠🂠🂠",
+			"🂪🂫🂠🂠🂠",
+			"🂪🂫🂭🂠🂠",
+			"🂪🂫🂭🂮🂠",
+			"🂪🂫🂭🂮🂱",
+			"🂪🂫🂭🂮🂱",
+			"🂪🂫🂭🂮🂱",
+			"🂪🂫🂭🂮🂱",
+			"🂠🂫🂭🂮🂱",
+			"🂠🂠🂭🂮🂱",
+			"🂠🂠🂠🂮🂱",
+			"🂠🂠🂠🂠🂱",
+			"🂠🂠🂠🂠🂠",
+			"🂠🂠🂠🂠🂠",
+			"🂠🂠🂠🂠🂠",
+			"🂠🂠🂠🂠🂠",
+		],
+	:clock => join([Char(i) for i in 0x1f550:0x1f55b]),
+	:dots => join([Char(i) for i in 0x2800:0x28ff]),
+		#  @show map(Unicode.julia_chartransform, x for x in s)
+		# or just collect(s)
+	:loading => [
+			"Loading.    ",
+			"Loading..   ",
+			"Loading...  ",
+			"Loading.... ",
+			"Loading.....",
+			"Loading.....",
+			"Loading.....",
+			"Loading.....",
+		],
+	:moon => "🌑🌒🌓🌔🌕🌖🌗🌘",
+    # https://github.com/sindresorhus/cli-spinners
+	:pong => [
+			"▐⠂       ▌",
+			"▐⠈       ▌",
+			"▐ ⠂      ▌",
+			"▐ ⠠      ▌",
+			"▐  ⡀     ▌",
+			"▐  ⠠     ▌",
+			"▐   ⠂    ▌",
+			"▐   ⠈    ▌",
+			"▐    ⠂   ▌",
+			"▐    ⠠   ▌",
+			"▐     ⡀  ▌",
+			"▐     ⠠  ▌",
+			"▐      ⠂ ▌",
+			"▐      ⠈ ▌",
+			"▐       ⠂▌",
+			"▐       ⠠▌",
+			"▐       ⡀▌",
+			"▐      ⠠ ▌",
+			"▐      ⠂ ▌",
+			"▐     ⠈  ▌",
+			"▐     ⠂  ▌",
+			"▐    ⠠   ▌",
+			"▐    ⡀   ▌",
+			"▐   ⠠    ▌",
+			"▐   ⠂    ▌",
+			"▐  ⠈     ▌",
+			"▐  ⠂     ▌",
+			"▐ ⠠      ▌",
+			"▐ ⡀      ▌",
+			"▐⠠       ▌"
+		],
+	:shutter => "▉▊▋▌▍▎▏▎▍▌▋▊▉",
+	:snail => ["🐌        🏁"],
+)
+
+end # module Spinners

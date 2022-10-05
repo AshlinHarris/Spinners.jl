@@ -8,7 +8,7 @@ module Spinners
 
 using Unicode: transcode
 
-export @spinner
+export @spinner, spinner
 
 const BACKSPACE = '\b'
 const ANSI_ESCAPE = '\u001B'
@@ -30,14 +30,29 @@ Create a command line spinner
 
 ## Available symbols
 """
-macro spinner(s, f)
-	quote
+#! TODO Macros to rewrite
+
+#! TODO Write documentation
+function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Expr, Function} = quote sleep(3) end)
+
+        #TODO error management (@warn ...)
 		hide_cursor()
-		local T = timer_spin($s)
-		$(esc(f))
+
+        if typeof(style) == Symbol
+            local T = timer_spin(style |> get_named_string)
+        else
+            local T = timer_spin(style)
+        end
+
+        if typeof(action)==Expr
+            eval(action)
+        else
+            action()
+        end
+
 		close(T)
 		show_cursor()
-	end
+
 end
 
 # Assemble the global Spinner dictionnary from SpinnerDefinitions.jl
@@ -53,7 +68,7 @@ function timer_spin(raw_s)
 	else
 		s = raw_s
 	end
-	
+
 	i=1
 	print(s[1])
 	cb(timer) = (

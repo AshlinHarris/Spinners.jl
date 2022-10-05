@@ -18,7 +18,6 @@ const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 const default_user_function() = sleep(3)
 
-
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 function __start_up(s)
@@ -96,7 +95,6 @@ Create a command line spinner
 
 ## Usage
 ```
-@spinner expression          # Use the default spinner
 @spinner "string" expression # Iterate through the graphemes of a string
 @spinner :symbol expression  # Use a built-in spinner
 ```
@@ -104,42 +102,11 @@ Create a command line spinner
 ## Available symbols
 `:arrow`, `:bar`, `:blink`, `:bounce`, `:cards`, `:clock`, `:dots`, `:loading`, `:moon`, `:pong`, `:shutter`, `:snail`
 """
-macro spinner()
+macro spinner(s, f)
 	quote
-		@spinner default_user_function()
-	end
-end
-macro spinner(x::QuoteNode)
-	quote
-		local s = get_named_string($x)
-		local p = __start_up(s)
-		default_user_function()
-		__clean_up(p, s)
-	end
-end
-macro spinner(x::QuoteNode, f)
-	quote
-		local s = get_named_string($x)
-		local p = __start_up(s)
+		local T = timer_spin($s)
 		$(esc(f))
-		__clean_up(p,s)
-	end
-end
-macro spinner(s::String, f)
-	quote
-		local p = __start_up($s)
-		$(esc(f))
-		__clean_up(p,$s)
-	end
-end
-macro spinner(f)
-	quote
-		@spinner "◒◐◓◑" $(esc(f))
-	end
-end
-macro spinner(s::String)
-	quote
-		@spinner $s default_user_function()
+		close(T)
 	end
 end
 
@@ -147,5 +114,23 @@ end
 include("SpinnerDefinitions.jl")
 # Add dictionnaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
+
+function timer_spin(raw_s)
+	if typeof(raw_s) == Symbol
+		s = get_named_string(raw_s) |> collect
+	elseif typeof(raw_s) == String
+		s = collect(raw_s)
+	else
+		s = raw_s
+	end
+	
+	i=1
+	print(s[1])
+	cb(timer) = (
+		i+=1;
+		print("\b"^length(transcode(UInt16, string(s[(i-1)%length(s)+1])))*s[i%length(s)+1]);
+	)
+	return Timer(cb, 2, interval = 0.2)
+end
 
 end # module Spinners

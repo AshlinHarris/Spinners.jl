@@ -60,7 +60,7 @@ function timer_spin(raw_s)
 		i+=1;
 		print("\b"^length(transcode(UInt16, string(s[(i-1)%length(s)+1])))*s[i%length(s)+1]);
 	)
-	return Timer(cb, 2, interval = 0.2)
+	return Timer(cb, 0, interval = 0.2)
 end
 
 end # module Spinners

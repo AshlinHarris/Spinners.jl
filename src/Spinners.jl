@@ -95,7 +95,6 @@ Create a command line spinner
 
 ## Usage
 ```
-@spinner expression          # Use the default spinner
 @spinner "string" expression # Iterate through the graphemes of a string
 @spinner :symbol expression  # Use a built-in spinner
 ```
@@ -103,48 +102,13 @@ Create a command line spinner
 ## Available symbols
 `:arrow`, `:bar`, `:blink`, `:bounce`, `:cards`, `:clock`, `:dots`, `:loading`, `:moon`, `:pong`, `:shutter`, `:snail`
 """
-#=
-macro spinner()
-	quote
-		@spinner default_user_function()
-	end
-end
-macro spinner(x::QuoteNode)
-	quote
-		local s = get_named_string($x)
-		local p = __start_up(s)
-		default_user_function()
-		__clean_up(p, s)
-	end
-end
-macro spinner(x::QuoteNode, f)
-	quote
-		local s = get_named_string($x)
-		local p = __start_up(s)
-		$(esc(f))
-		__clean_up(p,s)
-	end
-end
 macro spinner(s, f)
 	quote
-		#local p = __start_up($s)
-		local T = timer_spin(s)
+		local T = timer_spin($s)
 		$(esc(f))
-		#__clean_up(p,$s)
 		close(T)
 	end
 end
-macro spinner(f)
-	quote
-		@spinner "◒◐◓◑" $(esc(f))
-	end
-end
-macro spinner(s::String)
-	quote
-		@spinner $s default_user_function()
-	end
-end
-=#
 
 # Assemble the global Spinner dictionnary from SpinnerDefinitions.jl
 include("SpinnerDefinitions.jl")

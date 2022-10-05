@@ -52,43 +52,6 @@ function __start_up(s)
 	return run(pipeline(` julia -e $c`, stdout), wait=false)
 end
 
-function __clean_up(p, s)
-	kill(p)
-
-	# Wait for process to terminate, if needed.
-	while process_running(p)
-		sleep(0.1)
-	end
-	sleep(0.1)
-	#=
-	if process_running(p)
-		sleep(0.01)
-		if process_running(p)
-			sleep(0.1)
-			if process_running(p)
-				sleep(1)
-				if process_running(p)
-					sleep(2)
-					# Then just give up
-					# I don't think any Julia release from this decade will typically end up here.
-				end
-			end
-		end
-	end
-	=#
-
-	flush(stdout)
-
-	# Calculate the number of spaces needed to overwrite the printed character
-	# Notice that this might exceed the required number, which could delete preceding characters
-	amount = maximum(length.(transcode.(UInt8, "$x" for x in collect(s))))
-	print(BACKSPACE^amount * " "^amount * BACKSPACE^amount)
-
-	flush(stdout)
-
-	show_cursor()
-end
-
 """
 # @spinner
 Create a command line spinner
@@ -100,13 +63,14 @@ Create a command line spinner
 ```
 
 ## Available symbols
-`:arrow`, `:bar`, `:blink`, `:bounce`, `:cards`, `:clock`, `:dots`, `:loading`, `:moon`, `:pong`, `:shutter`, `:snail`
 """
 macro spinner(s, f)
 	quote
+		hide_cursor()
 		local T = timer_spin($s)
 		$(esc(f))
 		close(T)
+		show_cursor()
 	end
 end
 

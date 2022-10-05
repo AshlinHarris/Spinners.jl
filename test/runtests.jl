@@ -21,10 +21,16 @@ end
 
 # Scope test
 let
+	os = stdout;
+	(rd, wr) = redirect_stdout();
+
 	@spinner "abc" new_variable = 4
 	@test new_variable == 4
 	@spinner "◒◐◓◑" new_variable_2 = 5
 	@test new_variable_2 == 5
+
+	redirect_stdout(os);
+	close(wr);
 end
 #=
 

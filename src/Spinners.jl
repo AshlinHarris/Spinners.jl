@@ -59,20 +59,27 @@ function timer_spin(raw_s)
 		s = raw_s
 	end
 
-	function doit(i, rch) # callback function
+	# Callback function
+	function doit(i, rch)
 	    (timer) -> begin
+
+		# Check for a stop signal (42) on this channel
 		ch = rch[myid()]
 		stop = isready(ch) && take!(ch) == 42
+
 		if(stop)
+			# Clean up and close
+			print("\b"^length(transcode(UInt16, string(s[(i)%length(s)+1]))))
 			close(timer)
 		else
-			i+=1;
-			print("\b"^length(transcode(UInt16, string(s[(i-1)%length(s)+1])))*s[i%length(s)+1]);
+			# Clean up and print next
+			print("\b"^length(transcode(UInt16, string(s[(i)%length(s)+1])))*s[(i+1)%length(s)+1])
+			i+=1
 		end
+
 	    end
 	end
 
-	
 	i=1
 	print(s[1])
 	Timer(doit(i, rch), 0, interval = 0.2)

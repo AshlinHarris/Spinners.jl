@@ -26,6 +26,7 @@ let
 	@spinner "◒◐◓◑" new_variable_2 = 5
 	@test new_variable_2 == 5
 end
+#=
 
 let rex = r"^(\e\[\?25l)([abcdefg][\b]){0,48}([\b ])*(\e\[0J\e\[\?25h)$"
 	regex_test(rex, :( @spinner "abcdefg" sleep(1) ) )
@@ -78,3 +79,4 @@ let rex = r"^(\e\[\?25l)([▉▊▋▌▍▎▏][\b])*([\b ]){2,48}(\e\[0J\e\[\?
 	regex_test(rex, :( @spinner :shutter sleep(1) ) )
 end
 
+=#

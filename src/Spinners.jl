@@ -6,9 +6,13 @@ Please see `?@spinner` for more information.
 """
 module Spinners
 
+using Base.Threads
+using Distributed
 using Unicode: transcode
 
 export @spinner, spinner
+
+rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
 
 const BACKSPACE = '\b'
 const ANSI_ESCAPE = '\u001B'
@@ -38,19 +42,10 @@ function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::
         #TODO error management (@warn ...)
 		hide_cursor()
 
-        if typeof(style) == Symbol
-            local T = timer_spin(style |> get_named_string)
-        else
-            local T = timer_spin(style)
-        end
+		local new_thing = fetch(Threads.@spawn :interactive timer_spin($s))
+		$(esc(f))
+		put!(rch[1], 42);
 
-        if typeof(action)==Expr
-            eval(action)
-        else
-            action()
-        end
-
-		close(T)
 		show_cursor()
 
 end
@@ -61,6 +56,7 @@ include("SpinnerDefinitions.jl")
 SPINNERS = merge(custom, sindresorhus)
 
 function timer_spin(raw_s)
+
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
@@ -69,13 +65,30 @@ function timer_spin(raw_s)
 		s = raw_s
 	end
 
+
+	# Callback function
+	function doit(i, rch)
+	    (timer) -> begin
+
+		# Check for a stop signal (42) on this channel
+		ch = rch[myid()]
+		stop = isready(ch) && take!(ch) == 42
+
+		if(stop)
+			# Clean up and close
+			print("\b"^length(transcode(UInt16, string(s[(i)%length(s)+1]))))
+			close(timer)
+		else
+			# Clean up and print next
+			print("\b"^length(transcode(UInt16, string(s[(i)%length(s)+1])))*s[(i+1)%length(s)+1])
+			i+=1
+		end
+
+	    end
+	end
 	i=1
 	print(s[1])
-	cb(timer) = (
-		i+=1;
-		print("\b"^length(transcode(UInt16, string(s[(i-1)%length(s)+1])))*s[i%length(s)+1]);
-	)
-	return Timer(cb, 2, interval = 0.2)
+	Timer(doit(i, rch), 0, interval = 0.2)
 end
 
 end # module Spinners

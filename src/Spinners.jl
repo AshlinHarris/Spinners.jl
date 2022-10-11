@@ -36,16 +36,26 @@ Create a command line spinner
 """
 #! TODO Macros to rewrite
 
+macro spinner(symbol::QuoteNode, action::Expr)
+    #! Not working
+    :(spinner($symbol,quote $action end))
+end
+
 #! TODO Write documentation
-function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Expr, Function} = quote sleep(3) end)
+function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Expr, Function} = quote sleep(3) end, msg:String="")
 
         #TODO error management (@warn ...)
 		hide_cursor()
 
-		local new_thing = fetch(Threads.@spawn :interactive timer_spin($s))
-		$(esc(f))
-		put!(rch[1], 42);
+        local T = fetch(Threads.@spawn :interactive timer_spin(style, msg))
 
+        if typeof(action) == Expr
+            eval(action)
+        else
+            action()
+        end
+
+		put!(rch[1], 42);
 		show_cursor()
 
 end
@@ -55,8 +65,8 @@ include("SpinnerDefinitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
-function timer_spin(raw_s)
-
+function timer_spin(raw_s, msg="")
+    #! TODO implement right custom text
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
@@ -64,7 +74,6 @@ function timer_spin(raw_s)
 	else
 		s = raw_s
 	end
-
 
 	# Callback function
 	function doit(i, rch)
@@ -86,9 +95,11 @@ function timer_spin(raw_s)
 
 	    end
 	end
+
 	i=1
 	print(s[1])
 	Timer(doit(i, rch), 0, interval = 0.2)
 end
+
 
 end # module Spinners

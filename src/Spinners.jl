@@ -37,12 +37,12 @@ Create a command line spinner
 #! TODO Macros to rewrite
 
 macro spinner(symbol::QuoteNode, action::Expr)
-    #! Not working
-    :(spinner($symbol,quote $action end))
+    # Scope problem when calling a function foo()
+    spinner(eval(symbol), action)
 end
 
 #! TODO Write documentation
-function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Expr, Function} = quote sleep(3) end, msg:String="")
+function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Expr, Function} = quote sleep(3) end, msg::String="")
 
         #TODO error management (@warn ...)
 		hide_cursor()

@@ -7,6 +7,8 @@ on:
     branches:
       - main
     tags: '*'
+env:
+  JULIA_NUM_THREADS: 1,1
 concurrency:
   # Skip intermediate builds: all builds except for builds on the `main` branch
   # Cancel intermediate builds: only pull request builds

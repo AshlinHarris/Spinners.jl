@@ -36,12 +36,28 @@ Create a command line spinner
 """
 #! TODO Macros to rewrite
 
-macro spinner(symbol::QuoteNode, action::Expr)
-    # Scope problem when calling a function foo()
-    spinner(eval(symbol), action)
+
+# Is the return needed ? one can use : var = @spinner :clock "messsage" expr
+macro spinner(inputs...)
+	_check_inputs(inputs)
+	return quote
+
+		hide_cursor()
+
+		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
+		
+		res = $(esc(inputs[end]))
+		
+		put!(rch[1], 42)
+
+		show_cursor()
+
+		res
+
+	end
 end
 
-#! TODO Write documentation
+#! Warning, no global scope
 function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Expr, Function} = quote sleep(3) end, msg::String="")
 
         #TODO error management (@warn ...)
@@ -50,13 +66,15 @@ function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::
         local T = fetch(Threads.@spawn :interactive timer_spin(style, msg))
 
         if typeof(action) == Expr
-            eval(action)
+            res = eval(action)
         else
-            action()
+            res = action()
         end
 
 		put!(rch[1], 42);
 		show_cursor()
+
+		return res
 
 end
 
@@ -99,6 +117,10 @@ function timer_spin(raw_s, msg="")
 	i=1
 	print(s[1])
 	Timer(doit(i, rch), 0, interval = 0.2)
+end
+
+function _check_inputs(inputs)
+	#! To implement
 end
 
 

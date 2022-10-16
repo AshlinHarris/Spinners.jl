@@ -45,9 +45,9 @@ macro spinner(inputs...)
 		hide_cursor()
 
 		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
-		
+
 		res = $(esc(inputs[end]))
-		
+
 		put!(rch[1], 42)
 
 		show_cursor()
@@ -57,8 +57,8 @@ macro spinner(inputs...)
 	end
 end
 
-#! Warning, no global scope
-function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Expr, Function} = quote sleep(3) end, msg::String="")
+# if i want a spinner for foo(5) then type spinner(:clock, foo, (5))
+function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Function} = quote sleep(3) end, args=nothing; msg::String="")
 
         #TODO error management (@warn ...)
 		hide_cursor()
@@ -68,7 +68,11 @@ function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::
         if typeof(action) == Expr
             res = eval(action)
         else
-            res = action()
+            if args!=nothing
+                res = action(args)
+            else
+                res = action()
+            end
         end
 
 		put!(rch[1], 42);

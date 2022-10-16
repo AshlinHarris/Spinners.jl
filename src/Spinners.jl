@@ -34,28 +34,8 @@ Create a command line spinner
 
 ## Available symbols
 """
-#! TODO Macros to rewrite
 
 
-# Is the return needed ? one can use : var = @spinner :clock "messsage" expr
-macro spinner(inputs...)
-	_check_inputs(inputs)
-	return quote
-
-		hide_cursor()
-
-		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
-
-		res = $(esc(inputs[end]))
-
-		put!(rch[1], 42)
-
-		show_cursor()
-
-		res
-
-	end
-end
 
 # if i want a spinner for foo(5) then type spinner(:clock, foo, (5))
 function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Function} = quote sleep(3) end, args=nothing; msg::String="")
@@ -88,7 +68,7 @@ include("SpinnerDefinitions.jl")
 SPINNERS = merge(custom, sindresorhus)
 
 function timer_spin(raw_s, msg="")
-    #! TODO implement right custom text
+    #! TODO implement right custom text (msg arg)
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
@@ -127,5 +107,34 @@ function _check_inputs(inputs)
 	#! To implement
 end
 
+
+
+# Is the return needed ? one can use : var = @spinner :clock "message" expr
+macro spinner(inputs...)
+	_check_inputs(inputs)
+	return quote
+
+		hide_cursor()
+
+		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
+
+		res = $(esc(inputs[end]))
+
+		put!(rch[1], 42)
+
+		show_cursor()
+
+		res
+
+	end
+end
+
+macro spinner()
+    @spinner :clock sleep(3)
+end
+
+macro spinner(style::QuoteNode)
+    :(@spinner $style sleep(3))
+end
 
 end # module Spinners

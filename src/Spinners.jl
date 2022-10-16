@@ -37,8 +37,8 @@ Create a command line spinner
 
 
 
-# if i want a spinner for foo(5) then type spinner(:clock, foo, (5))
-function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Function} = quote sleep(3) end, args=nothing; msg::String="")
+# if i want a spinner for foo(5) then type spinner(:clock, foo, 5)
+function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Function} = quote sleep(3) end, args::Union{Any, Vector{Any}}=nothing; msg::String="")
 
         #TODO error management (@warn ...)
 		hide_cursor()
@@ -49,7 +49,7 @@ function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::
             res = eval(action)
         else
             if args!=nothing
-                res = action(args)
+                res = action((args)...)
             else
                 res = action()
             end

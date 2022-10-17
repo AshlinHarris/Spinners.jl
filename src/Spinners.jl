@@ -67,7 +67,18 @@ function timer_spin(parameters...)
 		seconds_per_frame = popfirst!(inputs)
 	end
 
-    #! TODO implement right custom text (msg arg)
+	if isempty(inputs)
+		msg_before = ""
+	else
+		msg_before = popfirst!(inputs)
+	end
+
+	if isempty(inputs)
+		msg_after = ""
+	else
+		msg_after = popfirst!(inputs)
+	end
+
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
@@ -75,6 +86,10 @@ function timer_spin(parameters...)
 	else
 		s = raw_s
 	end
+
+	# Append messages to each frame
+	s = msg_before .* s
+	s .*= msg_after
 
 	# Callback function
 	function doit(i, rch)

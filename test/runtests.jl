@@ -36,9 +36,12 @@ let
 	#@spinner :clock 
 	@spinner :clock x=1
 	@spinner :clock f()
-	@spinner :clock 0.2
 	@spinner :clock 0.2 x=1
 	@spinner :clock 0.2 f()
+	@spinner :clock 0.2 "before" x=1
+	@spinner :clock 0.2 "before" f()
+	@spinner :clock 0.2 "before" "after" x=1
+	@spinner :clock 0.2 "before" "after" f()
 	s=:clock
 	#@spinner s "hello"
 	#@spinner s "hello" x=1

@@ -36,9 +36,9 @@ let
 	#@spinner :clock 
 	@spinner :clock x=1
 	@spinner :clock f()
-	@spinner :clock "hello"
-	@spinner :clock "hello" x=1
-	@spinner :clock "hello" f()
+	@spinner :clock 0.2
+	@spinner :clock 0.2 x=1
+	@spinner :clock 0.2 f()
 	s=:clock
 	#@spinner s "hello"
 	#@spinner s "hello" x=1

@@ -67,6 +67,9 @@ include("SpinnerDefinitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
+function timer_spin()
+	timer_spin(:clock, "")
+end
 function timer_spin(raw_s, msg="")
     #! TODO implement right custom text (msg arg)
 	if typeof(raw_s) == Symbol

@@ -46,7 +46,26 @@ SPINNERS = merge(custom, sindresorhus)
 function timer_spin()
 	timer_spin(:clock, "")
 end
-function timer_spin(raw_s, msg="")
+#function timer_spin(raw_s, msg="")
+function timer_spin(parameters...)
+
+	inputs = collect(parameters)
+
+	# Process inputs
+	# Currently, this makes assumptions on the presence and order of certain inputs
+	# Ideally, we should parse the input.
+	if isempty(inputs)
+		raw_s = :clock
+	else
+		raw_s = popfirst!(inputs)
+	end
+
+	if isempty(inputs)
+		msg = ""
+	else
+		msg = popfirst!(inputs)
+	end
+
     #! TODO implement right custom text (msg arg)
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
@@ -84,22 +103,18 @@ function timer_spin(raw_s, msg="")
 	Timer(doit(i, rch), 0, interval = 0.2)
 end
 
-function _check_inputs(inputs)
-	#! To implement
-end
-
-# Is the return needed ? one can use : var = @spinner :clock "message" expr
+# Add spinner start up and clean up to user expression
 macro spinner(inputs...)
-	_check_inputs(inputs)
 	return quote
+		# Add start up before user expression
 		hide_cursor()
-
 		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
 
-		res = $(esc(inputs[end]))
-		res
-		put!(rch[1], 42)
+		# User expression
+		$(esc(inputs[end]))
 
+		# Add clean up after user expression
+		put!(rch[1], 42)
 		show_cursor()
 	end
 end

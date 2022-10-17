@@ -79,6 +79,12 @@ function timer_spin(parameters...)
 		msg_after = popfirst!(inputs)
 	end
 
+	if isempty(inputs)
+		mode = :none
+	else
+		mode = popfirst!(inputs)
+	end
+
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
@@ -92,7 +98,7 @@ function timer_spin(parameters...)
 	s .*= msg_after
 
 	# Callback function
-	function doit(i, rch)
+	function doit(i, rch, mode)
 		(timer) -> begin
 			# Check for a stop signal (42) on this channel
 			ch = rch[myid()]
@@ -106,17 +112,20 @@ function timer_spin(parameters...)
 			if(stop)
 				close(timer)
 			else
-				i+=1
+				if mode == :rand || mode == :random
+					i = rand(filter((x) -> x!= i, 1:100))
+				else
+					i+=1
+				end
 				next = get_character(s, i)
 				print(next)
 			end
 
 		end
 	end
-
 	i=1
 	print(s[1])
-	Timer(doit(i, rch), 0, interval = seconds_per_frame)
+	Timer(doit(i, rch, mode), 0, interval = seconds_per_frame)
 end
 
 # Add spinner start up and clean up to user expression

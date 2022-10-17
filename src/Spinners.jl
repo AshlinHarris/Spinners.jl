@@ -10,7 +10,7 @@ using Base.Threads
 using Distributed
 using Unicode: transcode
 
-export @spinner
+export @spinner, spinner
 
 rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
 
@@ -34,14 +34,32 @@ Create a command line spinner
 
 ## Available symbols
 """
-macro spinner(s, f)
-	quote
+
+
+
+# if i want a spinner for foo(5) then type spinner(:clock, foo, 5)
+function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Function} = quote sleep(3) end, args::Union{Any, Vector{Any}}=nothing; msg::String="")
+
+        #TODO error management (@warn ...)
 		hide_cursor()
-		local new_thing = fetch(Threads.@spawn :interactive timer_spin($s))
-		$(esc(f))
+
+        local T = fetch(Threads.@spawn :interactive timer_spin(style, msg))
+
+        if typeof(action) == Expr
+            res = eval(action)
+        else
+            if args!=nothing
+                res = action((args)...)
+            else
+                res = action()
+            end
+        end
+
 		put!(rch[1], 42);
 		show_cursor()
-	end
+
+		return res
+
 end
 
 # Assemble the global Spinner dictionnary from SpinnerDefinitions.jl
@@ -49,8 +67,8 @@ include("SpinnerDefinitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
-function timer_spin(raw_s)
-
+function timer_spin(raw_s, msg="")
+    #! TODO implement right custom text (msg arg)
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
@@ -83,6 +101,40 @@ function timer_spin(raw_s)
 	i=1
 	print(s[1])
 	Timer(doit(i, rch), 0, interval = 0.2)
+end
+
+function _check_inputs(inputs)
+	#! To implement
+end
+
+
+
+# Is the return needed ? one can use : var = @spinner :clock "message" expr
+macro spinner(inputs...)
+	_check_inputs(inputs)
+	return quote
+
+		hide_cursor()
+
+		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
+
+		res = $(esc(inputs[end]))
+
+		put!(rch[1], 42)
+
+		show_cursor()
+
+		res
+
+	end
+end
+
+macro spinner()
+    @spinner :clock sleep(3)
+end
+
+macro spinner(style::QuoteNode)
+    :(@spinner $style sleep(3))
 end
 
 end # module Spinners

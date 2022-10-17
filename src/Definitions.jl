@@ -53,6 +53,7 @@ custom = Dict(
 			"Loading.....",
 			"Loading.....",
 		],
+	:pinwheel => "\\|/-",
 	:shutter => "▉▊▋▌▍▎▏▎▍▌▋▊▉",
 	:snail => ["🐌        🏁"],
 )

@@ -30,7 +30,7 @@ let
 
 	# Usage tests
 	f() = 2+2
-	@spinner
+	#@spinner
 	@spinner x=1
 	@spinner f()
 	@spinner :clock 

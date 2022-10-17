@@ -130,7 +130,8 @@ macro spinner(inputs...)
 end
 
 macro spinner()
-    @spinner :clock sleep(3)
+        @info("An expression is required (e.g., `@spinner sleep(4)`).")
 end
+
 
 end # module Spinners

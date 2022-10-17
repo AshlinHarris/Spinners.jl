@@ -46,7 +46,6 @@ SPINNERS = merge(custom, sindresorhus)
 function timer_spin()
 	timer_spin(:clock, "")
 end
-#function timer_spin(raw_s, msg="")
 function timer_spin(parameters...)
 
 	inputs = collect(parameters)
@@ -61,9 +60,9 @@ function timer_spin(parameters...)
 	end
 
 	if isempty(inputs)
-		msg = ""
+		seconds_per_frame = 0.2
 	else
-		msg = popfirst!(inputs)
+		seconds_per_frame = popfirst!(inputs)
 	end
 
     #! TODO implement right custom text (msg arg)
@@ -100,7 +99,7 @@ function timer_spin(parameters...)
 
 	i=1
 	print(s[1])
-	Timer(doit(i, rch), 0, interval = 0.2)
+	Timer(doit(i, rch), 0, interval = seconds_per_frame)
 end
 
 # Add spinner start up and clean up to user expression

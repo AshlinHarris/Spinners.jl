@@ -21,7 +21,9 @@ const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 get_character(s,i) = s[(i)%length(s)+1]
-erase_character(c) = print("\b"^length(transcode(UInt16, string(c))))
+#erase_character(c) = print("\e[1D \e[1D")
+#erase_character(c) = print("\b"^length(transcode(UInt16, string(c))))
+erase_character(c) = print("\b"^(sizeof("$c")+1÷2))
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 

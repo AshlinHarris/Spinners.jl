@@ -19,17 +19,34 @@ function regex_test(rex, expr)
 	@test occursin(rex, out)
 end
 
-# Scope test
 os = stdout;
 (rd, wr) = redirect_stdout();
 let
+	# Scope tests
 	@spinner "abc" new_variable = 4
 	@test new_variable == 4
 	@spinner "◒◐◓◑" new_variable_2 = 5
 	@test new_variable_2 == 5
+
+	# Usage tests
+	f() = 2+2
+	@spinner
+	@spinner x=1
+	@spinner f()
+	@spinner :clock 
+	@spinner :clock x=1
+	@spinner :clock f()
+	@spinner :clock "hello"
+	@spinner :clock "hello" x=1
+	@spinner :clock "hello" f()
+	s=:clock
+	#@spinner s "hello"
+	#@spinner s "hello" x=1
+	#@spinner s "hello" f()
 end
 redirect_stdout(os);
 close(wr);
+
 #=
 
 let rex = r"^(\e\[\?25l)([abcdefg][\b]){0,48}([\b ])*(\e\[0J\e\[\?25h)$"

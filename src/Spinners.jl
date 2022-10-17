@@ -46,56 +46,55 @@ include("Definitions.jl")
 SPINNERS = merge(custom, sindresorhus)
 
 function timer_spin()
-	timer_spin(:clock, "")
+	timer_spin("◒◐◓◑")
 end
 function timer_spin(parameters...)
 
 	inputs = collect(parameters)
 
 	# Process inputs
-	# Currently, this makes assumptions on the presence and order of certain inputs
-	# Ideally, we should parse the input.
+
 	if isempty(inputs)
-		raw_s = :clock
+		seconds_per_frame = 0.2
+	else
+		location = [isa(x, Number) for x in inputs] |> findfirst
+		if isnothing(location)
+			seconds_per_frame = 0.2
+		else
+			seconds_per_frame = popat!(inputs, location)
+		end
+	end
+
+	if isempty(inputs)
+		raw_s = "◒◐◓◑"
 	else
 		raw_s = popfirst!(inputs)
 	end
 
 	if isempty(inputs)
-		seconds_per_frame = 0.2
+		msg = ""
 	else
-		seconds_per_frame = popfirst!(inputs)
-	end
-
-	if isempty(inputs)
-		msg_before = ""
-	else
-		msg_before = popfirst!(inputs)
-	end
-
-	if isempty(inputs)
-		msg_after = ""
-	else
-		msg_after = popfirst!(inputs)
+		msg = popfirst!(inputs)::String
 	end
 
 	if isempty(inputs)
 		mode = :none
 	else
-		mode = popfirst!(inputs)
+		mode = popfirst!(inputs)::Symbol
 	end
 
 	if typeof(raw_s) == Symbol
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
 		s = collect(raw_s)
+		s = ["$i" for i in s]
+
 	else
 		s = raw_s
 	end
 
 	# Append messages to each frame
-	s = msg_before .* s
-	s .*= msg_after
+	s .*= msg
 
 	# Callback function
 	function doit(i, rch, mode)

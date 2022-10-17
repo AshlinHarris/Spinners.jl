@@ -20,6 +20,9 @@ const ANSI_ESCAPE = '\u001B'
 const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
+get_character(s,i) = s[(i)%length(s)+1]
+erase_character(c) = print("\b"^length(transcode(UInt16, string(c))))
+
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 """
@@ -34,8 +37,6 @@ Create a command line spinner
 
 ## Available symbols
 """
-
-
 
 # if i want a spinner for foo(5) then type spinner(:clock, foo, 5)
 function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Function} = quote sleep(3) end, args::Union{Any, Vector{Any}}=nothing; msg::String="")
@@ -55,15 +56,15 @@ function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::
             end
         end
 
-		put!(rch[1], 42);
-		show_cursor()
+	put!(rch[1], 42);
+	show_cursor()
 
-		return res
+	return res
 
 end
 
-# Assemble the global Spinner dictionnary from SpinnerDefinitions.jl
-include("SpinnerDefinitions.jl")
+# Assemble the global Spinner dictionnary from Definitions.jl
+include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
@@ -82,23 +83,25 @@ function timer_spin(raw_s, msg="")
 
 	# Callback function
 	function doit(i, rch)
-	    (timer) -> begin
+		(timer) -> begin
+			# Check for a stop signal (42) on this channel
+			ch = rch[myid()]
+			stop = isready(ch) && take!(ch) == 42
 
-		# Check for a stop signal (42) on this channel
-		ch = rch[myid()]
-		stop = isready(ch) && take!(ch) == 42
+			# Clean up
+			current = get_character(s,i)
+			erase_character(current)
 
-		if(stop)
-			# Clean up and close
-			print("\b"^length(transcode(UInt16, string(s[(i)%length(s)+1]))))
-			close(timer)
-		else
-			# Clean up and print next
-			print("\b"^length(transcode(UInt16, string(s[(i)%length(s)+1])))*s[(i+1)%length(s)+1])
-			i+=1
+			# Stop or print next
+			if(stop)
+				close(timer)
+			else
+				i+=1
+				next = get_character(s, i)
+				print(next)
+			end
+
 		end
-
-	    end
 	end
 
 	i=1
@@ -110,34 +113,24 @@ function _check_inputs(inputs)
 	#! To implement
 end
 
-
-
 # Is the return needed ? one can use : var = @spinner :clock "message" expr
 macro spinner(inputs...)
 	_check_inputs(inputs)
 	return quote
-
 		hide_cursor()
 
 		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
 
 		res = $(esc(inputs[end]))
-
+		res
 		put!(rch[1], 42)
 
 		show_cursor()
-
-		res
-
 	end
 end
 
 macro spinner()
     @spinner :clock sleep(3)
-end
-
-macro spinner(style::QuoteNode)
-    :(@spinner $style sleep(3))
 end
 
 end # module Spinners

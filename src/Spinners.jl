@@ -68,12 +68,6 @@ function timer_spin(parameters...)
 	end
 
 	if isempty(inputs)
-		msg_before = ""
-	else
-		msg_before = popfirst!(inputs)
-	end
-
-	if isempty(inputs)
 		msg_after = ""
 	else
 		msg_after = popfirst!(inputs)
@@ -89,12 +83,13 @@ function timer_spin(parameters...)
 		s = get_named_string(raw_s) |> collect
 	elseif typeof(raw_s) == String
 		s = collect(raw_s)
+		s = ["$i" for i in s]
+
 	else
 		s = raw_s
 	end
 
 	# Append messages to each frame
-	s = msg_before .* s
 	s .*= msg_after
 
 	# Callback function

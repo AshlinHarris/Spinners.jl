@@ -31,9 +31,9 @@ let
 	# Usage tests
 	f() = 2+2
 	#@spinner
-	@spinner x=1
-	@spinner f()
-	@spinner :clock 
+	#@spinner x=1
+	#@spinner f()
+	#@spinner :clock 
 	@spinner :clock x=1
 	@spinner :clock f()
 	@spinner :clock "hello"

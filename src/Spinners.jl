@@ -38,31 +38,6 @@ Create a command line spinner
 ## Available symbols
 """
 
-# if i want a spinner for foo(5) then type spinner(:clock, foo, 5)
-function spinner(style::Union{Symbol, String, Vector{String}} = :clock, action::Union{Function} = quote sleep(3) end, args::Union{Any, Vector{Any}}=nothing; msg::String="")
-
-        #TODO error management (@warn ...)
-		hide_cursor()
-
-        local T = fetch(Threads.@spawn :interactive timer_spin(style, msg))
-
-        if typeof(action) == Expr
-            res = eval(action)
-        else
-            if args!=nothing
-                res = action((args)...)
-            else
-                res = action()
-            end
-        end
-
-	put!(rch[1], 42);
-	show_cursor()
-
-	return res
-
-end
-
 # Assemble the global Spinner dictionnary from Definitions.jl
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
@@ -132,6 +107,5 @@ end
 macro spinner()
         @info("An expression is required (e.g., `@spinner sleep(4)`).")
 end
-
 
 end # module Spinners

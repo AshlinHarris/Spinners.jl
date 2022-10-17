@@ -20,18 +20,16 @@ function regex_test(rex, expr)
 end
 
 # Scope test
+os = stdout;
+(rd, wr) = redirect_stdout();
 let
-	os = stdout;
-	(rd, wr) = redirect_stdout();
-
 	@spinner "abc" new_variable = 4
 	@test new_variable == 4
 	@spinner "◒◐◓◑" new_variable_2 = 5
 	@test new_variable_2 == 5
-
-	redirect_stdout(os);
-	close(wr);
 end
+redirect_stdout(os);
+close(wr);
 #=
 
 let rex = r"^(\e\[\?25l)([abcdefg][\b]){0,48}([\b ])*(\e\[0J\e\[\?25h)$"

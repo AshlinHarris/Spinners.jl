@@ -42,6 +42,8 @@ let
 	@spinner :clock 0.2 "before" f()
 	@spinner :clock 0.2 "before" "after" x=1
 	@spinner :clock 0.2 "before" "after" f()
+	@spinner :clock 0.2 "before" "after" :rand x=1
+	@spinner :clock 0.2 "before" "after" :random f()
 	s=:clock
 	#@spinner s "hello"
 	#@spinner s "hello" x=1

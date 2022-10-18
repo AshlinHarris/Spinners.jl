@@ -8,6 +8,7 @@ module Spinners
 
 using Base.Threads
 using Distributed
+using Unicode: graphemes
 using Unicode: transcode
 
 export @spinner, spinner
@@ -20,10 +21,10 @@ const ANSI_ESCAPE = '\u001B'
 const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
-get_character(s,i) = s[(i)%length(s)+1]
-#erase_character(c) = print("\e[1D \e[1D")
-#erase_character(c) = print("\b"^length(transcode(UInt16, string(c))))
-erase_character(c) = print("\b"^(sizeof("$c")+1÷2))
+get_grapheme(s,i) = s[(i)%length(s)+1]
+erase_grapheme(c) = print("\b"^textwidth(c) *
+	" "^textwidth(c) *
+	"\b"^textwidth(c) )
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
@@ -84,11 +85,11 @@ function timer_spin(parameters...)
 	end
 
 	if typeof(raw_s) == Symbol
-		s = get_named_string(raw_s) |> collect
-	elseif typeof(raw_s) == String
-		s = collect(raw_s)
-		s = ["$i" for i in s]
+		raw_s = get_named_string(raw_s)
+	end
 
+	if typeof(raw_s) == String
+		s = ["$i" for i in collect(graphemes(raw_s))]
 	else
 		s = raw_s
 	end
@@ -104,8 +105,8 @@ function timer_spin(parameters...)
 			stop = isready(ch) && take!(ch) == 42
 
 			# Clean up
-			current = get_character(s,i)
-			erase_character(current)
+			current = get_grapheme(s,i)
+			erase_grapheme(current)
 
 			# Stop or print next
 			if(stop)
@@ -116,7 +117,7 @@ function timer_spin(parameters...)
 				else
 					i+=1
 				end
-				next = get_character(s, i)
+				next = get_grapheme(s, i)
 				print(next)
 			end
 

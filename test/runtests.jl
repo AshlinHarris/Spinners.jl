@@ -46,6 +46,12 @@ let
 	#@spinner s "hello"
 	#@spinner s "hello" x=1
 	#@spinner s "hello" f()
+
+	# Tricky spinners
+	@spinner "क़ " sleep(2)
+	@spinner ["क़ ", "12345"] sleep(2)
+	@spinner "🎉\u3000დ\u3000@ क़ " sleep(2)
+
 end
 redirect_stdout(os);
 close(wr);

@@ -161,7 +161,7 @@ function timer_spin(parameters...)
 	try
 		hide_cursor()
 		print(s[1])
-		my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame)
+		my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame);
 		wait(my_timer)
 		show_cursor()
 	catch

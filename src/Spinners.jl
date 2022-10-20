@@ -129,6 +129,9 @@ function timer_spin(parameters...)
 end
 
 # Add spinner start up and clean up to user expression
+macro spinner()
+        @info("An expression is required (e.g., `@spinner sleep(4)`).")
+end
 macro spinner(inputs...)
 	return quote
 		# Add start up before user expression
@@ -142,10 +145,6 @@ macro spinner(inputs...)
 		put!(rch[1], 42)
 		show_cursor()
 	end
-end
-
-macro spinner()
-        @info("An expression is required (e.g., `@spinner sleep(4)`).")
 end
 
 end # module Spinners

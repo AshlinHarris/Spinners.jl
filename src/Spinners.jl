@@ -20,6 +20,7 @@ using Unicode: transcode
 export @spinner, spinner
 
 # Spinner struct
+
 mutable struct Spinner
 	#id::Unsigned
 	#location::String
@@ -28,10 +29,7 @@ mutable struct Spinner
 	frame::Unsigned
 end
 
-rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
-
-const hide_cursor() = print("\u001B[?25l")
-const show_cursor() = print("\u001B[0J", "\u001B[?25h")
+# Functions on spinner types
 
 function get_grapheme(spinner)
 	s = spinner.style
@@ -50,7 +48,9 @@ function erase_grapheme(spinner)
 	return
 end
 
-get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
+# Signaling spinners
+
+rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
 
 const STOP_SIGNAL = 42
 const signal_to_close() = put!(rch[1], STOP_SIGNAL)
@@ -58,6 +58,11 @@ function stop_signal_found()
 	ch = rch[myid()]
 	stop = isready(ch) && take!(ch) == STOP_SIGNAL
 end
+
+const hide_cursor() = print("\u001B[?25l")
+const show_cursor() = print("\u001B[0J", "\u001B[?25h")
+
+get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 """
 # @spinner

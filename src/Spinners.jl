@@ -31,11 +31,8 @@ export @spinner, spinner
 
 rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
 
-const BACKSPACE = '\b'
-const ANSI_ESCAPE = '\u001B'
-
-const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
-const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
+const hide_cursor() = print("\u001B[?25l")
+const show_cursor() = print("\u001B[0J", "\u001B[?25h")
 
 function get_grapheme(spinner)
 	s = spinner.style
@@ -57,7 +54,7 @@ end
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 const STOP_SIGNAL = 42
-const close_spinner() = put!(rch[1], STOP_SIGNAL)
+const signal_to_close() = put!(rch[1], STOP_SIGNAL)
 function stop_signal_found()
 	ch = rch[myid()]
 	stop = isready(ch) && take!(ch) == STOP_SIGNAL
@@ -159,8 +156,16 @@ function timer_spin(parameters...)
 
 		end
 	end
-	print(s[1])
-	Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame)
+
+	try
+		hide_cursor()
+		print(s[1])
+		my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame)
+		wait(my_timer)
+		show_cursor()
+	catch
+		show_cursor()
+	end
 end
 
 # Add spinner start up and clean up to user expression
@@ -169,16 +174,14 @@ macro spinner()
 end
 macro spinner(inputs...)
 	return quote
-		# Add start up before user expression
-		hide_cursor()
+		# Start spinner
 		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
 
 		# User expression
 		$(esc(inputs[end]))
 
-		# Add clean up after user expression
-		close_spinner()
-		show_cursor()
+		# Close spinner
+		signal_to_close()
 	end
 end
 

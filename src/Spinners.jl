@@ -20,11 +20,11 @@ using Unicode: transcode
 export @spinner, spinner
 
 	# Spinner struct
-	struct Spinner
+	mutable struct Spinner
 		#id::Unsigned
 		#location::String
-		style::Vector{String}
-		mode::Symbol
+		const style::Vector{String}
+		const mode::Symbol
 		frame::Unsigned
 	end
 
@@ -37,10 +37,22 @@ const ANSI_ESCAPE = '\u001B'
 const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
 const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
-get_grapheme(s,i) = s[(i)%length(s)+1]
-erase_grapheme(c) = print("\b"^textwidth(c) *
-	" "^textwidth(c) *
-	"\b"^textwidth(c) )
+function get_grapheme(spinner)
+	s = spinner.style
+	i = spinner.frame
+
+	return s[(i)%length(s)+1]
+end
+
+function erase_grapheme(spinner)
+	c = get_grapheme(spinner)
+
+	print("\b"^textwidth(c) *
+		" "^textwidth(c) *
+		"\b"^textwidth(c) )
+
+	return
+end
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
@@ -127,23 +139,21 @@ function timer_spin(parameters...)
 
 		s = my_spinner.style
 		mode = my_spinner.mode
-		i = my_spinner.frame
 
 		(timer) -> begin
 			# Clean up
-			current = get_grapheme(s,i)
-			erase_grapheme(current)
+			erase_grapheme(my_spinner)
 
 			# Stop or print next
 			if(stop_signal_found())
 				close(timer)
 			else
 				if mode == :rand || mode == :random
-					i = rand(filter((x) -> x!= i, 1:100))
+					my_spinner.frame = rand(filter((x) -> x!= my_spinner.frame, 1:100))
 				else
-					i+=1
+					my_spinner.frame+=1
 				end
-				next = get_grapheme(s, i)
+				next = get_grapheme(my_spinner)
 				print(next)
 			end
 

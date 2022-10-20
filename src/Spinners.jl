@@ -19,15 +19,14 @@ using Unicode: transcode
 
 export @spinner, spinner
 
-	# Spinner struct
-	mutable struct Spinner
-		#id::Unsigned
-		#location::String
-		const style::Vector{String}
-		const mode::Symbol
-		frame::Unsigned
-	end
-
+# Spinner struct
+mutable struct Spinner
+	#id::Unsigned
+	#location::String
+	const style::Vector{String}
+	const mode::Symbol
+	frame::Unsigned
+end
 
 rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
 

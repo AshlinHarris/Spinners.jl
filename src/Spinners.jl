@@ -19,6 +19,16 @@ using Unicode: transcode
 
 export @spinner, spinner
 
+	# Spinner struct
+	struct Spinner
+		#id::Unsigned
+		#location::String
+		style::Vector{String}
+		mode::Symbol
+		frame::Unsigned
+	end
+
+
 rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
 
 const BACKSPACE = '\b'
@@ -110,8 +120,15 @@ function timer_spin(parameters...)
 	# Append messages to each frame
 	s .*= msg
 
+	my_spinner = Spinner(s, mode, 1)
+
 	# Callback function
-	function doit(i, rch, mode)
+	function doit(rch, my_spinner)
+
+		s = my_spinner.style
+		mode = my_spinner.mode
+		i = my_spinner.frame
+
 		(timer) -> begin
 			# Clean up
 			current = get_grapheme(s,i)
@@ -132,9 +149,8 @@ function timer_spin(parameters...)
 
 		end
 	end
-	i=1
 	print(s[1])
-	Timer(doit(i, rch, mode), 0, interval = seconds_per_frame)
+	Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame)
 end
 
 # Add spinner start up and clean up to user expression

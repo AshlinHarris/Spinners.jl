@@ -28,7 +28,7 @@ erase_grapheme(c) = print("\b"^textwidth(c) *
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
-const STOP_SIGNAL == 42
+const STOP_SIGNAL = 42
 const close_spinner() = put!(rch[1], STOP_SIGNAL)
 function stop_signal_found()
 	ch = rch[myid()]

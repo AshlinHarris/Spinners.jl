@@ -7,7 +7,13 @@ Please see `?@spinner` for more information.
 module Spinners
 
 using Base.Threads
-using Distributed
+using Distributed: fetch
+using Distributed: isready
+using Distributed: myid
+using Distributed: nprocs
+using Distributed: put!
+using Distributed: RemoteChannel
+using Distributed: take!
 using Unicode: graphemes
 using Unicode: transcode
 

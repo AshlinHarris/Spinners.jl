@@ -28,6 +28,13 @@ erase_grapheme(c) = print("\b"^textwidth(c) *
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
+const STOP_SIGNAL = 42
+const close_spinner() = put!(rch[1], STOP_SIGNAL)
+function stop_signal_found()
+	ch = rch[myid()]
+	stop = isready(ch) && take!(ch) == STOP_SIGNAL
+end
+
 """
 # @spinner
 Create a command line spinner
@@ -100,16 +107,12 @@ function timer_spin(parameters...)
 	# Callback function
 	function doit(i, rch, mode)
 		(timer) -> begin
-			# Check for a stop signal (42) on this channel
-			ch = rch[myid()]
-			stop = isready(ch) && take!(ch) == 42
-
 			# Clean up
 			current = get_grapheme(s,i)
 			erase_grapheme(current)
 
 			# Stop or print next
-			if(stop)
+			if(stop_signal_found())
 				close(timer)
 			else
 				if mode == :rand || mode == :random
@@ -129,6 +132,9 @@ function timer_spin(parameters...)
 end
 
 # Add spinner start up and clean up to user expression
+macro spinner()
+        @info("An expression is required (e.g., `@spinner sleep(4)`).")
+end
 macro spinner(inputs...)
 	return quote
 		# Add start up before user expression
@@ -139,13 +145,9 @@ macro spinner(inputs...)
 		$(esc(inputs[end]))
 
 		# Add clean up after user expression
-		put!(rch[1], 42)
+		close_spinner()
 		show_cursor()
 	end
-end
-
-macro spinner()
-        @info("An expression is required (e.g., `@spinner sleep(4)`).")
 end
 
 end # module Spinners

@@ -136,25 +136,22 @@ function timer_spin(parameters...)
 	my_spinner = Spinner(s, mode, 1)
 
 	# Callback function
-	function doit(rch, my_spinner)
-
-		s = my_spinner.style
-		mode = my_spinner.mode
+	function doit(rch, S::Spinner)
 
 		(timer) -> begin
 			# Clean up
-			erase_grapheme(my_spinner)
+			erase_grapheme(S)
 
 			# Stop or print next
 			if(stop_signal_found())
 				close(timer)
 			else
-				if mode == :rand || mode == :random
-					my_spinner.frame = rand(filter((x) -> x!= my_spinner.frame, 1:100))
+				if S.mode == :rand || mode == :random
+					S.frame = rand(filter((x) -> x!= S.frame, 1:100))
 				else
-					my_spinner.frame+=1
+					S.frame+=1
 				end
-				next = get_grapheme(my_spinner)
+				next = get_grapheme(S)
 				print(next)
 			end
 

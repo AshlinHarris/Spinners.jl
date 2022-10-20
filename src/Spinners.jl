@@ -50,7 +50,7 @@ end
 
 # Signaling spinners
 
-rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
+rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()];
 
 const STOP_SIGNAL = 42
 const signal_to_close() = put!(rch[1], STOP_SIGNAL)
@@ -154,19 +154,12 @@ function timer_spin(parameters...)
 				next = get_grapheme(S)
 				print(next)
 			end
-
 		end
 	end
 
-	try
-		hide_cursor()
-		print(s[1])
-		my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame);
-		wait(my_timer)
-		show_cursor()
-	catch
-		show_cursor()
-	end
+	print(s[1])
+	my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame);
+	wait(my_timer)
 end
 
 # Add spinner start up and clean up to user expression
@@ -176,13 +169,15 @@ end
 macro spinner(inputs...)
 	return quote
 		# Start spinner
-		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
+		hide_cursor()
+		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)));
 
 		# User expression
 		$(esc(inputs[end]))
 
 		# Close spinner
 		signal_to_close()
+		show_cursor()
 	end
 end
 

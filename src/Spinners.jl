@@ -19,20 +19,17 @@ using Unicode: transcode
 
 export @spinner, spinner
 
-	# Spinner struct
-	mutable struct Spinner
-		#id::Unsigned
-		#location::String
-		const style::Vector{String}
-		const mode::Symbol
-		frame::Unsigned
-	end
+# Spinner struct
 
+mutable struct Spinner
+	#id::Unsigned
+	#location::String
+	const style::Vector{String}
+	const mode::Symbol
+	frame::Unsigned
+end
 
-rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()]
-
-const hide_cursor() = print("\u001B[?25l")
-const show_cursor() = print("\u001B[0J", "\u001B[?25h")
+# Functions on spinner types
 
 function get_grapheme(spinner)
 	s = spinner.style
@@ -51,7 +48,9 @@ function erase_grapheme(spinner)
 	return
 end
 
-get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
+# Signaling spinners
+
+rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()];
 
 const STOP_SIGNAL = 42
 const signal_to_close() = put!(rch[1], STOP_SIGNAL)
@@ -59,6 +58,11 @@ function stop_signal_found()
 	ch = rch[myid()]
 	stop = isready(ch) && take!(ch) == STOP_SIGNAL
 end
+
+const hide_cursor() = print("\u001B[?25l")
+const show_cursor() = print("\u001B[0J", "\u001B[?25h")
+
+get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 """
 # @spinner
@@ -132,40 +136,30 @@ function timer_spin(parameters...)
 	my_spinner = Spinner(s, mode, 1)
 
 	# Callback function
-	function doit(rch, my_spinner)
-
-		s = my_spinner.style
-		mode = my_spinner.mode
+	function doit(rch, S::Spinner)
 
 		(timer) -> begin
 			# Clean up
-			erase_grapheme(my_spinner)
+			erase_grapheme(S)
 
 			# Stop or print next
 			if(stop_signal_found())
 				close(timer)
 			else
-				if mode == :rand || mode == :random
-					my_spinner.frame = rand(filter((x) -> x!= my_spinner.frame, 1:100))
+				if S.mode == :rand || mode == :random
+					S.frame = rand(filter((x) -> x!= S.frame, 1:100))
 				else
-					my_spinner.frame+=1
+					S.frame+=1
 				end
-				next = get_grapheme(my_spinner)
+				next = get_grapheme(S)
 				print(next)
 			end
-
 		end
 	end
 
-	try
-		hide_cursor()
-		print(s[1])
-		my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame)
-		wait(my_timer)
-		show_cursor()
-	catch
-		show_cursor()
-	end
+	print(s[1])
+	my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame);
+	wait(my_timer)
 end
 
 # Add spinner start up and clean up to user expression
@@ -175,13 +169,15 @@ end
 macro spinner(inputs...)
 	return quote
 		# Start spinner
-		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)))
+		hide_cursor()
+		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)));
 
 		# User expression
 		$(esc(inputs[end]))
 
 		# Close spinner
 		signal_to_close()
+		show_cursor()
 	end
 end
 

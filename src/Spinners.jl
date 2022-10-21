@@ -74,33 +74,24 @@ include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
+function pop_first_by_type!(inputs, type, default)
+	if isempty(inputs)
+		return default
+	end
+
+	location = [isa(x, type) for x in inputs] |> findfirst
+	return isnothing(location) ? default : popat!(inputs, location)
+end
+
 function generate_spinner(inputs)::Spinner
 
 	# Process inputs
 
 	# The first Number must be the rate
-	if isempty(inputs)
-		seconds_per_frame = 0.2
-	else
-		location = [isa(x, Number) for x in inputs] |> findfirst
-		if isnothing(location)
-			seconds_per_frame = 0.2
-		else
-			seconds_per_frame = popat!(inputs, location)
-		end
-	end
+	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
 
 	# The first Symbol must be the mode
-	if isempty(inputs)
-		mode = :none
-	else
-		location = [isa(x, Symbol) for x in inputs] |> findfirst
-		if isnothing(location)
-			mode = :none
-		else
-			mode = popat!(inputs, location)
-		end
-	end
+	mode = pop_first_by_type!(inputs, Symbol, :none)
 
 	if isempty(inputs)
 		raw_s = "◒◐◓◑"
@@ -108,16 +99,7 @@ function generate_spinner(inputs)::Spinner
 		raw_s = popfirst!(inputs)
 	end
 
-	if isempty(inputs)
-		msg = ""
-	else
-		location = [isa(x, String) for x in inputs] |> findfirst
-		if isnothing(location)
-			msg = ""
-		else
-			msg = popat!(inputs, location)
-		end
-	end
+	msg = pop_first_by_type!(inputs, String, "")
 
 	if typeof(raw_s) == Symbol
 		raw_s = get_named_string(raw_s)

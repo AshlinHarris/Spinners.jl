@@ -21,7 +21,7 @@ export @spinner, spinner
 
 # Spinner struct
 Base.@kwdef mutable struct Spinner
-	style::Vector{String} = ["\\","|","/","-"] |> collect .|> string
+	style::Vector{String} = ["◒","◐","◓","◑"] |> collect .|> string
 	mode::Symbol = :none
 	seconds_per_frame::Real = 0.2
 	frame::Unsigned = 1
@@ -111,7 +111,12 @@ function generate_spinner(inputs)::Spinner
 	if isempty(inputs)
 		msg = ""
 	else
-		msg = popfirst!(inputs)::String
+		location = [isa(x, String) for x in inputs] |> findfirst
+		if isnothing(location)
+			msg = ""
+		else
+			msg = popat!(inputs, location)
+		end
 	end
 
 	if typeof(raw_s) == Symbol

@@ -48,7 +48,7 @@ end
 
 function increment_frame!(S::Spinner)
 	if S.mode == :rand || S.mode == :random
-		S.frame = rand(filter((x) -> x!= S.frame, 1:length(style)))
+		S.frame = rand(filter((x) -> x!= S.frame, 1:length(S.style)))
 	else
 		S.frame+=1
 	end
@@ -78,6 +78,7 @@ function generate_spinner(inputs)::Spinner
 
 	# Process inputs
 
+	# The first Number must be the rate
 	if isempty(inputs)
 		seconds_per_frame = 0.2
 	else
@@ -86,6 +87,18 @@ function generate_spinner(inputs)::Spinner
 			seconds_per_frame = 0.2
 		else
 			seconds_per_frame = popat!(inputs, location)
+		end
+	end
+
+	# The first Symbol must be the mode
+	if isempty(inputs)
+		mode = :none
+	else
+		location = [isa(x, Symbol) for x in inputs] |> findfirst
+		if isnothing(location)
+			mode = :none
+		else
+			mode = popat!(inputs, location)
 		end
 	end
 
@@ -99,12 +112,6 @@ function generate_spinner(inputs)::Spinner
 		msg = ""
 	else
 		msg = popfirst!(inputs)::String
-	end
-
-	if isempty(inputs)
-		mode = :none
-	else
-		mode = popfirst!(inputs)
 	end
 
 	if typeof(raw_s) == Symbol

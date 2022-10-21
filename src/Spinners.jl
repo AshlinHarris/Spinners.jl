@@ -20,14 +20,11 @@ using Unicode: transcode
 export @spinner, spinner
 
 # Spinner struct
-
-mutable struct Spinner
-	#id::Unsigned
-	#location::String
-	const style::Vector{String}
-	const mode::Symbol
-	const seconds_per_frame::Real
-	frame::Unsigned
+Base.@kwdef mutable struct Spinner
+	style::Vector{String} = ["\\","|","/","-"] |> collect .|> string
+	mode::Symbol = :none
+	seconds_per_frame::Real = 0.2
+	frame::Unsigned = 1
 end
 
 # Functions on spinner types
@@ -115,7 +112,11 @@ function generate_spinner(inputs)::Spinner
 	# Append messages to each frame
 	s .*= msg
 
-	return Spinner(s, mode, seconds_per_frame, 1)
+	return Spinner(
+		style=s,
+		mode=mode,
+		seconds_per_frame=seconds_per_frame,
+	)
 end
 
 function timer_spin()

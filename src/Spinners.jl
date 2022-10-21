@@ -64,20 +64,6 @@ const show_cursor() = print("\u001B[0J", "\u001B[?25h")
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
-"""
-# @spinner
-Create a command line spinner
-
-## Usage
-```
-@spinner "string" expression # Iterate through the graphemes of a string
-@spinner :symbol expression  # Use a built-in spinner
-```
-
-## Available symbols
-"""
-
-# Assemble the global Spinner dictionnary from Definitions.jl
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
@@ -162,7 +148,20 @@ function timer_spin(parameters...)
 	wait(my_timer)
 end
 
-# Add spinner start up and clean up to user expression
+"""
+# @spinner
+Create a command line spinner
+
+## Usage
+```
+@spinner "string" expression # Iterate through the graphemes of a string
+@spinner :symbol expression  # Use a built-in spinner
+```
+
+## Available symbols
+"""
+
+# Assemble the global Spinner dictionnary from Definitions.jl
 macro spinner()
         @info("An expression is required (e.g., `@spinner sleep(4)`).")
 end

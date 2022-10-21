@@ -26,6 +26,7 @@ mutable struct Spinner
 	#location::String
 	const style::Vector{String}
 	const mode::Symbol
+	const seconds_per_frame::Real
 	frame::Unsigned
 end
 
@@ -64,30 +65,11 @@ const show_cursor() = print("\u001B[0J", "\u001B[?25h")
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
-"""
-# @spinner
-Create a command line spinner
-
-## Usage
-```
-@spinner "string" expression # Iterate through the graphemes of a string
-@spinner :symbol expression  # Use a built-in spinner
-```
-
-## Available symbols
-"""
-
-# Assemble the global Spinner dictionnary from Definitions.jl
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
-function timer_spin()
-	timer_spin("◒◐◓◑")
-end
-function timer_spin(parameters...)
-
-	inputs = collect(parameters)
+function generate_spinner(inputs)::Spinner
 
 	# Process inputs
 
@@ -117,7 +99,7 @@ function timer_spin(parameters...)
 	if isempty(inputs)
 		mode = :none
 	else
-		mode = popfirst!(inputs)::Symbol
+		mode = popfirst!(inputs)
 	end
 
 	if typeof(raw_s) == Symbol
@@ -133,7 +115,13 @@ function timer_spin(parameters...)
 	# Append messages to each frame
 	s .*= msg
 
-	my_spinner = Spinner(s, mode, 1)
+	return Spinner(s, mode, seconds_per_frame, 1)
+end
+
+function timer_spin()
+	timer_spin("◒◐◓◑")
+end
+function timer_spin(parameters...)
 
 	# Callback function
 	function doit(rch, S::Spinner)
@@ -146,7 +134,7 @@ function timer_spin(parameters...)
 			if(stop_signal_found())
 				close(timer)
 			else
-				if S.mode == :rand || mode == :random
+				if S.mode == :rand || S.mode == :random
 					S.frame = rand(filter((x) -> x!= S.frame, 1:100))
 				else
 					S.frame+=1
@@ -157,12 +145,28 @@ function timer_spin(parameters...)
 		end
 	end
 
-	print(s[1])
-	my_timer = Timer(doit(rch, my_spinner), 0, interval = seconds_per_frame);
+	inputs = collect(parameters)
+	my_spinner = generate_spinner(inputs)
+
+	print(get_grapheme(my_spinner))
+	my_timer = Timer(doit(rch, my_spinner), 0, interval = my_spinner.seconds_per_frame);
 	wait(my_timer)
 end
 
-# Add spinner start up and clean up to user expression
+"""
+# @spinner
+Create a command line spinner
+
+## Usage
+```
+@spinner "string" expression # Iterate through the graphemes of a string
+@spinner :symbol expression  # Use a built-in spinner
+```
+
+## Available symbols
+"""
+
+# Assemble the global Spinner dictionnary from Definitions.jl
 macro spinner()
         @info("An expression is required (e.g., `@spinner sleep(4)`).")
 end

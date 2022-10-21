@@ -20,26 +20,23 @@ using Unicode: transcode
 export @spinner, spinner
 
 # Spinner struct
-
-mutable struct Spinner
-	#id::Unsigned
-	#location::String
-	const style::Vector{String}
-	const mode::Symbol
-	const seconds_per_frame::Real
-	frame::Unsigned
+Base.@kwdef mutable struct Spinner
+	style::Vector{String} = ["◒","◐","◓","◑"] |> collect .|> string
+	mode::Symbol = :none
+	seconds_per_frame::Real = 0.2
+	frame::Unsigned = 1
 end
 
 # Functions on spinner types
 
-function get_grapheme(spinner)
+function get_grapheme(spinner::Spinner)
 	s = spinner.style
 	i = spinner.frame
 
 	return s[(i)%length(s)+1]
 end
 
-function erase_grapheme(spinner)
+function erase_grapheme(spinner::Spinner)
 	c = get_grapheme(spinner)
 
 	print("\b"^textwidth(c) *
@@ -47,6 +44,14 @@ function erase_grapheme(spinner)
 		"\b"^textwidth(c) )
 
 	return
+end
+
+function increment_frame!(S::Spinner)
+	if S.mode == :rand || S.mode == :random
+		S.frame = rand(filter((x) -> x!= S.frame, 1:length(S.style)))
+	else
+		S.frame+=1
+	end
 end
 
 # Signaling spinners
@@ -69,20 +74,24 @@ include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
+function pop_first_by_type!(inputs, type, default)
+	if isempty(inputs)
+		return default
+	end
+
+	location = [isa(x, type) for x in inputs] |> findfirst
+	return isnothing(location) ? default : popat!(inputs, location)
+end
+
 function generate_spinner(inputs)::Spinner
 
 	# Process inputs
 
-	if isempty(inputs)
-		seconds_per_frame = 0.2
-	else
-		location = [isa(x, Number) for x in inputs] |> findfirst
-		if isnothing(location)
-			seconds_per_frame = 0.2
-		else
-			seconds_per_frame = popat!(inputs, location)
-		end
-	end
+	# The first Number must be the rate
+	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
+
+	# The first Symbol must be the mode
+	mode = pop_first_by_type!(inputs, Symbol, :none)
 
 	if isempty(inputs)
 		raw_s = "◒◐◓◑"
@@ -90,17 +99,7 @@ function generate_spinner(inputs)::Spinner
 		raw_s = popfirst!(inputs)
 	end
 
-	if isempty(inputs)
-		msg = ""
-	else
-		msg = popfirst!(inputs)::String
-	end
-
-	if isempty(inputs)
-		mode = :none
-	else
-		mode = popfirst!(inputs)
-	end
+	msg = pop_first_by_type!(inputs, String, "")
 
 	if typeof(raw_s) == Symbol
 		raw_s = get_named_string(raw_s)
@@ -115,7 +114,11 @@ function generate_spinner(inputs)::Spinner
 	# Append messages to each frame
 	s .*= msg
 
-	return Spinner(s, mode, seconds_per_frame, 1)
+	return Spinner(
+		style=s,
+		mode=mode,
+		seconds_per_frame=seconds_per_frame,
+	)
 end
 
 function timer_spin()
@@ -134,11 +137,7 @@ function timer_spin(parameters...)
 			if(stop_signal_found())
 				close(timer)
 			else
-				if S.mode == :rand || S.mode == :random
-					S.frame = rand(filter((x) -> x!= S.frame, 1:100))
-				else
-					S.frame+=1
-				end
+				increment_frame!(S)
 				next = get_grapheme(S)
 				print(next)
 			end

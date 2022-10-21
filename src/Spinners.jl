@@ -143,6 +143,7 @@ function timer_spin(parameters...)
 	print(get_grapheme(my_spinner))
 	my_timer = Timer(doit(rch, my_spinner), 0, interval = my_spinner.seconds_per_frame);
 	wait(my_timer)
+	erase_grapheme(my_spinner)
 end
 
 """

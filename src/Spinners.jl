@@ -84,21 +84,14 @@ function pop_first_by_type!(inputs, type, default)
 end
 
 function generate_spinner(inputs)::Spinner
-
-	# Process inputs
-
+	
 	# The first Number must be the rate
 	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
-
 	# The first Symbol must be the mode
 	mode = pop_first_by_type!(inputs, Symbol, :none)
-
-	if isempty(inputs)
-		raw_s = "◒◐◓◑"
-	else
-		raw_s = popfirst!(inputs)
-	end
-
+	# Afterwards, first input must be the style
+	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
+	# Afterwards, the first string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
 
 	if typeof(raw_s) == Symbol

@@ -13,7 +13,6 @@ using Distributed: myid
 using Distributed: nprocs
 using Distributed: put!
 using Distributed: RemoteChannel
-using Distributed: take!
 using Unicode: graphemes
 using Unicode: transcode
 
@@ -62,7 +61,7 @@ const STOP_SIGNAL = 42
 const signal_to_close() = put!(rch[1], STOP_SIGNAL)
 function stop_signal_found()
 	ch = rch[myid()]
-	stop = isready(ch) && take!(ch) == STOP_SIGNAL
+	stop = isready(ch) && fetch(ch) == STOP_SIGNAL
 end
 
 const hide_cursor() = print("\u001B[?25l")

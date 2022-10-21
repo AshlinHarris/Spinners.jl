@@ -29,14 +29,14 @@ end
 
 # Functions on spinner types
 
-function get_grapheme(spinner)
+function get_grapheme(spinner::Spinner)
 	s = spinner.style
 	i = spinner.frame
 
 	return s[(i)%length(s)+1]
 end
 
-function erase_grapheme(spinner)
+function erase_grapheme(spinner::Spinner)
 	c = get_grapheme(spinner)
 
 	print("\b"^textwidth(c) *
@@ -44,6 +44,14 @@ function erase_grapheme(spinner)
 		"\b"^textwidth(c) )
 
 	return
+end
+
+function increment_frame!(S::Spinner)
+	if S.mode == :rand || S.mode == :random
+		S.frame = rand(filter((x) -> x!= S.frame, 1:length(style)))
+	else
+		S.frame+=1
+	end
 end
 
 # Signaling spinners
@@ -135,11 +143,7 @@ function timer_spin(parameters...)
 			if(stop_signal_found())
 				close(timer)
 			else
-				if S.mode == :rand || S.mode == :random
-					S.frame = rand(filter((x) -> x!= S.frame, 1:100))
-				else
-					S.frame+=1
-				end
+				increment_frame!(S)
 				next = get_grapheme(S)
 				print(next)
 			end

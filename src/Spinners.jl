@@ -85,13 +85,13 @@ end
 
 function generate_spinner(inputs)::Spinner
 	
-	# The first Number must be the rate
-	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
-	# The first Symbol must be the mode
-	mode = pop_first_by_type!(inputs, Symbol, :none)
-	# Afterwards, first input must be the style
+	# The first input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
-	# Afterwards, the first string must be the message
+	# Then the first Number must be the rate
+	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
+	# Then the first remaining Symbol must be the mode
+	mode = pop_first_by_type!(inputs, Symbol, :none)
+	# The first remaining string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
 
 	if typeof(raw_s) == Symbol

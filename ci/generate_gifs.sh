@@ -5,4 +5,4 @@
 julia --project=@. -e "using Pkg; Pkg.instantiate()"
 rm result.cast
 asciinema rec result.cast --command "julia -q --project=@. generate_gifs.jl"
-agg --theme asciinema --font-dir /usr/share/fonts/trutype/ result.cast test.gif
+agg --theme asciinema --font-family "JuliaMono, Segoe UI Emoji" result.cast test.gif

@@ -18,7 +18,7 @@ export @spinner, spinner
 # Spinner struct
 Base.@kwdef mutable struct Spinner
 	status::Status = starting
-	style::Vector{String} = ["◒","◐","◓","◑"] |> collect .|> string
+	style::Vector{String} = ["◒","◐","◓","◑"]
 	mode::Symbol = :none
 	seconds_per_frame::Real = 0.2
 	frame::Unsigned = 1

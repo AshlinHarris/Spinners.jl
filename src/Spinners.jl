@@ -63,11 +63,19 @@ rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()];
 
 const STOP_SIGNAL = 42
 function signal_to_close!()
+	#println("SENDING STOP SIGNAL!")
 	put!(rch[1], STOP_SIGNAL)
 end
 function stop_signal_found()
 	ch = rch[myid()]
-	stop = isready(ch) && take!(ch) == STOP_SIGNAL
+	if isready(ch)
+		signal_found = take!(ch)
+		#println("FOUND $signal_found")
+		return signal_found == STOP_SIGNAL
+	else
+		return false
+	end
+	
 end
 
 const hide_cursor() = print("\u001B[?25l")
@@ -165,6 +173,8 @@ function timer_spin(parameters...)
 	while my_spinner.status != closed
 		sleep(0.2)
 	end
+
+	close(my_timer)
 end
 
 """

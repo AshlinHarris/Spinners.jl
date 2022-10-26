@@ -167,7 +167,7 @@ function timer_spin(parameters...)
 	my_spinner = generate_spinner(inputs)
 
 	my_timer = Timer(doit(rch, my_spinner),
-		0,
+		0, # Delay
 		interval=my_spinner.seconds_per_frame);
 	
 	while my_spinner.status != closed

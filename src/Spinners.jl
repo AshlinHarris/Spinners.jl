@@ -61,13 +61,8 @@ function get_frame(spinner::Spinner)
 end
 
 function clean_up_frame(spinner::Spinner)
-	c = get_frame(spinner)
-
-	print("\b"^textwidth(c) *
-		" "^textwidth(c) *
-		"\b"^textwidth(c) )
-
-	return
+	width = get_frame(spinner) |> textwidth
+	print("\b" ^ width * " " ^ width)
 end
 
 function next_frame!(S::Spinner)

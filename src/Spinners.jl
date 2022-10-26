@@ -135,10 +135,12 @@ function timer_spin(parameters...)
 	# Callback function
 	function doit(rch, S::Spinner)
 		(timer) -> begin
+
 			# Stop or print next
 			if(stop_signal_found())
 				S.status=closing
 			end
+
 			if S.status == starting
 				hide_cursor()
 				print(get_frame(S))
@@ -158,6 +160,7 @@ function timer_spin(parameters...)
 				show_cursor()
 				S.status = closed
 			end
+
 		end
 	end
 

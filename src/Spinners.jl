@@ -134,9 +134,7 @@ function timer_spin(parameters...)
 
 	# Callback function
 	function doit(rch, S::Spinner)
-
 		(timer) -> begin
-
 			# Stop or print next
 			if(stop_signal_found())
 				S.status=closing
@@ -170,7 +168,7 @@ function timer_spin(parameters...)
 		interval=my_spinner.seconds_per_frame);
 	
 	while my_spinner.status != closed
-		sleep(0.2)
+		sleep(0.1)
 	end
 
 	close(my_timer)

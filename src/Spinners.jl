@@ -151,6 +151,7 @@ function timer_spin(parameters...)
 				print(next)
 			#elseif S.status == finishing
 				# a final success symbol such as "✅" could be displayed here
+				# failure symbol: ❌
 			elseif S.status == closing
 				# Clean up
 				erase_grapheme(S)

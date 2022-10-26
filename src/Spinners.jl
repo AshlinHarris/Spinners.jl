@@ -37,19 +37,15 @@ function render(rch, S::Spinner)
 		if S.status == starting
 			hide_cursor()
 			print(get_frame(S))
-			increment_frame!(S)
 			S.status = running
 		elseif S.status == running
-			erase_frame(S)
-			increment_frame!(S)
-			next = get_frame(S)
-			print(next)
+			next_frame!(S)
 		#elseif S.status == finishing
 			# a final success symbol such as "✅" could be displayed here
 			# failure symbol: ❌
 		elseif S.status == closing
 			# Clean up
-			erase_frame(S)
+			clean_up_frame(S)
 			show_cursor()
 			S.status = closed
 		end
@@ -64,7 +60,7 @@ function get_frame(spinner::Spinner)
 	return s[(i)%length(s)+1]
 end
 
-function erase_frame(spinner::Spinner)
+function clean_up_frame(spinner::Spinner)
 	c = get_frame(spinner)
 
 	print("\b"^textwidth(c) *
@@ -74,12 +70,20 @@ function erase_frame(spinner::Spinner)
 	return
 end
 
-function increment_frame!(S::Spinner)
+function next_frame!(S::Spinner)
+
+	old = get_frame(S)
+
 	if S.mode == :rand || S.mode == :random
 		S.frame = rand(filter((x) -> x!= S.frame, 1:length(S.style)))
 	else
 		S.frame+=1
 	end
+
+	new = get_frame(S)
+
+	print("\b"^textwidth(old) * new)
+
 end
 
 # Signaling spinners

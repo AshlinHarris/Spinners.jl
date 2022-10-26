@@ -62,10 +62,20 @@ end
 rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()];
 
 const STOP_SIGNAL = 42
-const signal_to_close() = put!(rch[1], STOP_SIGNAL)
+function signal_to_close!()
+	#println("SENDING STOP SIGNAL!")
+	put!(rch[1], STOP_SIGNAL)
+end
 function stop_signal_found()
 	ch = rch[myid()]
-	stop = isready(ch) && take!(ch) == STOP_SIGNAL
+	if isready(ch)
+		signal_found = take!(ch)
+		#println("FOUND $signal_found")
+		return signal_found == STOP_SIGNAL
+	else
+		return false
+	end
+	
 end
 
 const hide_cursor() = print("\u001B[?25l")
@@ -145,11 +155,10 @@ function timer_spin(parameters...)
 			#elseif S.status == finishing
 			#	;
 			elseif S.status == closing
-				close(timer)
 				# Clean up
 				erase_grapheme(S)
 				show_cursor()
-				S.status == closed
+				S.status = closed
 			end
 		end
 	end
@@ -157,10 +166,15 @@ function timer_spin(parameters...)
 	inputs = collect(parameters)
 	my_spinner = generate_spinner(inputs)
 
-	print(get_grapheme(my_spinner))
-	my_timer = Timer(doit(rch, my_spinner), 0, interval = my_spinner.seconds_per_frame);
-	wait(my_timer)
-	erase_grapheme(my_spinner)
+	my_timer = Timer(doit(rch, my_spinner),
+		0,
+		interval=my_spinner.seconds_per_frame);
+	
+	while my_spinner.status != closed
+		sleep(0.2)
+	end
+
+	close(my_timer)
 end
 
 """
@@ -189,8 +203,8 @@ macro spinner(inputs...)
 		$(esc(inputs[end]))
 
 		# Close spinner
-		signal_to_close()
-		sleep(0.5)
+		signal_to_close!()
+		wait(T)
 	end
 end
 

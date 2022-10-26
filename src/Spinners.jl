@@ -32,6 +32,35 @@ end
 
 # Functions on spinner types
 
+function render(rch, S::Spinner)
+
+	# Stop or print next
+	if(stop_signal_found())
+		S.status=closing
+	end
+
+	if S.status == starting
+		hide_cursor()
+		print(get_frame(S))
+		increment_frame!(S)
+		S.status = running
+	elseif S.status == running
+		erase_frame(S)
+		increment_frame!(S)
+		next = get_frame(S)
+		print(next)
+	#elseif S.status == finishing
+		# a final success symbol such as "✅" could be displayed here
+		# failure symbol: ❌
+	elseif S.status == closing
+		# Clean up
+		erase_frame(S)
+		show_cursor()
+		S.status = closed
+	end
+
+end
+
 function get_frame(spinner::Spinner)
 	s = spinner.style
 	i = spinner.frame
@@ -132,42 +161,11 @@ function timer_spin()
 end
 function timer_spin(parameters...)
 
-	# Callback function
-	function doit(rch, S::Spinner)
-		(timer) -> begin
-
-			# Stop or print next
-			if(stop_signal_found())
-				S.status=closing
-			end
-
-			if S.status == starting
-				hide_cursor()
-				print(get_frame(S))
-				increment_frame!(S)
-				S.status = running
-			elseif S.status == running
-				erase_frame(S)
-				increment_frame!(S)
-				next = get_frame(S)
-				print(next)
-			#elseif S.status == finishing
-				# a final success symbol such as "✅" could be displayed here
-				# failure symbol: ❌
-			elseif S.status == closing
-				# Clean up
-				erase_frame(S)
-				show_cursor()
-				S.status = closed
-			end
-
-		end
-	end
 
 	inputs = collect(parameters)
 	my_spinner = generate_spinner(inputs)
 
-	my_timer = Timer(doit(rch, my_spinner),
+	my_timer = Timer(Ref(render(rch, my_spinner)),
 		0, # Delay
 		interval=my_spinner.seconds_per_frame);
 	

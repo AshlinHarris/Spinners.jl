@@ -1,9 +1,3 @@
-"""
-# Exported names:
-- `@spinner`
-
-Please see `?@spinner` for more information.
-"""
 module Spinners
 
 using Base.Threads
@@ -176,19 +170,6 @@ function timer_spin(parameters...)
 
 	close(my_timer)
 end
-
-"""
-# @spinner
-Create a command line spinner
-
-## Usage
-```
-@spinner "string" expression # Iterate through the graphemes of a string
-@spinner :symbol expression  # Use a built-in spinner
-```
-
-## Available symbols
-"""
 
 # Assemble the global Spinner dictionnary from Definitions.jl
 macro spinner()

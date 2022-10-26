@@ -190,7 +190,7 @@ macro spinner(inputs...)
 
 		# Close spinner
 		signal_to_close()
-		sleep(0.1)
+		sleep(0.5)
 	end
 end
 

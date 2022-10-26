@@ -133,6 +133,7 @@ function timer_spin(parameters...)
 				S.status=closing
 			end
 			if S.status == starting
+				hide_cursor()
 				print(get_grapheme(S))
 				increment_frame!(S)
 				S.status = running
@@ -147,7 +148,7 @@ function timer_spin(parameters...)
 				close(timer)
 				# Clean up
 				erase_grapheme(S)
-				print("END")
+				show_cursor()
 				S.status == closed
 			end
 		end
@@ -182,7 +183,6 @@ end
 macro spinner(inputs...)
 	return quote
 		# Start spinner
-		hide_cursor()
 		local T = Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...));
 
 		# User expression
@@ -191,7 +191,6 @@ macro spinner(inputs...)
 		# Close spinner
 		signal_to_close()
 		sleep(0.1)
-		show_cursor()
 	end
 end
 

@@ -39,7 +39,7 @@ function get_frame(spinner::Spinner)
 	return s[(i)%length(s)+1]
 end
 
-function erase_grapheme(spinner::Spinner)
+function erase_frame(spinner::Spinner)
 	c = get_frame(spinner)
 
 	print("\b"^textwidth(c) *
@@ -147,7 +147,7 @@ function timer_spin(parameters...)
 				increment_frame!(S)
 				S.status = running
 			elseif S.status == running
-				erase_grapheme(S)
+				erase_frame(S)
 				increment_frame!(S)
 				next = get_frame(S)
 				print(next)
@@ -156,7 +156,7 @@ function timer_spin(parameters...)
 				# failure symbol: ❌
 			elseif S.status == closing
 				# Clean up
-				erase_grapheme(S)
+				erase_frame(S)
 				show_cursor()
 				S.status = closed
 			end

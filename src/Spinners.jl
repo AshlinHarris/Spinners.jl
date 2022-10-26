@@ -32,7 +32,7 @@ end
 
 # Functions on spinner types
 
-function get_grapheme(spinner::Spinner)
+function get_frame(spinner::Spinner)
 	s = spinner.style
 	i = spinner.frame
 
@@ -40,7 +40,7 @@ function get_grapheme(spinner::Spinner)
 end
 
 function erase_grapheme(spinner::Spinner)
-	c = get_grapheme(spinner)
+	c = get_frame(spinner)
 
 	print("\b"^textwidth(c) *
 		" "^textwidth(c) *
@@ -141,13 +141,13 @@ function timer_spin(parameters...)
 			end
 			if S.status == starting
 				hide_cursor()
-				print(get_grapheme(S))
+				print(get_frame(S))
 				increment_frame!(S)
 				S.status = running
 			elseif S.status == running
 				erase_grapheme(S)
 				increment_frame!(S)
-				next = get_grapheme(S)
+				next = get_frame(S)
 				print(next)
 			#elseif S.status == finishing
 				# a final success symbol such as "✅" could be displayed here

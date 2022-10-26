@@ -28,7 +28,6 @@ end
 
 function render(rch, S::Spinner)
 	(timer) -> begin
-
 		# Stop or print next
 		if(stop_signal_found())
 			S.status=closing
@@ -49,7 +48,6 @@ function render(rch, S::Spinner)
 			show_cursor()
 			S.status = closed
 		end
-
 	end
 end
 

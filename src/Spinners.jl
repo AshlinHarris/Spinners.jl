@@ -1,9 +1,3 @@
-"""
-# Exported names:
-- `@spinner`
-
-Please see `?@spinner` for more information.
-"""
 module Spinners
 
 using Base.Threads
@@ -24,7 +18,7 @@ export @spinner, spinner
 # Spinner struct
 Base.@kwdef mutable struct Spinner
 	status::Status = starting
-	style::Vector{String} = ["◒","◐","◓","◑"] |> collect .|> string
+	style::Vector{String} = ["◒","◐","◓","◑"]
 	mode::Symbol = :none
 	seconds_per_frame::Real = 0.2
 	frame::Unsigned = 1
@@ -32,15 +26,46 @@ end
 
 # Functions on spinner types
 
-function get_grapheme(spinner::Spinner)
+function render(rch, S::Spinner)
+	(timer) -> begin
+
+		# Stop or print next
+		if(stop_signal_found())
+			S.status=closing
+		end
+
+		if S.status == starting
+			hide_cursor()
+			print(get_frame(S))
+			increment_frame!(S)
+			S.status = running
+		elseif S.status == running
+			erase_frame(S)
+			increment_frame!(S)
+			next = get_frame(S)
+			print(next)
+		#elseif S.status == finishing
+			# a final success symbol such as "✅" could be displayed here
+			# failure symbol: ❌
+		elseif S.status == closing
+			# Clean up
+			erase_frame(S)
+			show_cursor()
+			S.status = closed
+		end
+
+	end
+end
+
+function get_frame(spinner::Spinner)
 	s = spinner.style
 	i = spinner.frame
 
 	return s[(i)%length(s)+1]
 end
 
-function erase_grapheme(spinner::Spinner)
-	c = get_grapheme(spinner)
+function erase_frame(spinner::Spinner)
+	c = get_frame(spinner)
 
 	print("\b"^textwidth(c) *
 		" "^textwidth(c) *
@@ -121,7 +146,6 @@ function generate_spinner(inputs)::Spinner
 	s .*= msg
 
 	return Spinner(
-		status=starting,
 		style=s,
 		mode=mode,
 		seconds_per_frame=seconds_per_frame,
@@ -133,62 +157,19 @@ function timer_spin()
 end
 function timer_spin(parameters...)
 
-	# Callback function
-	function doit(rch, S::Spinner)
-
-		(timer) -> begin
-
-			# Stop or print next
-			if(stop_signal_found())
-				S.status=closing
-			end
-			if S.status == starting
-				hide_cursor()
-				print(get_grapheme(S))
-				increment_frame!(S)
-				S.status = running
-			elseif S.status == running
-				erase_grapheme(S)
-				increment_frame!(S)
-				next = get_grapheme(S)
-				print(next)
-			#elseif S.status == finishing
-			#	;
-			elseif S.status == closing
-				# Clean up
-				erase_grapheme(S)
-				show_cursor()
-				S.status = closed
-			end
-		end
-	end
-
 	inputs = collect(parameters)
 	my_spinner = generate_spinner(inputs)
 
-	my_timer = Timer(doit(rch, my_spinner),
-		0,
+	my_timer = Timer(render(rch, my_spinner),
+		0, # Delay
 		interval=my_spinner.seconds_per_frame);
 	
 	while my_spinner.status != closed
-		sleep(0.2)
+		sleep(0.1)
 	end
 
 	close(my_timer)
 end
-
-"""
-# @spinner
-Create a command line spinner
-
-## Usage
-```
-@spinner "string" expression # Iterate through the graphemes of a string
-@spinner :symbol expression  # Use a built-in spinner
-```
-
-## Available symbols
-"""
 
 # Assemble the global Spinner dictionnary from Definitions.jl
 macro spinner()

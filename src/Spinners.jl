@@ -19,8 +19,11 @@ using Unicode: transcode
 
 export @spinner, spinner
 
+@enum Status starting=1 running=2 finishing=3 closing=4 closed=5
+
 # Spinner struct
 Base.@kwdef mutable struct Spinner
+	status::Status = starting
 	style::Vector{String} = ["◒","◐","◓","◑"] |> collect .|> string
 	mode::Symbol = :none
 	seconds_per_frame::Real = 0.2
@@ -108,6 +111,7 @@ function generate_spinner(inputs)::Spinner
 	s .*= msg
 
 	return Spinner(
+		status=starting,
 		style=s,
 		mode=mode,
 		seconds_per_frame=seconds_per_frame,
@@ -123,16 +127,29 @@ function timer_spin(parameters...)
 	function doit(rch, S::Spinner)
 
 		(timer) -> begin
-			# Clean up
-			erase_grapheme(S)
 
 			# Stop or print next
 			if(stop_signal_found())
-				close(timer)
-			else
+				S.status=closing
+			end
+			if S.status == starting
+				hide_cursor()
+				print(get_grapheme(S))
+				increment_frame!(S)
+				S.status = running
+			elseif S.status == running
+				erase_grapheme(S)
 				increment_frame!(S)
 				next = get_grapheme(S)
 				print(next)
+			#elseif S.status == finishing
+			#	;
+			elseif S.status == closing
+				close(timer)
+				# Clean up
+				erase_grapheme(S)
+				show_cursor()
+				S.status == closed
 			end
 		end
 	end
@@ -166,15 +183,14 @@ end
 macro spinner(inputs...)
 	return quote
 		# Start spinner
-		hide_cursor()
-		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)));
+		local T = Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...));
 
 		# User expression
 		$(esc(inputs[end]))
 
 		# Close spinner
 		signal_to_close()
-		show_cursor()
+		sleep(0.5)
 	end
 end
 

@@ -121,7 +121,6 @@ function generate_spinner(inputs)::Spinner
 	s .*= msg
 
 	return Spinner(
-		status=starting,
 		style=s,
 		mode=mode,
 		seconds_per_frame=seconds_per_frame,

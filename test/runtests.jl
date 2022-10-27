@@ -2,7 +2,7 @@ using Random
 using Spinners
 using Test
 
-#usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
+usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
 
 function get_stdout(command::Expr)
 	os = stdout;
@@ -14,10 +14,29 @@ function get_stdout(command::Expr)
 	return output
 end
 
+function output_test(expr, expected)
+	output = get_stdout(expr)
+	@test output == expected
+end
+
 function regex_test(rex, expr)
 	out = get_stdout(expr)
 	@test occursin(rex, out)
 end
+
+# How to make this more readable?
+# Maybe read the outputs from elsewhere
+# Also, does the order of tests affect the output?
+# How can these be randomized?
+usleep(1_000_000)
+output_test( :( @spinner "abc" usleep(1_000_000) ), "\e[?25lb\bc\ba\b \e[0J\e[?25h")
+output_test( :( @spinner :pong sleep(1) ), "\e[?25l▐⠈       ▌\b\b\b\b\b\b\b\b\b\b▐ ⠂      ▌\b\b\b\b\b\b\b\b\b\b▐ ⠠      ▌\b\b\b\b\b\b\b\b\b\b▐  ⡀     ▌\b\b\b\b\b\b\b\b\b\b          \e[0J\e[?25h")
+output_test( :( @spinner :clock sleep(1) ), "\e[?25l🕐 \b\b\b🕑 \b\b\b🕒 \b\b\b🕓 \b\b\b🕔 \b\b\b   \e[0J\e[?25h")
+
+
+output_test( :( @spinner "क़ " sleep(1) ), "\e[?25l \bक़\b \bक़\b \b \e[0J\e[?25h")
+output_test( :( @spinner ["क़ ", "12345"] sleep(1) ), "\e[?25l12345\b\b\b\b\bक़ \b\b12345\b\b\b\b\bक़ \b\b12345\b\b\b\b\b     \e[0J\e[?25h")
+output_test( :( @spinner "🎉\u3000დ\u3000@ क़ " sleep(2) ), "\e[?25l　\b\bდ\b　\b\b@\b \bक़\b \b🎉\b\b　\b\bდ\b \e[0J\e[?25h")
 
 os = stdout;
 (rd, wr) = redirect_stdout();
@@ -48,10 +67,6 @@ let
 	#@spinner s "hello" f()
 
 	# Tricky spinners
-	@spinner "क़ " sleep(2)
-	@spinner ["क़ ", "12345"] sleep(2)
-	@spinner "🎉\u3000დ\u3000@ क़ " sleep(2)
-
 end
 redirect_stdout(os);
 close(wr);

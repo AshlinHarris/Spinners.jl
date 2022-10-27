@@ -9,7 +9,7 @@ __Important:__ Version 0.3 of `Spinners.jl` creates a process which __no longer 
 Version 0.4 supports Linux, MacOS, and Windows. However, it requires at least Julia v1.9.
 However, Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
 
-[![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml)
+[![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) [![Coverage](https://codecov.io/gh/ashlinharris/Spinners.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/AshlinHarris/Spinners.jl)
 
 ![spinners](https://user-images.githubusercontent.com/90787010/189241813-9ff87134-7b57-4e53-829b-32c6bc660851.gif)
 

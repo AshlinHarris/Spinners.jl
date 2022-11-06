@@ -1,9 +1,3 @@
-"""
-# Exported names:
-- `@spinner`
-
-Please see `?@spinner` for more information.
-"""
 module Spinners
 
 using Base.Threads
@@ -19,9 +13,12 @@ using Unicode: transcode
 
 export @spinner, spinner
 
+@enum Status starting=1 running=2 finishing=3 closing=4 closed=5
+
 # Spinner struct
 Base.@kwdef mutable struct Spinner
-	style::Vector{String} = ["◒","◐","◓","◑"] |> collect .|> string
+	status::Status = starting
+	style::Vector{String} = ["◒","◐","◓","◑"]
 	mode::Symbol = :none
 	seconds_per_frame::Real = 0.2
 	frame::Unsigned = 1
@@ -29,29 +26,57 @@ end
 
 # Functions on spinner types
 
-function get_grapheme(spinner::Spinner)
+function render(rch, S::Spinner)
+	(timer) -> begin
+		# Stop or print next
+		if(stop_signal_found())
+			S.status=closing
+		end
+
+		if S.status == starting
+			hide_cursor()
+			print(get_frame(S))
+			S.status = running
+		elseif S.status == running
+			next_frame!(S)
+		#elseif S.status == finishing
+			# a final success symbol such as "✅" could be displayed here
+			# failure symbol: ❌
+		elseif S.status == closing
+			# Clean up
+			clean_up_frame(S)
+			show_cursor()
+			S.status = closed
+		end
+	end
+end
+
+function get_frame(spinner::Spinner)
 	s = spinner.style
 	i = spinner.frame
 
 	return s[(i)%length(s)+1]
 end
 
-function erase_grapheme(spinner::Spinner)
-	c = get_grapheme(spinner)
-
-	print("\b"^textwidth(c) *
-		" "^textwidth(c) *
-		"\b"^textwidth(c) )
-
-	return
+function clean_up_frame(spinner::Spinner)
+	width = get_frame(spinner) |> textwidth
+	print("\b" ^ width * " " ^ width)
 end
 
-function increment_frame!(S::Spinner)
+function next_frame!(S::Spinner)
+
+	old = get_frame(S)
+
 	if S.mode == :rand || S.mode == :random
 		S.frame = rand(filter((x) -> x!= S.frame, 1:length(S.style)))
 	else
 		S.frame+=1
 	end
+
+	new = get_frame(S)
+
+	print("\b"^textwidth(old) * new)
+
 end
 
 # Signaling spinners
@@ -59,10 +84,20 @@ end
 rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()];
 
 const STOP_SIGNAL = 42
-const signal_to_close() = put!(rch[1], STOP_SIGNAL)
+function signal_to_close!()
+	#println("SENDING STOP SIGNAL!")
+	put!(rch[1], STOP_SIGNAL)
+end
 function stop_signal_found()
 	ch = rch[myid()]
-	stop = isready(ch) && take!(ch) == STOP_SIGNAL
+	if isready(ch)
+		signal_found = take!(ch)
+		#println("FOUND $signal_found")
+		return signal_found == STOP_SIGNAL
+	else
+		return false
+	end
+	
 end
 
 const hide_cursor() = print("\u001B[?25l")
@@ -119,45 +154,19 @@ function timer_spin()
 end
 function timer_spin(parameters...)
 
-	# Callback function
-	function doit(rch, S::Spinner)
-
-		(timer) -> begin
-			# Clean up
-			erase_grapheme(S)
-
-			# Stop or print next
-			if(stop_signal_found())
-				close(timer)
-			else
-				increment_frame!(S)
-				next = get_grapheme(S)
-				print(next)
-			end
-		end
-	end
-
 	inputs = collect(parameters)
 	my_spinner = generate_spinner(inputs)
 
-	print(get_grapheme(my_spinner))
-	my_timer = Timer(doit(rch, my_spinner), 0, interval = my_spinner.seconds_per_frame);
-	wait(my_timer)
-	erase_grapheme(my_spinner)
+	my_timer = Timer(render(rch, my_spinner),
+		0, # Delay
+		interval=my_spinner.seconds_per_frame);
+	
+	while my_spinner.status != closed
+		sleep(0.1)
+	end
+
+	close(my_timer)
 end
-
-"""
-# @spinner
-Create a command line spinner
-
-## Usage
-```
-@spinner "string" expression # Iterate through the graphemes of a string
-@spinner :symbol expression  # Use a built-in spinner
-```
-
-## Available symbols
-"""
 
 # Assemble the global Spinner dictionnary from Definitions.jl
 macro spinner()
@@ -166,15 +175,14 @@ end
 macro spinner(inputs...)
 	return quote
 		# Start spinner
-		hide_cursor()
-		local T = fetch(Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...)));
+		local T = Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...));
 
 		# User expression
 		$(esc(inputs[end]))
 
 		# Close spinner
-		signal_to_close()
-		show_cursor()
+		signal_to_close!()
+		wait(T)
 	end
 end
 

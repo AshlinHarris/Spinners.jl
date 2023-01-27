@@ -243,23 +243,41 @@ macro spinner(x::QuoteNode)
 	quote
 		local s = get_named_string($x)
 		local p, proc_input = __start_up(s)
+	os = stdout;
+	(rd, wr) = redirect_stdout();
 		default_user_function()
 		__clean_up(p, proc_input, s)
+	redirect_stdout(os);
+	close(wr);
+	output = read(rd, String)
+	print( output )
 	end
 end
 macro spinner(x::QuoteNode, f)
 	quote
 		local s = get_named_string($x)
 		local p, proc_input = __start_up(s)
+	os = stdout;
+	(rd, wr) = redirect_stdout();
 		$(esc(f))
 		__clean_up(p, proc-input, s)
+	redirect_stdout(os);
+	close(wr);
+	output = read(rd, String)
+	print( output )
 	end
 end
 macro spinner(s::String, f)
 	quote
 		local p, proc_input = __start_up($s)
+	os = stdout;
+	(rd, wr) = redirect_stdout();
 		$(esc(f))
 		__clean_up(p, proc_input, $s)
+	redirect_stdout(os);
+	close(wr);
+	output = read(rd, String)
+	print( output )
 	end
 end
 macro spinner(f)

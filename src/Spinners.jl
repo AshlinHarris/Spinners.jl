@@ -1,19 +1,123 @@
+"""
+# Exported names:
+- `@spinner`
+Please see `?@spinner` for more information.
+"""
 module Spinners
 
-using Base.Threads
-using Distributed: fetch
-using Distributed: isready
-using Distributed: myid
-using Distributed: nprocs
-using Distributed: put!
-using Distributed: RemoteChannel
-using Distributed: take!
 using Unicode: graphemes
 using Unicode: transcode
 
 export @spinner, spinner
 
 @enum Status starting=1 running=2 finishing=3 closing=4 closed=5
+
+const hide_cursor() = print("\u001B[?25l")
+const show_cursor() = print("\u001B[0J", "\u001B[?25h")
+
+
+const default_user_function() = sleep(3)
+
+function __start_up(s)
+
+	hide_cursor()
+
+	# Modify for statement based on input type
+	if typeof(s) == String
+		for_statement = "for i in collect(\"$s\");"
+		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, string(last(\"$s\")))));"
+	elseif typeof(s) == Vector{String}
+		for_statement = "for i in $s;"
+		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, last($s))));"
+	end
+
+	# Prime the loop so that print steps can be consolidated
+	first = s[1]
+
+	# Assemble command to produce spinner
+	command =
+	"print(\"$first\");" *
+	"t=Threads.@async read(stdin, Char);" *
+	"while !istaskdone(t);" *
+		for_statement *
+			"try;" *
+				"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
+			"finally;" *
+				"flush(stdout);" *
+			"end;" *
+			"sleep(0.125);" *
+		"end;" *
+	"end;" *
+	cleanup_statement;
+
+	# Display the spinner as an external program
+	proc_input = Pipe()
+	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
+	return proc, proc_input
+end
+
+function __clean_up(p, proc_input, s)
+	write(proc_input,'c')
+
+	# Wait for process to terminate, if needed.
+	while process_running(p)
+		sleep(0.1)
+	end
+	sleep(0.1)
+	flush(stdout)
+
+	show_cursor()
+end
+
+get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
+
+include("Definitions.jl")
+# Add dictionaries in the merge process when adding a new set of spinners
+SPINNERS = merge(custom, sindresorhus)
+
+#= Outdated functions and macros for interactive tasks
+
+
+function pop_first_by_type!(inputs, type, default)
+	if isempty(inputs)
+		return default
+	end
+
+	location = [isa(x, type) for x in inputs] |> findfirst
+	return isnothing(location) ? default : popat!(inputs, location)
+end
+
+function generate_spinner(inputs)::Spinner
+	
+	# The first input must be the style
+	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
+	# Then the first Number must be the rate
+	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
+	# Then the first remaining Symbol must be the mode
+	mode = pop_first_by_type!(inputs, Symbol, :none)
+	# The first remaining string must be the message
+	msg = pop_first_by_type!(inputs, String, "")
+
+	if typeof(raw_s) == Symbol
+		raw_s = get_named_string(raw_s)
+	end
+
+	if typeof(raw_s) == String
+		s = ["$i" for i in collect(graphemes(raw_s))]
+	else
+		s = raw_s
+	end
+
+	# Append messages to each frame
+	s .*= msg
+
+	return Spinner(
+		style=s,
+		mode=mode,
+		seconds_per_frame=seconds_per_frame,
+	)
+end
+
 
 # Spinner struct
 Base.@kwdef mutable struct Spinner
@@ -79,75 +183,6 @@ function next_frame!(S::Spinner)
 
 end
 
-# Signaling spinners
-
-rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()];
-
-const STOP_SIGNAL = 42
-function signal_to_close!()
-	#println("SENDING STOP SIGNAL!")
-	put!(rch[1], STOP_SIGNAL)
-end
-function stop_signal_found()
-	ch = rch[myid()]
-	if isready(ch)
-		signal_found = take!(ch)
-		#println("FOUND $signal_found")
-		return signal_found == STOP_SIGNAL
-	else
-		return false
-	end
-	
-end
-
-const hide_cursor() = print("\u001B[?25l")
-const show_cursor() = print("\u001B[0J", "\u001B[?25h")
-
-get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
-
-include("Definitions.jl")
-# Add dictionaries in the merge process when adding a new set of spinners
-SPINNERS = merge(custom, sindresorhus)
-
-function pop_first_by_type!(inputs, type, default)
-	if isempty(inputs)
-		return default
-	end
-
-	location = [isa(x, type) for x in inputs] |> findfirst
-	return isnothing(location) ? default : popat!(inputs, location)
-end
-
-function generate_spinner(inputs)::Spinner
-	
-	# The first input must be the style
-	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
-	# Then the first Number must be the rate
-	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
-	# Then the first remaining Symbol must be the mode
-	mode = pop_first_by_type!(inputs, Symbol, :none)
-	# The first remaining string must be the message
-	msg = pop_first_by_type!(inputs, String, "")
-
-	if typeof(raw_s) == Symbol
-		raw_s = get_named_string(raw_s)
-	end
-
-	if typeof(raw_s) == String
-		s = ["$i" for i in collect(graphemes(raw_s))]
-	else
-		s = raw_s
-	end
-
-	# Append messages to each frame
-	s .*= msg
-
-	return Spinner(
-		style=s,
-		mode=mode,
-		seconds_per_frame=seconds_per_frame,
-	)
-end
 
 function timer_spin()
 	timer_spin("◒◐◓◑")
@@ -185,5 +220,62 @@ macro spinner(inputs...)
 		wait(T)
 	end
 end
+=#
+
+"""
+# @spinner
+Create a command line spinner
+## Usage
+```
+@spinner expression          # Use the default spinner
+@spinner "string" expression # Iterate through the graphemes of a string
+@spinner :symbol expression  # Use a built-in spinner
+```
+## Available symbols
+`:arrow`, `:bar`, `:blink`, `:bounce`, `:cards`, `:clock`, `:dots`, `:loading`, `:moon`, `:pong`, `:shutter`, `:snail`
+"""
+macro spinner()
+	quote
+		@spinner default_user_function()
+	end
+end
+macro spinner(x::QuoteNode)
+	quote
+		local s = get_named_string($x)
+		local p, proc_input = __start_up(s)
+		default_user_function()
+		__clean_up(p, proc_input, s)
+	end
+end
+macro spinner(x::QuoteNode, f)
+	quote
+		local s = get_named_string($x)
+		local p, proc_input = __start_up(s)
+		$(esc(f))
+		__clean_up(p, proc-input, s)
+	end
+end
+macro spinner(s::String, f)
+	quote
+		local p, proc_input = __start_up($s)
+		$(esc(f))
+		__clean_up(p, proc_input, $s)
+	end
+end
+macro spinner(f)
+	quote
+		@spinner "◒◐◓◑" $(esc(f))
+	end
+end
+macro spinner(s::String)
+	quote
+		@spinner $s default_user_function()
+	end
+end
+
+
+
+
+
 
 end # module Spinners

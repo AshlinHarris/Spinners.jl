@@ -2,6 +2,10 @@ using Random
 using Spinners
 using Test
 
+@test true
+
+#=
+
 #usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
 
 function get_stdout(command::Expr)
@@ -55,6 +59,11 @@ let
 end
 redirect_stdout(os);
 close(wr);
+
+for i in 1:20
+@test get_stdout(:( @spinner "abcdefg" sleep(1) )) == "\e[?25lb\b \bd\b \be\b \bf\b \bg\b \b\e[0J\e[?25h"
+end
+=#
 
 #=
 

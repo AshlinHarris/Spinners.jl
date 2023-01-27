@@ -57,7 +57,6 @@ function __start_up(s)
 end
 
 function __clean_up(p, proc_input, s)
-	#kill(p)
 	write(proc_input,'c')
 
 	# Wait for process to terminate, if needed.
@@ -67,15 +66,58 @@ function __clean_up(p, proc_input, s)
 	sleep(0.1)
 	flush(stdout)
 
-	# Calculate the number of spaces needed to overwrite the printed character
-	# Notice that this might exceed the required number, which could delete preceding characters
-	#amount = maximum(length.(transcode.(UInt8, "$x" for x in collect(s))))
-	#print('\b'^amount * " "^amount * '\b'^amount)
-
-	#flush(stdout)
-
 	show_cursor()
 end
+
+get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
+
+include("Definitions.jl")
+# Add dictionaries in the merge process when adding a new set of spinners
+SPINNERS = merge(custom, sindresorhus)
+
+#= Outdated functions and macros for interactive tasks
+
+
+function pop_first_by_type!(inputs, type, default)
+	if isempty(inputs)
+		return default
+	end
+
+	location = [isa(x, type) for x in inputs] |> findfirst
+	return isnothing(location) ? default : popat!(inputs, location)
+end
+
+function generate_spinner(inputs)::Spinner
+	
+	# The first input must be the style
+	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
+	# Then the first Number must be the rate
+	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
+	# Then the first remaining Symbol must be the mode
+	mode = pop_first_by_type!(inputs, Symbol, :none)
+	# The first remaining string must be the message
+	msg = pop_first_by_type!(inputs, String, "")
+
+	if typeof(raw_s) == Symbol
+		raw_s = get_named_string(raw_s)
+	end
+
+	if typeof(raw_s) == String
+		s = ["$i" for i in collect(graphemes(raw_s))]
+	else
+		s = raw_s
+	end
+
+	# Append messages to each frame
+	s .*= msg
+
+	return Spinner(
+		style=s,
+		mode=mode,
+		seconds_per_frame=seconds_per_frame,
+	)
+end
+
 
 # Spinner struct
 Base.@kwdef mutable struct Spinner
@@ -141,51 +183,6 @@ function next_frame!(S::Spinner)
 
 end
 
-get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
-
-include("Definitions.jl")
-# Add dictionaries in the merge process when adding a new set of spinners
-SPINNERS = merge(custom, sindresorhus)
-
-function pop_first_by_type!(inputs, type, default)
-	if isempty(inputs)
-		return default
-	end
-
-	location = [isa(x, type) for x in inputs] |> findfirst
-	return isnothing(location) ? default : popat!(inputs, location)
-end
-
-function generate_spinner(inputs)::Spinner
-	
-	# The first input must be the style
-	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
-	# Then the first Number must be the rate
-	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
-	# Then the first remaining Symbol must be the mode
-	mode = pop_first_by_type!(inputs, Symbol, :none)
-	# The first remaining string must be the message
-	msg = pop_first_by_type!(inputs, String, "")
-
-	if typeof(raw_s) == Symbol
-		raw_s = get_named_string(raw_s)
-	end
-
-	if typeof(raw_s) == String
-		s = ["$i" for i in collect(graphemes(raw_s))]
-	else
-		s = raw_s
-	end
-
-	# Append messages to each frame
-	s .*= msg
-
-	return Spinner(
-		style=s,
-		mode=mode,
-		seconds_per_frame=seconds_per_frame,
-	)
-end
 
 function timer_spin()
 	timer_spin("◒◐◓◑")
@@ -206,7 +203,6 @@ function timer_spin(parameters...)
 	close(my_timer)
 end
 
-#= Outdated macros for interactive tasks
 # Assemble the global Spinner dictionnary from Definitions.jl
 macro spinner()
         @info("An expression is required (e.g., `@spinner sleep(4)`).")

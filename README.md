@@ -4,10 +4,11 @@ Command line spinners in Julia with Unicode support
 
 ## Warning for Windows users
 
-__Important:__ Version 0.3 of `Spinners.jl` creates a process which __no longer terminates on Windows__. The issue first appeared in the past several days and applies regardless of Julia version or package version.
 
-Version 0.4 supports Linux, MacOS, and Windows. However, it requires at least Julia v1.9.
-However, Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
+
+__Important:__ Use the development version! Version 0.3 of `Spinners.jl` doesn't terminate properly.
+
+Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
 
 [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) [![Coverage](https://codecov.io/gh/ashlinharris/Spinners.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/AshlinHarris/Spinners.jl)
 
@@ -85,7 +86,8 @@ help?> @spinner
 ## Related Works
 
 I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which already has its own version of spinners, albeit with a different use case.
-[This thread on the Julia Discourse](https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285) gives some technical details, but essentially those spinners are still progress meters, which must be updated at points with the function being measured. In contrast, I'm developing spinners that update independently and only need a signal to terminate after a function call elapses.
+[This thread on the Julia Discourse](https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285) gives some technical details, but essentially those spinners are still progress meters, which must be updated at points with the function being measured.
+`Spinners.jl.@spinner` receives a signal when the user's function is complete, so the user doesn't need to alter their function.
 
 In Julia:
 - [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)

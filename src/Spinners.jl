@@ -5,14 +5,6 @@ Please see `?@spinner` for more information.
 """
 module Spinners
 
-using Base.Threads
-using Distributed: fetch
-using Distributed: isready
-using Distributed: myid
-using Distributed: nprocs
-using Distributed: put!
-using Distributed: RemoteChannel
-using Distributed: take!
 using Unicode: graphemes
 using Unicode: transcode
 
@@ -20,11 +12,9 @@ export @spinner, spinner
 
 @enum Status starting=1 running=2 finishing=3 closing=4 closed=5
 
-const BACKSPACE = '\b'
-const ANSI_ESCAPE = '\u001B'
+const hide_cursor() = print("\u001B[?25l")
+const show_cursor() = print("\u001B[0J", "\u001B[?25h")
 
-const hide_cursor() = print(ANSI_ESCAPE, "[?25l")
-const show_cursor() = print(ANSI_ESCAPE, "[0J", ANSI_ESCAPE, "[?25h")
 
 const default_user_function() = sleep(3)
 
@@ -64,7 +54,7 @@ function __start_up(s)
 end
 
 function __clean_up(p, proc_input, s)
-	kill(p)
+	#kill(p)
 	write(proc_input,'c')
 
 	# Wait for process to terminate, if needed.
@@ -77,7 +67,7 @@ function __clean_up(p, proc_input, s)
 	# Calculate the number of spaces needed to overwrite the printed character
 	# Notice that this might exceed the required number, which could delete preceding characters
 	amount = maximum(length.(transcode.(UInt8, "$x" for x in collect(s))))
-	print(BACKSPACE^amount * " "^amount * BACKSPACE^amount)
+	print('\b'^amount * " "^amount * '\b'^amount)
 
 	flush(stdout)
 
@@ -147,30 +137,6 @@ function next_frame!(S::Spinner)
 	print("\b"^textwidth(old) * new)
 
 end
-
-# Signaling spinners
-
-rch = [RemoteChannel(()->Channel(1), 1) for _ in 1:nprocs()];
-
-const STOP_SIGNAL = 42
-function signal_to_close!()
-	#println("SENDING STOP SIGNAL!")
-	put!(rch[1], STOP_SIGNAL)
-end
-function stop_signal_found()
-	ch = rch[myid()]
-	if isready(ch)
-		signal_found = take!(ch)
-		#println("FOUND $signal_found")
-		return signal_found == STOP_SIGNAL
-	else
-		return false
-	end
-	
-end
-
-const hide_cursor() = print("\u001B[?25l")
-const show_cursor() = print("\u001B[0J", "\u001B[?25h")
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 

@@ -25,8 +25,10 @@ function __start_up(s)
 	# Modify for statement based on input type
 	if typeof(s) == String
 		for_statement = "for i in collect(\"$s\");"
+		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, string(last(\"$s\")))));"
 	elseif typeof(s) == Vector{String}
 		for_statement = "for i in $s;"
+		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, last($s))));"
 	end
 
 	# Prime the loop so that print steps can be consolidated
@@ -45,7 +47,8 @@ function __start_up(s)
 			"end;" *
 			"sleep(0.125);" *
 		"end;" *
-	"end"
+	"end;" *
+	cleanup_statement;
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
@@ -66,10 +69,10 @@ function __clean_up(p, proc_input, s)
 
 	# Calculate the number of spaces needed to overwrite the printed character
 	# Notice that this might exceed the required number, which could delete preceding characters
-	amount = maximum(length.(transcode.(UInt8, "$x" for x in collect(s))))
-	print('\b'^amount * " "^amount * '\b'^amount)
+	#amount = maximum(length.(transcode.(UInt8, "$x" for x in collect(s))))
+	#print('\b'^amount * " "^amount * '\b'^amount)
 
-	flush(stdout)
+	#flush(stdout)
 
 	show_cursor()
 end

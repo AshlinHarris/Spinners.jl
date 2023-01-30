@@ -268,7 +268,7 @@ macro spinner(x::QuoteNode, f)
 		else
 			$(esc(f))
 		end
-		__clean_up(p, proc-input, s)
+		__clean_up(p, proc_input, s)
 	redirect_stdout(os);
 	close(wr);
 	output = read(rd, String)

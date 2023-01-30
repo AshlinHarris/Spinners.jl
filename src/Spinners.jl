@@ -245,7 +245,11 @@ macro spinner(x::QuoteNode)
 		local p, proc_input = __start_up(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
-		default_user_function()
+		if(isinteractive())
+			show(default_user_function())
+		else
+			default_user_function()
+		end
 		__clean_up(p, proc_input, s)
 	redirect_stdout(os);
 	close(wr);
@@ -259,7 +263,11 @@ macro spinner(x::QuoteNode, f)
 		local p, proc_input = __start_up(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
-		$(esc(f))
+		if(isinteractive())
+			show($(esc(f)))
+		else
+			$(esc(f))
+		end
 		__clean_up(p, proc-input, s)
 	redirect_stdout(os);
 	close(wr);
@@ -272,7 +280,11 @@ macro spinner(s::String, f)
 		local p, proc_input = __start_up($s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
-		$(esc(f))
+		if(isinteractive())
+			show($(esc(f)))
+		else
+			$(esc(f))
+		end
 		__clean_up(p, proc_input, $s)
 	redirect_stdout(os);
 	close(wr);

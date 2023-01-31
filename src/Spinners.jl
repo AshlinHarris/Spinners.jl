@@ -21,11 +21,9 @@ function __start_up(s)
 
 	# Modify for statement based on input type
 	if typeof(s) == String
-		#for_statement = "for i in collect(\"$s\");"
 		for_statement = "V = collect(\"$s\");"
 		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, string(last(\"$s\")))));"
 	elseif typeof(s) == Vector{String}
-		#for_statement = "for i in $s;"
 		for_statement = "V = $s;"
 		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, last($s))));"
 	end
@@ -82,7 +80,6 @@ get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
-
 
 """
 # @spinner

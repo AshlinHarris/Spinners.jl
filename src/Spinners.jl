@@ -8,6 +8,7 @@ export @spinner, spinner
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
+get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 const hide_cursor() = print("\u001B[?25l")
 const show_cursor() = print("\u001B[0J", "\u001B[?25h")
@@ -69,12 +70,9 @@ function __clean_up(p, proc_input, s)
 		sleep(0.1)
 	end
 	sleep(0.1)
-	flush(stdout)
-
 	show_cursor()
+	flush(stdout)
 end
-
-get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 macro spinner()
 	quote

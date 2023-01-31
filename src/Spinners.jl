@@ -115,9 +115,9 @@ macro spinner(x::QuoteNode)
 	print( output )
 	end
 end
-macro spinner(x::QuoteNode, f)
+macro spinner(x, f)
 	quote
-		local s = get_named_string($x)
+		local s = isa($x, Symbol) ? get_named_string($x) : $x
 		local p, proc_input = __start_up(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
@@ -129,23 +129,7 @@ macro spinner(x::QuoteNode, f)
 	redirect_stdout(os);
 	close(wr);
 	output = read(rd, String)
-	print( output )
-	end
-end
-macro spinner(s::String, f)
-	quote
-		local p, proc_input = __start_up($s)
-	os = stdout;
-	(rd, wr) = redirect_stdout();
-		return_value = $(esc(f))
-		if(isinteractive() && !isnothing(return_value))
-			show($(esc(f)))
-		end
-		__clean_up(p, proc_input, $s)
-	redirect_stdout(os);
-	close(wr);
-	output = read(rd, String)
-	print( output )
+	print(output)
 	end
 end
 macro spinner(f)

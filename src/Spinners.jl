@@ -5,6 +5,10 @@ using Unicode: transcode
 
 export @spinner, spinner
 
+include("Definitions.jl")
+# Add dictionaries in the merge process when adding a new set of spinners
+SPINNERS = merge(custom, sindresorhus)
+
 const hide_cursor() = print("\u001B[?25l")
 const show_cursor() = print("\u001B[0J", "\u001B[?25h")
 
@@ -72,10 +76,6 @@ end
 
 get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
-include("Definitions.jl")
-# Add dictionaries in the merge process when adding a new set of spinners
-SPINNERS = merge(custom, sindresorhus)
-
 macro spinner()
 	quote
 		@spinner "◒◐◓◑" default_user_function()
@@ -115,9 +115,6 @@ macro spinner(s::String)
 end
 
 end # module Spinners
-
-
-
 
 #= Outdated functions and macros for interactive tasks
 
@@ -162,7 +159,6 @@ function generate_spinner(inputs)::Spinner
 		seconds_per_frame=seconds_per_frame,
 	)
 end
-
 
 # Spinner struct
 Base.@kwdef mutable struct Spinner
@@ -227,7 +223,6 @@ function next_frame!(S::Spinner)
 	print("\b"^textwidth(old) * new)
 
 end
-
 
 function timer_spin()
 	timer_spin("◒◐◓◑")

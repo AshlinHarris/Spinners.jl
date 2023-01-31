@@ -104,10 +104,9 @@ macro spinner(x::QuoteNode)
 		local p, proc_input = __start_up(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
-		if(isinteractive())
+		return_value = default_user_function()
+		if(isinteractive() && !isnothing(return_value))
 			show(default_user_function())
-		else
-			default_user_function()
 		end
 		__clean_up(p, proc_input, s)
 	redirect_stdout(os);

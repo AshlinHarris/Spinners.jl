@@ -16,7 +16,7 @@ const hide_cursor() = print("\u001B[?25l")
 const show_cursor() = print("\u001B[0J", "\u001B[?25h")
 
 
-const default_user_function() = sleep(3)
+default_user_function() = sleep(3)
 
 function __start_up(s)
 
@@ -24,10 +24,12 @@ function __start_up(s)
 
 	# Modify for statement based on input type
 	if typeof(s) == String
-		for_statement = "for i in collect(\"$s\");"
+		#for_statement = "for i in collect(\"$s\");"
+		for_statement = "V = collect(\"$s\");"
 		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, string(last(\"$s\")))));"
 	elseif typeof(s) == Vector{String}
-		for_statement = "for i in $s;"
+		#for_statement = "for i in $s;"
+		for_statement = "V = $s;"
 		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, last($s))));"
 	end
 
@@ -36,16 +38,25 @@ function __start_up(s)
 
 	# Assemble command to produce spinner
 	command =
-	"print(\"$first\");" *
-	"t=Threads.@async read(stdin, Char);" *
-	"while !istaskdone(t);" *
+	"let;" *
+		"print(\"$first\");" *
 		for_statement *
-			"try;" *
-				"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
-			"finally;" *
-				"flush(stdout);" *
+		"L = length(V);" *
+		"i=1;" *
+		"t=Threads.@async read(stdin, Char);" *
+		"while !istaskdone(t);" *
+			#for_statement *
+			"while !istaskdone(t);" *
+				"try;" *
+					"print(\"\\b\"^length(transcode(UInt16, string(V[i])))*V[i]);" *
+					#"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
+				"finally;" *
+					"flush(stdout);" *
+				"end;" *
+				"sleep(0.125);" *
+				"i == L ? i = 1 : i += 1;" *
 			"end;" *
-			"sleep(0.125);" *
+			#"end;" *
 		"end;" *
 	"end;" *
 	cleanup_statement;

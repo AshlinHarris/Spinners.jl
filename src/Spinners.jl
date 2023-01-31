@@ -95,24 +95,12 @@ Create a command line spinner
 """
 macro spinner()
 	quote
-		@spinner default_user_function()
+		@spinner "◒◐◓◑" default_user_function()
 	end
 end
 macro spinner(x::QuoteNode)
 	quote
-		local s = get_named_string($x)
-		local p, proc_input = __start_up(s)
-	os = stdout;
-	(rd, wr) = redirect_stdout();
-		return_value = default_user_function()
-		if(isinteractive() && !isnothing(return_value))
-			show(default_user_function())
-		end
-		__clean_up(p, proc_input, s)
-	redirect_stdout(os);
-	close(wr);
-	output = read(rd, String)
-	print( output )
+		@spinner $x default_user_function()
 	end
 end
 macro spinner(x, f)
@@ -277,10 +265,6 @@ function timer_spin(parameters...)
 	close(my_timer)
 end
 
-# Assemble the global Spinner dictionnary from Definitions.jl
-macro spinner()
-        @info("An expression is required (e.g., `@spinner sleep(4)`).")
-end
 macro spinner(inputs...)
 	return quote
 		# Start spinner

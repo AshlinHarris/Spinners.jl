@@ -1,8 +1,3 @@
-"""
-# Exported names:
-- `@spinner`
-Please see `?@spinner` for more information.
-"""
 module Spinners
 
 using Unicode: graphemes
@@ -81,18 +76,6 @@ include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
 
-"""
-# @spinner
-Create a command line spinner
-## Usage
-```
-@spinner expression          # Use the default spinner
-@spinner "string" expression # Iterate through the graphemes of a string
-@spinner :symbol expression  # Use a built-in spinner
-```
-## Available symbols
-`:arrow`, `:bar`, `:blink`, `:bounce`, `:cards`, `:clock`, `:dots`, `:loading`, `:moon`, `:pong`, `:shutter`, `:snail`
-"""
 macro spinner()
 	quote
 		@spinner "◒◐◓◑" default_user_function()

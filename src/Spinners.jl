@@ -1,8 +1,3 @@
-"""
-# Exported names:
-- `@spinner`
-Please see `?@spinner` for more information.
-"""
 module Spinners
 
 using Unicode: graphemes
@@ -10,11 +5,13 @@ using Unicode: transcode
 
 export @spinner, spinner
 
-@enum Status starting=1 running=2 finishing=3 closing=4 closed=5
+include("Definitions.jl")
+# Add dictionaries in the merge process when adding a new set of spinners
+SPINNERS = merge(custom, sindresorhus)
+get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
 
 const hide_cursor() = print("\u001B[?25l")
 const show_cursor() = print("\u001B[0J", "\u001B[?25h")
-
 
 default_user_function() = sleep(3)
 
@@ -24,11 +21,9 @@ function __start_up(s)
 
 	# Modify for statement based on input type
 	if typeof(s) == String
-		#for_statement = "for i in collect(\"$s\");"
 		for_statement = "V = collect(\"$s\");"
 		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, string(last(\"$s\")))));"
 	elseif typeof(s) == Vector{String}
-		#for_statement = "for i in $s;"
 		for_statement = "V = $s;"
 		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, last($s))));"
 	end
@@ -75,19 +70,53 @@ function __clean_up(p, proc_input, s)
 		sleep(0.1)
 	end
 	sleep(0.1)
-	flush(stdout)
-
 	show_cursor()
+	flush(stdout)
 end
 
-get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
+macro spinner()
+	quote
+		@spinner "◒◐◓◑" default_user_function()
+	end
+end
+macro spinner(x::QuoteNode)
+	quote
+		@spinner $x default_user_function()
+	end
+end
+macro spinner(x, f)
+	quote
+		local s = isa($x, Symbol) ? get_named_string($x) : $x
+		local p, proc_input = __start_up(s)
+	os = stdout;
+	(rd, wr) = redirect_stdout();
+		return_value = $(esc(f))
+		if(isinteractive() && !isnothing(return_value))
+			show($(esc(f)))
+		end
+		__clean_up(p, proc_input, s)
+	redirect_stdout(os);
+	close(wr);
+	output = read(rd, String)
+	print(output)
+	end
+end
+macro spinner(f)
+	quote
+		@spinner "◒◐◓◑" $(esc(f))
+	end
+end
+macro spinner(s::String)
+	quote
+		@spinner $s default_user_function()
+	end
+end
 
-include("Definitions.jl")
-# Add dictionaries in the merge process when adding a new set of spinners
-SPINNERS = merge(custom, sindresorhus)
+end # module Spinners
 
 #= Outdated functions and macros for interactive tasks
 
+@enum Status starting=1 running=2 finishing=3 closing=4 closed=5
 
 function pop_first_by_type!(inputs, type, default)
 	if isempty(inputs)
@@ -128,7 +157,6 @@ function generate_spinner(inputs)::Spinner
 		seconds_per_frame=seconds_per_frame,
 	)
 end
-
 
 # Spinner struct
 Base.@kwdef mutable struct Spinner
@@ -194,7 +222,6 @@ function next_frame!(S::Spinner)
 
 end
 
-
 function timer_spin()
 	timer_spin("◒◐◓◑")
 end
@@ -214,10 +241,6 @@ function timer_spin(parameters...)
 	close(my_timer)
 end
 
-# Assemble the global Spinner dictionnary from Definitions.jl
-macro spinner()
-        @info("An expression is required (e.g., `@spinner sleep(4)`).")
-end
 macro spinner(inputs...)
 	return quote
 		# Start spinner
@@ -232,89 +255,3 @@ macro spinner(inputs...)
 	end
 end
 =#
-
-"""
-# @spinner
-Create a command line spinner
-## Usage
-```
-@spinner expression          # Use the default spinner
-@spinner "string" expression # Iterate through the graphemes of a string
-@spinner :symbol expression  # Use a built-in spinner
-```
-## Available symbols
-`:arrow`, `:bar`, `:blink`, `:bounce`, `:cards`, `:clock`, `:dots`, `:loading`, `:moon`, `:pong`, `:shutter`, `:snail`
-"""
-macro spinner()
-	quote
-		@spinner default_user_function()
-	end
-end
-macro spinner(x::QuoteNode)
-	quote
-		local s = get_named_string($x)
-		local p, proc_input = __start_up(s)
-	os = stdout;
-	(rd, wr) = redirect_stdout();
-		if(isinteractive())
-			show(default_user_function())
-		else
-			default_user_function()
-		end
-		__clean_up(p, proc_input, s)
-	redirect_stdout(os);
-	close(wr);
-	output = read(rd, String)
-	print( output )
-	end
-end
-macro spinner(x::QuoteNode, f)
-	quote
-		local s = get_named_string($x)
-		local p, proc_input = __start_up(s)
-	os = stdout;
-	(rd, wr) = redirect_stdout();
-		return_value = $(esc(f))
-		if(isinteractive() && !isnothing(return_value))
-			show($(esc(f)))
-		end
-		__clean_up(p, proc_input, s)
-	redirect_stdout(os);
-	close(wr);
-	output = read(rd, String)
-	print( output )
-	end
-end
-macro spinner(s::String, f)
-	quote
-		local p, proc_input = __start_up($s)
-	os = stdout;
-	(rd, wr) = redirect_stdout();
-		return_value = $(esc(f))
-		if(isinteractive() && !isnothing(return_value))
-			show($(esc(f)))
-		end
-		__clean_up(p, proc_input, $s)
-	redirect_stdout(os);
-	close(wr);
-	output = read(rd, String)
-	print( output )
-	end
-end
-macro spinner(f)
-	quote
-		@spinner "◒◐◓◑" $(esc(f))
-	end
-end
-macro spinner(s::String)
-	quote
-		@spinner $s default_user_function()
-	end
-end
-
-
-
-
-
-
-end # module Spinners

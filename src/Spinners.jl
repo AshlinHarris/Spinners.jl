@@ -8,7 +8,10 @@ export @spinner, spinner
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
-get_named_string_vector(x::Symbol) = get(SPINNERS, x, "? ")
+function get_named_string_vector(x::Symbol)::Vector{String}
+	value = get(SPINNERS, x, "? ")
+	return isa(value, String) ? string.(collect(value)) : value
+end
 
 const hide_cursor() = print("\u001B[?25l")
 const show_cursor() = print("\u001B[0J", "\u001B[?25h")

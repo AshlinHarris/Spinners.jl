@@ -8,7 +8,7 @@ export @spinner, spinner
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
-get_named_string(x::Symbol) = get(SPINNERS, x, "? ")
+get_named_string_vector(x::Symbol) = get(SPINNERS, x, "? ")
 
 const hide_cursor() = print("\u001B[?25l")
 const show_cursor() = print("\u001B[0J", "\u001B[?25h")
@@ -86,7 +86,7 @@ macro spinner(x::QuoteNode)
 end
 macro spinner(x, f)
 	quote
-		local s = isa($x, Symbol) ? get_named_string($x) : $x
+		local s = isa($x, Symbol) ? get_named_string_vector($x) : $x
 		local p, proc_input = __start_up(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
@@ -139,7 +139,7 @@ function generate_spinner(inputs)::Spinner
 	msg = pop_first_by_type!(inputs, String, "")
 
 	if typeof(raw_s) == Symbol
-		raw_s = get_named_string(raw_s)
+		raw_s = get_named_string_vector(raw_s)
 	end
 
 	if typeof(raw_s) == String

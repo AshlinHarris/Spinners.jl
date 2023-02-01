@@ -39,67 +39,39 @@ println(x)
 # ...but note that the following is not yet supported
 # my_string = "🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛"
 # @spinner my_string do_some_calculations(15)
-# There is some Unicode support.
 
 # There are several character sets built in
 # For instance, @spinner :clock do_some_calculations(15)
 @spinner :loading
 @spinner :shutter
 @spinner :blink
-
-# Currently, users cannot input their own string vector.
-# However, there are some that are already built in:
-@spinner :loading
 @spinner :pong
 @spinner :cards
 ```
 
-## Notes for developers
-Here are any aspects of the code that might be confusing to new developers:
-- Source code
-  - To erase a character, the spinner process prints a number of backspaces depending on the length of the character's transcode.
-- Tests
-  - To see what the spinner process has printed, stdout is captured.
-  - The spinner isn't guranteed to start or stop at a particular moment, so regular expressions are used to make sure the printout is reasonable.
-  
-## Internal documentation:
-```
-julia> using Spinners
-help?> @spinner
-  @spinner
-  ≡≡≡≡≡≡≡≡≡≡
-
-  Create a command line spinner
-
-  Usage
-  =======
-
-  @spinner "string" expression # Iterate through the graphemes of a string
-  @spinner :symbol expression  # Use a built-in spinner
-
-  Available symbols
-  ===================
-
-  :arrow, :bar, :blink, :bounce, :cards, :clock, :dots, :loading, :moon, :pong, :shutter, :snail
-```
-
 ## Related Works
 
-I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which already has its own version of spinners, albeit with a different use case.
-[This thread on the Julia Discourse](https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285) gives some technical details, but essentially those spinners are still progress meters, which must be updated at points with the function being measured.
-`Spinners.jl.@spinner` receives a signal when the user's function is complete, so the user doesn't need to alter their function.
+I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl). This package includes spinning progress meters, which must be updated at points within the function being measured.
+In contrast, `Spinners.jl.@spinner` treats the user function as a black box. It can't measure progress, but it receives a signal when the user's function is complete, so the user doesn't need to add breaks to their function.
 
 In Julia:
-- [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)
-  - Includes feature from [Spinner.jl](https://github.com/rahulkp220/Spinner.jl)
-- [Term.jl](https://github.com/FedeClaudi/Term.jl)
+- [timholy/ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)
+- [FedeClaudi/Term.jl](https://github.com/FedeClaudi/Term.jl)
   - https://fedeclaudi.github.io/Term.jl/stable/adv/progressbars/
-- [ProgressBars.jl](https://github.com/cloud-oak/ProgressBars.jl)
-- Pkg.jl spinners:
+- JuliaLang/Pkg.jl spinners:
   - [MiniProgressBars.jl](https://github.com/JuliaLang/Pkg.jl/blob/master/src/MiniProgressBars.jl)
   - [API.jl](https://github.com/JuliaLang/Pkg.jl/blob/master/src/API.jl)
+- [cloud-oak/ProgressBars.jl](https://github.com/cloud-oak/ProgressBars.jl)
+- [KristofferC/TerminalSpinners.jl](https://github.com/KristofferC/TerminalSpinners.jl)
+- [rahulkp220/Spinner.jl (defunct)](https://github.com/rahulkp220/Spinner.jl)
   
-Other projects:
-- [cli-spinners](https://github.com/sindresorhus/cli-spinners)
+In other languages:
+- [sindresorhus/cli-spinners (JavaScript)](https://github.com/sindresorhus/cli-spinners)
   - Some assets in Spinners.jl come from here.
+
+## Related discussions:
+- https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285
+- https://discourse.julialang.org/t/how-to-print-rotating-tick-as-progress-bar-in-terminal/62099
+- https://discourse.julialang.org/t/terminating-a-process-on-windows/87481
+- https://discourse.julialang.org/t/whats-an-interactive-task-does-it-pause-a-running-task/93532
   

@@ -10,11 +10,13 @@ include("Definitions.jl")
 SPINNERS = merge(custom, sindresorhus)
 function get_named_string_vector(x::Symbol)::Vector{String}
 	value = get(SPINNERS, x, "? ")
-	return isa(value, String) ? string.(collect(value)) : value
+	return isa(value, String) ? string_to_vector(value) : value
 end
 
 const hide_cursor() = print("\u001B[?25l")
 const show_cursor() = print("\u001B[0J", "\u001B[?25h")
+
+string_to_vector(s) = string.(collect(s))
 
 default_user_function() = sleep(3)
 
@@ -22,23 +24,16 @@ function __start_up(s)
 
 	hide_cursor()
 
-	# Modify for statement based on input type
-	if typeof(s) == String
-		for_statement = "V = collect(\"$s\");"
-		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, string(last(\"$s\")))));"
-	elseif typeof(s) == Vector{String}
-		for_statement = "V = $s;"
-		cleanup_statement = "print(\"\\b\"^length(transcode(UInt16, last($s))));"
-	end
-
 	# Prime the loop so that print steps can be consolidated
 	first = s[1]
+
 
 	# Assemble command to produce spinner
 	command =
 	"let;" *
 		"print(\"$first\");" *
-		for_statement *
+		#replace("V = $s;", "\"" => "\\\"") *
+		"V = $s;" *
 		"L = length(V);" *
 		"i=1;" *
 		"t=Threads.@async read(stdin, Char);" *
@@ -47,17 +42,15 @@ function __start_up(s)
 			"while !istaskdone(t);" *
 				"try;" *
 					"print(\"\\b\"^length(transcode(UInt16, string(V[i])))*V[i]);" *
-					#"print(\"\\b\"^length(transcode(UInt16, \"\$i\"))*\"\$i\");" *
 				"finally;" *
 					"flush(stdout);" *
 				"end;" *
 				"sleep(0.125);" *
 				"i == L ? i = 1 : i += 1;" *
 			"end;" *
-			#"end;" *
 		"end;" *
-	"end;" *
-	cleanup_statement;
+		"print(\"\\b\"^length(transcode(UInt16, last(V))));" *
+	"end;"
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
@@ -79,7 +72,7 @@ end
 
 macro spinner()
 	quote
-		@spinner "◒◐◓◑" default_user_function()
+		@spinner ["◒", "◐", "◓", "◑"] default_user_function()
 	end
 end
 macro spinner(x::QuoteNode)
@@ -89,7 +82,14 @@ macro spinner(x::QuoteNode)
 end
 macro spinner(x, f)
 	quote
-		local s = isa($x, Symbol) ? get_named_string_vector($x) : $x
+		local s = 
+			if(isa($x, Symbol))
+				 get_named_string_vector($x)
+			elseif(isa($x, String))
+				string_to_vector($x)
+			else
+				$x
+			end
 		local p, proc_input = __start_up(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
@@ -106,12 +106,12 @@ macro spinner(x, f)
 end
 macro spinner(f)
 	quote
-		@spinner "◒◐◓◑" $(esc(f))
+		@spinner ["◒", "◐", "◓", "◑"] $(esc(f))
 	end
 end
 macro spinner(s::String)
 	quote
-		@spinner $s default_user_function()
+		@spinner string_to_vector($s) default_user_function()
 	end
 end
 

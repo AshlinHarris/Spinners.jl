@@ -15,7 +15,6 @@ Base.@kwdef mutable struct Spinner
 	frame::Unsigned = 1
 end
 
-
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
@@ -25,7 +24,6 @@ function get_named_string_vector(x::Symbol)::Vector{String}
 end
 
 string_to_vector(s) = string.(collect(graphemes(s)))
-
 
 function __spinner(S)
 

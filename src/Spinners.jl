@@ -51,7 +51,8 @@ seconds_per_frame = S.seconds_per_frame
 			
 			i = 1
 			t=Threads.@async read(stdin, Char)
-			while true
+			keep_going = true
+			while keep_going
 				try
 					prev = iterator_to_index(i)
 					i += 1
@@ -60,13 +61,13 @@ seconds_per_frame = S.seconds_per_frame
 
 					if istaskdone(t)
 						clean_up(V[prev])
-						quit()
+						keep_going = false
 					end
 
 				catch InterruptException
 					curr = iterator_to_index(i)
 					clean_up(V[curr])
-					quit()
+					keep_going = false
 				finally
 				end
 				sleep(x)
@@ -78,7 +79,7 @@ seconds_per_frame = S.seconds_per_frame
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
+	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, ), wait = false)
 	return proc, proc_input
 end
 

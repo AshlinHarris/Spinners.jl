@@ -13,61 +13,58 @@ function get_named_string_vector(x::Symbol)::Vector{String}
 	return isa(value, String) ? string_to_vector(value) : value
 end
 
-const hide_cursor() = print("\u001B[?25l")
-const show_cursor() = print("\u001B[0J", "\u001B[?25h")
-
 string_to_vector(s) = string.(collect(s))
 
 default_user_function() = sleep(3)
 
-function __start_up(s)
-
-	hide_cursor()
-
-	# Prime the loop so that print steps can be consolidated
-	first = s[1]
-
+function __spinner(s)
 
 	# Assemble command to produce spinner
-	command =
-	"let;" *
-		"print(\"$first\");" *
-		#replace("V = $s;", "\"" => "\\\"") *
-		"V = $s;" *
-		"L = length(V);" *
-		"i=1;" *
-		"t=Threads.@async read(stdin, Char);" *
-		"while !istaskdone(t);" *
-			#for_statement *
-			"while !istaskdone(t);" *
-				"try;" *
-					"print(\"\\b\"^length(transcode(UInt16, string(V[i])))*V[i]);" *
-				"finally;" *
-					"flush(stdout);" *
-				"end;" *
-				"sleep(0.125);" *
-				"i == L ? i = 1 : i += 1;" *
-			"end;" *
-		"end;" *
-		"print(\"\\b\"^length(transcode(UInt16, last(V))));" *
-	"end;"
+	command = "
+		let
+			match_length(c) = length(transcode(UInt16, string(c)))
+			function clean_up(c) # Erase spinner and restore cursor
+					print(
+						\"\\b\"^match_length(c),
+						\" \"^match_length(c),
+						\"\\b\"^match_length(c),
+						\"\\u001B[0J\", \"\\u001B[?25h\"
+					)
+			end
+			V = $s
+			print(\"\\u001B[?25l\", V[1]) # hide cursor
+			L = length(V) # declaring this const keeps the spinner from drawing?
+			iterator_to_index(i) = (i - 1) % L + 1
+			
+			i = 1
+			t=Threads.@async read(stdin, Char)
+			while true
+				try
+					prev = iterator_to_index(i)
+					i += 1
+					curr = iterator_to_index(i)
+					print(\"\\b\"^match_length(V[prev])*V[curr])
+
+					if istaskdone(t)
+						clean_up(V[prev])
+						quit()
+					end
+
+				catch InterruptException
+					curr = iterator_to_index(i)
+					clean_up(V[curr])
+					quit()
+				finally
+				end
+				sleep(0.125)
+			end
+		end
+	"
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
+	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout), wait = false)
 	return proc, proc_input
-end
-
-function __clean_up(p, proc_input, s)
-	write(proc_input,'c')
-
-	# Wait for process to terminate, if needed.
-	while process_running(p)
-		sleep(0.1)
-	end
-	sleep(0.1)
-	show_cursor()
-	flush(stdout)
 end
 
 macro spinner()
@@ -90,14 +87,19 @@ macro spinner(x, f)
 			else
 				$x
 			end
-		local p, proc_input = __start_up(s)
+		local p, proc_input = __spinner(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
 		return_value = $(esc(f))
 		if(isinteractive() && !isnothing(return_value))
 			show($(esc(f)))
 		end
-		__clean_up(p, proc_input, s)
+		write(proc_input,'c')
+
+	while(process_running(p))
+		sleep(0.1)
+	end
+
 	redirect_stdout(os);
 	close(wr);
 	output = read(rd, String)

@@ -9,7 +9,7 @@ Base.@kwdef mutable struct Spinner
 	#status::Status = starting
 	style::Vector{String} = ["◒","◐","◓","◑"]
 	mode::Symbol = :none
-	seconds_per_frame::Real = 0.2
+	seconds_per_frame::Real = 0.15
 	frame::Unsigned = 1
 end
 
@@ -29,7 +29,7 @@ default_user_function() = sleep(3)
 function __spinner(S)
 
 s=S.style
-seconds_per_frame = S. seconds_per_frame
+seconds_per_frame = S.seconds_per_frame
 
 	# Assemble command to produce spinner
 	command = "
@@ -103,6 +103,8 @@ end
 
 function generate_spinner(inputs)::Spinner
 #function generate_spinner(inputs)::Vector{String}
+
+	println.(inputs)
 	
 	# The first input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
@@ -144,7 +146,7 @@ end
 
 macro spinner(args...)
 	quote
-		local s = generate_spinner([eval($(args[1:end-1])[1])])
+		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))
 		#generate_spinner(args[1:end-1])
 		local p, proc_input = __spinner(s)
 	os = stdout;

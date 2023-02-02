@@ -5,6 +5,15 @@ using Unicode: transcode
 
 export @spinner, spinner
 
+Base.@kwdef mutable struct Spinner
+	#status::Status = starting
+	style::Vector{String} = ["◒","◐","◓","◑"]
+	mode::Symbol = :none
+	seconds_per_frame::Real = 0.2
+	frame::Unsigned = 1
+end
+
+
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
 SPINNERS = merge(custom, sindresorhus)
@@ -17,9 +26,10 @@ string_to_vector(s) = string.(collect(s))
 
 default_user_function() = sleep(3)
 
-#function generate_spinner(inputs)::Spinner
+function __spinner(S)
 
-function __spinner(s)
+s=S.style
+seconds_per_frame = S. seconds_per_frame
 
 	# Assemble command to produce spinner
 	command = "
@@ -59,7 +69,7 @@ function __spinner(s)
 					quit()
 				finally
 				end
-				sleep(0.15)
+				sleep($seconds_per_frame)
 			end
 		finally
 			print(\"\\u001B[0J\", \"\\u001B[?25h\") # Restore cursor
@@ -91,52 +101,51 @@ function pop_first_by_type!(inputs, type, default)
 	return isnothing(location) ? default : popat!(inputs, location)
 end
 
-function generate_spinner(inputs)::Vector{String}
+function generate_spinner(inputs)::Spinner
+#function generate_spinner(inputs)::Vector{String}
 	
 	# The first input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
 	# Then the first Number must be the rate
-	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.2)
+	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.15)
 	# Then the first remaining Symbol must be the mode
 	mode = pop_first_by_type!(inputs, Symbol, :none)
 	# The first remaining string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
 
-	if typeof(raw_s) == Symbol
-		raw_s = get_named_string_vector(raw_s)
-	end
+	#if typeof(raw_s) == Symbol
+	#	raw_s = get_named_string_vector(raw_s)
+	#end
 
-	if typeof(raw_s) == String
-		s = ["$i" for i in collect(graphemes(raw_s))]
-	else
-		s = raw_s
-	end
+	#if typeof(raw_s) == String
+	#	s = ["$i" for i in collect(graphemes(raw_s))]
+	#else
+	#	s = raw_s
+	#end
+
+	s = 
+		if(isa(raw_s, Symbol))
+			 get_named_string_vector(raw_s)
+		elseif(isa(raw_s, String))
+			string_to_vector(raw_s)
+		else
+			raw_s
+		end
 
 	# Append messages to each frame
 	s .*= msg
 
-	return(s)
-
-	#return Spinner(
-	#	style=s,
-	#	mode=mode,
-	#	seconds_per_frame=seconds_per_frame,
-	#)
+	return Spinner(
+		style=s,
+		mode=mode,
+		seconds_per_frame=seconds_per_frame,
+	)
 end
 
 macro spinner(args...)
 	quote
-		local x = generate_spinner([eval($(args[1:end-1])[1])])
-		println(typeof(x))
+		local s = generate_spinner([eval($(args[1:end-1])[1])])
 		#generate_spinner(args[1:end-1])
-		local s = 
-			if(isa(x, Symbol))
-				 get_named_string_vector(x)
-			elseif(isa(x, String))
-				string_to_vector(x)
-			else
-				x
-			end
 		local p, proc_input = __spinner(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
@@ -172,15 +181,6 @@ end # module Spinners
 #= Outdated functions and macros for interactive tasks
 
 @enum Status starting=1 running=2 finishing=3 closing=4 closed=5
-
-# Spinner struct
-Base.@kwdef mutable struct Spinner
-	status::Status = starting
-	style::Vector{String} = ["◒","◐","◓","◑"]
-	mode::Symbol = :none
-	seconds_per_frame::Real = 0.2
-	frame::Unsigned = 1
-end
 
 # Functions on spinner types
 

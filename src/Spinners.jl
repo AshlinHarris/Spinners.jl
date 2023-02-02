@@ -4,9 +4,12 @@ using Unicode: graphemes
 
 export @spinner, spinner
 
+const default_spinner_animation = ["◒", "◐", "◓", "◑"]
+default_user_function() = sleep(3)
+
 Base.@kwdef mutable struct Spinner
 	#status::Status = starting
-	style::Vector{String} = ["◒","◐","◓","◑"]
+	style::Vector{String} = default_spinner_animation
 	mode::Symbol = :none
 	seconds_per_frame::Real = 0.15
 	frame::Unsigned = 1
@@ -23,7 +26,6 @@ end
 
 string_to_vector(s) = string.(collect(graphemes(s)))
 
-default_user_function() = sleep(3)
 
 function __spinner(S)
 
@@ -85,7 +87,7 @@ end
 
 macro spinner()
 	quote
-		@spinner ["◒", "◐", "◓", "◑"] default_user_function()
+		@spinner default_spinner_animation default_user_function()
 	end
 end
 macro spinner(x::QuoteNode)
@@ -108,7 +110,7 @@ function pop_first_by_type!(inputs, type, default)
 end
 macro spinner(n::Number)
 	quote
-		@spinner ["◒", "◐", "◓", "◑"] $n default_user_function()
+		@spinner default_spinner_animation $n default_user_function()
 	end
 end
 

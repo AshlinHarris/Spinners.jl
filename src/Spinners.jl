@@ -85,6 +85,16 @@ macro spinner()
 		@spinner ["◒", "◐", "◓", "◑"] default_user_function()
 	end
 end
+macro spinner(x::QuoteNode)
+	quote
+		@spinner $x default_user_function()
+	end
+end
+macro spinner(s::String)
+	quote
+		@spinner string_to_vector($s) default_user_function()
+	end
+end
 function pop_first_by_type!(inputs, type, default)
 	if isempty(inputs)
 		return default
@@ -93,8 +103,14 @@ function pop_first_by_type!(inputs, type, default)
 	location = [isa(x, type) for x in inputs] |> findfirst
 	return isnothing(location) ? default : popat!(inputs, location)
 end
+macro spinner(n::Number)
+	quote
+		@spinner ["◒", "◐", "◓", "◑"] $n default_user_function()
+	end
+end
 
 function generate_spinner(inputs)::Spinner
+#function generate_spinner(inputs)::Vector{String}
 
 	# The first input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)

@@ -1,7 +1,6 @@
 module Spinners
 
 using Unicode: graphemes
-using Unicode: transcode
 
 export @spinner, spinner
 
@@ -86,11 +85,6 @@ macro spinner()
 		@spinner ["◒", "◐", "◓", "◑"] default_user_function()
 	end
 end
-macro spinner(x::QuoteNode)
-	quote
-		@spinner $x default_user_function()
-	end
-end
 function pop_first_by_type!(inputs, type, default)
 	if isempty(inputs)
 		return default
@@ -101,7 +95,6 @@ function pop_first_by_type!(inputs, type, default)
 end
 
 function generate_spinner(inputs)::Spinner
-#function generate_spinner(inputs)::Vector{String}
 
 	# The first input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
@@ -111,16 +104,6 @@ function generate_spinner(inputs)::Spinner
 	mode = pop_first_by_type!(inputs, Symbol, :none)
 	# The first remaining string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
-
-	#if typeof(raw_s) == Symbol
-	#	raw_s = get_named_string_vector(raw_s)
-	#end
-
-	#if typeof(raw_s) == String
-	#	s = ["$i" for i in collect(graphemes(raw_s))]
-	#else
-	#	s = raw_s
-	#end
 
 	s = 
 		if(isa(raw_s, Symbol))
@@ -162,16 +145,6 @@ macro spinner(args...)
 	close(wr);
 	output = read(rd, String)
 	print(output)
-	end
-end
-macro spinner(f)
-	quote
-		@spinner ["◒", "◐", "◓", "◑"] $(esc(f))
-	end
-end
-macro spinner(s::String)
-	quote
-		@spinner string_to_vector($s) default_user_function()
 	end
 end
 
@@ -255,17 +228,4 @@ function timer_spin(parameters...)
 	close(my_timer)
 end
 
-macro spinner(inputs...)
-	return quote
-		# Start spinner
-		local T = Threads.@spawn :interactive timer_spin($(inputs[1:end-1]...));
-
-		# User expression
-		$(esc(inputs[end]))
-
-		# Close spinner
-		signal_to_close!()
-		wait(T)
-	end
-end
 =#

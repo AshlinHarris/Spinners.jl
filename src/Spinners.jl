@@ -95,7 +95,7 @@ macro spinner(x, f)
 	(rd, wr) = redirect_stdout();
 		return_value = $(esc(f))
 		if(isinteractive() && !isnothing(return_value))
-			show($(esc(f)))
+			show(return_value)
 		end
 		write(proc_input,'c')
 

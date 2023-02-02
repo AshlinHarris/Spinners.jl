@@ -110,7 +110,6 @@ macro spinner(n::Number)
 end
 
 function generate_spinner(inputs)::Spinner
-#function generate_spinner(inputs)::Vector{String}
 
 	# The first input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)

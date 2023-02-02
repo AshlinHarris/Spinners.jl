@@ -21,18 +21,19 @@ function __spinner(s)
 
 	# Assemble command to produce spinner
 	command = "
-		let
+		try
+			V = $s
+			print(\"\\u001B[?25l\", V[1]) # hide cursor
 			match_length(c) = length(transcode(UInt16, string(c)))
-			function clean_up(c) # Erase spinner and restore cursor
+
+			function clean_up(c) # Erase spinner
 					print(
 						\"\\b\"^match_length(c),
 						\" \"^match_length(c),
 						\"\\b\"^match_length(c),
-						\"\\u001B[0J\", \"\\u001B[?25h\"
 					)
 			end
-			V = $s
-			print(\"\\u001B[?25l\", V[1]) # hide cursor
+
 			L = length(V) # declaring this const keeps the spinner from drawing?
 			iterator_to_index(i) = (i - 1) % L + 1
 			
@@ -56,8 +57,10 @@ function __spinner(s)
 					quit()
 				finally
 				end
-				sleep(0.125)
+				sleep(0.15)
 			end
+		finally
+			print(\"\\u001B[0J\", \"\\u001B[?25h\") # Restore cursor
 		end
 	"
 

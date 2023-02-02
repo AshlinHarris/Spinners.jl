@@ -34,13 +34,15 @@ seconds_per_frame = S.seconds_per_frame
 	command = "
 		try
 			V = $s
-			print(\"\\u001B[?25l\", V[1]) # hide cursor
+			x = $seconds_per_frame
+	" * raw"""
+			print("\u001B[?25l", V[1]) # hide cursor
 
 			function clean_up(c) # Erase spinner
 					print(
-						\"\\b\"^textwidth(c),
-						\" \"^textwidth(c),
-						\"\\b\"^textwidth(c),
+						"\b"^textwidth(c),
+						" "^textwidth(c),
+						"\b"^textwidth(c),
 					)
 			end
 
@@ -54,7 +56,7 @@ seconds_per_frame = S.seconds_per_frame
 					prev = iterator_to_index(i)
 					i += 1
 					curr = iterator_to_index(i)
-					print(\"\\b\"^textwidth(V[prev])*V[curr])
+					print("\b"^textwidth(V[prev])*V[curr])
 
 					if istaskdone(t)
 						clean_up(V[prev])
@@ -67,16 +69,16 @@ seconds_per_frame = S.seconds_per_frame
 					quit()
 				finally
 				end
-				sleep($seconds_per_frame)
+				sleep(x)
 			end
 		finally
-			print(\"\\u001B[0J\", \"\\u001B[?25h\") # Restore cursor
+			print("\u001B[0J", "\u001B[?25h") # Restore cursor
 		end
-	"
+	"""
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout), wait = false)
+	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
 	return proc, proc_input
 end
 

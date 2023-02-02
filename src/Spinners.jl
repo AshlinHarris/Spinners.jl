@@ -104,8 +104,6 @@ end
 function generate_spinner(inputs)::Spinner
 #function generate_spinner(inputs)::Vector{String}
 
-	println.(inputs)
-	
 	# The first input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
 	# Then the first Number must be the rate

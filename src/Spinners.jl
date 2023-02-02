@@ -4,14 +4,16 @@ using Unicode: graphemes
 
 export @spinner, spinner
 
+const default_spinner_animation = ["◒", "◐", "◓", "◑"]
+default_user_function() = sleep(3)
+
 Base.@kwdef mutable struct Spinner
 	#status::Status = starting
-	style::Vector{String} = ["◒","◐","◓","◑"]
+	style::Vector{String} = default_spinner_animation
 	mode::Symbol = :none
 	seconds_per_frame::Real = 0.15
 	frame::Unsigned = 1
 end
-
 
 include("Definitions.jl")
 # Add dictionaries in the merge process when adding a new set of spinners
@@ -23,8 +25,6 @@ end
 
 string_to_vector(s) = string.(collect(graphemes(s)))
 
-default_user_function() = sleep(3)
-
 function __spinner(S)
 
 s=S.style
@@ -34,13 +34,15 @@ seconds_per_frame = S.seconds_per_frame
 	command = "
 		try
 			V = $s
-			print(\"\\u001B[?25l\", V[1]) # hide cursor
+			x = $seconds_per_frame
+	" * raw"""
+			print("\u001B[?25l", V[1]) # hide cursor
 
 			function clean_up(c) # Erase spinner
 					print(
-						\"\\b\"^textwidth(c),
-						\" \"^textwidth(c),
-						\"\\b\"^textwidth(c),
+						"\b"^textwidth(c),
+						" "^textwidth(c),
+						"\b"^textwidth(c),
 					)
 			end
 
@@ -49,40 +51,41 @@ seconds_per_frame = S.seconds_per_frame
 			
 			i = 1
 			t=Threads.@async read(stdin, Char)
-			while true
+			keep_going = true
+			while keep_going
 				try
 					prev = iterator_to_index(i)
 					i += 1
 					curr = iterator_to_index(i)
-					print(\"\\b\"^textwidth(V[prev])*V[curr])
+					print("\b"^textwidth(V[prev])*V[curr])
 
 					if istaskdone(t)
 						clean_up(V[prev])
-						quit()
+						keep_going = false
 					end
 
 				catch InterruptException
 					curr = iterator_to_index(i)
 					clean_up(V[curr])
-					quit()
+					keep_going = false
 				finally
 				end
-				sleep($seconds_per_frame)
+				sleep(x)
 			end
 		finally
-			print(\"\\u001B[0J\", \"\\u001B[?25h\") # Restore cursor
+			print("\u001B[0J", "\u001B[?25h") # Restore cursor
 		end
-	"
+	"""
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout), wait = false)
+	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, ), wait = false)
 	return proc, proc_input
 end
 
 macro spinner()
 	quote
-		@spinner ["◒", "◐", "◓", "◑"] default_user_function()
+		@spinner default_spinner_animation default_user_function()
 	end
 end
 macro spinner(x::QuoteNode)
@@ -105,7 +108,7 @@ function pop_first_by_type!(inputs, type, default)
 end
 macro spinner(n::Number)
 	quote
-		@spinner ["◒", "◐", "◓", "◑"] $n default_user_function()
+		@spinner default_spinner_animation $n default_user_function()
 	end
 end
 

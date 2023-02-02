@@ -21,14 +21,13 @@ function __spinner(s)
 
 	# Assemble command to produce spinner
 	command = "
-		let
+		try
 			match_length(c) = length(transcode(UInt16, string(c)))
-			function clean_up(c) # Erase spinner and restore cursor
+			function clean_up(c) # Erase spinner
 					print(
 						\"\\b\"^match_length(c),
 						\" \"^match_length(c),
 						\"\\b\"^match_length(c),
-						\"\\u001B[0J\", \"\\u001B[?25h\"
 					)
 			end
 			V = $s
@@ -58,6 +57,8 @@ function __spinner(s)
 				end
 				sleep(0.125)
 			end
+		finally
+			print(\"\\u001B[0J\", \"\\u001B[?25h\") # Restore cursor
 		end
 	"
 

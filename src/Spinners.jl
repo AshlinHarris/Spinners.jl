@@ -22,7 +22,7 @@ function get_named_string_vector(x::Symbol)::Vector{String}
 	return isa(value, String) ? string_to_vector(value) : value
 end
 
-string_to_vector(s) = string.(collect(s))
+string_to_vector(s) = string.(collect(graphemes(s)))
 
 default_user_function() = sleep(3)
 

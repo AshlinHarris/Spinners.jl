@@ -80,20 +80,23 @@ macro spinner(x::QuoteNode)
 		@spinner $x default_user_function()
 	end
 end
-macro spinner(x, f)
+macro spinner(args...)
 	quote
+		local x = eval($(args[1:end-1])[1])
+		println(typeof(x))
+		#generate_spinner(args[1:end-1])
 		local s = 
-			if(isa($x, Symbol))
-				 get_named_string_vector($x)
-			elseif(isa($x, String))
-				string_to_vector($x)
+			if(isa(x, Symbol))
+				 get_named_string_vector(x)
+			elseif(isa(x, String))
+				string_to_vector(x)
 			else
-				$x
+				x
 			end
 		local p, proc_input = __spinner(s)
 	os = stdout;
 	(rd, wr) = redirect_stdout();
-		return_value = $(esc(f))
+		return_value = $(esc(args[end]))
 		if(isinteractive() && !isnothing(return_value))
 			show(return_value)
 		end

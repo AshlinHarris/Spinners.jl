@@ -36,13 +36,12 @@ seconds_per_frame = S.seconds_per_frame
 		try
 			V = $s
 			print(\"\\u001B[?25l\", V[1]) # hide cursor
-			match_length(c) = length(transcode(UInt16, string(c)))
 
 			function clean_up(c) # Erase spinner
 					print(
-						\"\\b\"^match_length(c),
-						\" \"^match_length(c),
-						\"\\b\"^match_length(c),
+						\"\\b\"^textwidth(c),
+						\" \"^textwidth(c),
+						\"\\b\"^textwidth(c),
 					)
 			end
 
@@ -56,7 +55,7 @@ seconds_per_frame = S.seconds_per_frame
 					prev = iterator_to_index(i)
 					i += 1
 					curr = iterator_to_index(i)
-					print(\"\\b\"^match_length(V[prev])*V[curr])
+					print(\"\\b\"^textwidth(V[prev])*V[curr])
 
 					if istaskdone(t)
 						clean_up(V[prev])

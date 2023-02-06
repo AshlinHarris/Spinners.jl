@@ -18,22 +18,16 @@ The API should be considered unstable until v1.0.
 ```
 using Spinners
 
-# The @spinner macro shouldn't affect the scope
+# The @spinner macro shouldn't affect the scope:
 do_some_calculations(x) = sum(map(i -> BigInt(999)^10_000_000 % i, 1:x))
 @spinner "\\|/-" x = do_some_calculations(10);
 println(x)
 
-# You can provide a character set...
-@spinner "🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛" do_some_calculations(15)
-# ...but note that the following is not yet supported
-# my_string = "🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛"
-# @spinner my_string do_some_calculations(15)
-
-# There are several character sets built in
-# For instance, @spinner :clock do_some_calculations(15)
-@spinner :loading
+# You can provide a character set, but many are already built in:
+@spinner "◧◨" 0.5 sleep(5)
+@spinner ["　　　🐈", "　　🐈🐾", "　🐈🐾🐾", "🐈🐾🐾🐾"] 0.5 sleep(5)
+@spinner :aesthetic
 @spinner :shutter
-@spinner :blink
 @spinner :pong
 @spinner :cards
 ```
@@ -41,7 +35,9 @@ println(x)
 ## Related Works
 
 I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl). This package includes spinning progress meters, which must be updated at points within the function being measured.
-In contrast, `Spinners.jl.@spinner` treats the user function as a black box. It can't measure progress, but it receives a signal when the user's function is complete, so the user doesn't need to add breaks to their function.
+In contrast, `Spinners.jl.@spinner` treats the user function as a black box.
+The spinner is controlled by an external process and doesn't measure progress.
+The process receives a signal when the user's function is complete, so the user doesn't need to add breaks to their function.
 
 In Julia:
 - [timholy/ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)

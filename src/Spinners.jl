@@ -25,15 +25,15 @@ include("Definitions.jl")
 SPINNERS = merge(custom, sindresorhus)
 function get_named_string_vector(x::Symbol)::Vector{String}
 	value = get(SPINNERS, x, "? ")
-	return isa(value, String) ? string_to_vector(value) : value
+	return isa(value, String) ? string_to_vector(value) : copy(value)
 end
 
 string_to_vector(s) = string.(collect(graphemes(s)))
 
 function __spinner(S)
 
-s=S.style
-seconds_per_frame = S.seconds_per_frame
+	s=S.style
+	seconds_per_frame = S.seconds_per_frame
 
 	# Assemble command to produce spinner
 	command = "

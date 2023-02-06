@@ -2,14 +2,6 @@
 
 Command line spinners in Julia with Unicode support
 
-## Warning for Windows users
-
-
-
-__Important:__ Use the development version! Version 0.3 of `Spinners.jl` doesn't terminate properly.
-
-Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
-
 [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) [![Coverage](https://codecov.io/gh/ashlinharris/Spinners.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/AshlinHarris/Spinners.jl)
 
 ![spinners](https://user-images.githubusercontent.com/90787010/189241813-9ff87134-7b57-4e53-829b-32c6bc660851.gif)
@@ -17,13 +9,10 @@ Windows terminal might have issues with some UTF-16 characters, which it display
 ## Description
 
 `Spinners.jl` provides a single macro (`@spinner`), which generates a terminal spinner.
-For user instructions, see the internal documentation (`?@spinner`).
-
-The API should be considered unstable until v1.0.
 
 Spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
-It isn't advisable to add terminal elements that are overly distracting unless there is a need.
-For improved performance and energy use, it might be better to use a static message, or nothing at all.
+
+The API should be considered unstable until v1.0.
 
 ## Tutorial:
 ```

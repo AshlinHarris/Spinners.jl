@@ -1,8 +1,13 @@
+"""
+`Spinners.jl` provides a single macro (@spinner), which generates a terminal spinner.
+
+For user instructions, see the internal documentation (`?@spinner`).
+"""
 module Spinners
 
 using Unicode: graphemes
 
-export @spinner, spinner
+export @spinner
 
 const default_spinner_animation = ["◒", "◐", "◓", "◑"]
 default_user_function() = sleep(3)
@@ -20,15 +25,15 @@ include("Definitions.jl")
 SPINNERS = merge(custom, sindresorhus)
 function get_named_string_vector(x::Symbol)::Vector{String}
 	value = get(SPINNERS, x, "? ")
-	return isa(value, String) ? string_to_vector(value) : value
+	return isa(value, String) ? string_to_vector(value) : copy(value)
 end
 
 string_to_vector(s) = string.(collect(graphemes(s)))
 
 function __spinner(S)
 
-s=S.style
-seconds_per_frame = S.seconds_per_frame
+	s=S.style
+	seconds_per_frame = S.seconds_per_frame
 
 	# Assemble command to produce spinner
 	command = "
@@ -83,35 +88,6 @@ seconds_per_frame = S.seconds_per_frame
 	return proc, proc_input
 end
 
-macro spinner()
-	quote
-		@spinner default_spinner_animation default_user_function()
-	end
-end
-macro spinner(x::QuoteNode)
-	quote
-		@spinner $x default_user_function()
-	end
-end
-macro spinner(s::String)
-	quote
-		@spinner string_to_vector($s) default_user_function()
-	end
-end
-function pop_first_by_type!(inputs, type, default)
-	if isempty(inputs)
-		return default
-	end
-
-	location = [isa(x, type) for x in inputs] |> findfirst
-	return isnothing(location) ? default : popat!(inputs, location)
-end
-macro spinner(n::Number)
-	quote
-		@spinner default_spinner_animation $n default_user_function()
-	end
-end
-
 function generate_spinner(inputs)::Spinner
 
 	# The first input must be the style
@@ -142,6 +118,51 @@ function generate_spinner(inputs)::Spinner
 	)
 end
 
+"""
+`@spinner`: Command line spinners with Unicode support
+
+Usage: `@spinner [style] [rate] [message] function`
+
+  - `style`: `String`, `Vector{String}`, or `Symbol`
+    - See `Spinners.SPINNERS` for the list of supported symbols
+  - `rate`: seconds per frame
+  - `message::String`: text displayed to the right of the spinner
+
+Examples:
+```
+	@spinner
+	@spinner :aesthetic
+	@spinner "◧◨" 0.5 sleep(5)
+```
+"""
+macro spinner()
+	quote
+		@spinner default_spinner_animation default_user_function()
+	end
+end
+macro spinner(x::QuoteNode)
+	quote
+		@spinner $x default_user_function()
+	end
+end
+macro spinner(s::String)
+	quote
+		@spinner string_to_vector($s) default_user_function()
+	end
+end
+function pop_first_by_type!(inputs, type, default)
+	if isempty(inputs)
+		return default
+	end
+
+	location = [isa(x, type) for x in inputs] |> findfirst
+	return isnothing(location) ? default : popat!(inputs, location)
+end
+macro spinner(n::Number)
+	quote
+		@spinner default_spinner_animation $n default_user_function()
+	end
+end
 macro spinner(args...)
 	quote
 		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))

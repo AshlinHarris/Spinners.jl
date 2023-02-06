@@ -2,14 +2,6 @@
 
 Command line spinners in Julia with Unicode support
 
-## Warning for Windows users
-
-
-
-__Important:__ Use the development version! Version 0.3 of `Spinners.jl` doesn't terminate properly.
-
-Windows terminal might have issues with some UTF-16 characters, which it displays with additional spaces.
-
 [![Build Status](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/AshlinHarris/Spinners.jl/actions/workflows/ci.yml) [![Coverage](https://codecov.io/gh/ashlinharris/Spinners.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/AshlinHarris/Spinners.jl)
 
 ![spinners](https://user-images.githubusercontent.com/90787010/189241813-9ff87134-7b57-4e53-829b-32c6bc660851.gif)
@@ -17,34 +9,25 @@ Windows terminal might have issues with some UTF-16 characters, which it display
 ## Description
 
 `Spinners.jl` provides a single macro (`@spinner`), which generates a terminal spinner.
-For user instructions, see the internal documentation (`?@spinner`).
-
-The API should be considered unstable until v1.0.
 
 Spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
-It isn't advisable to add terminal elements that are overly distracting unless there is a need.
-For improved performance and energy use, it might be better to use a static message, or nothing at all.
+
+The API should be considered unstable until v1.0.
 
 ## Tutorial:
 ```
 using Spinners
 
-# The @spinner macro shouldn't affect the scope
+# The @spinner macro shouldn't affect the scope:
 do_some_calculations(x) = sum(map(i -> BigInt(999)^10_000_000 % i, 1:x))
 @spinner "\\|/-" x = do_some_calculations(10);
 println(x)
 
-# You can provide a character set...
-@spinner "🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛" do_some_calculations(15)
-# ...but note that the following is not yet supported
-# my_string = "🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛"
-# @spinner my_string do_some_calculations(15)
-
-# There are several character sets built in
-# For instance, @spinner :clock do_some_calculations(15)
-@spinner :loading
+# You can provide a character set, but many are already built in:
+@spinner "◧◨" 0.5 sleep(5)
+@spinner ["　　　🐈", "　　🐈🐾", "　🐈🐾🐾", "🐈🐾🐾🐾"] 0.5 sleep(5)
+@spinner :aesthetic
 @spinner :shutter
-@spinner :blink
 @spinner :pong
 @spinner :cards
 ```
@@ -52,7 +35,9 @@ println(x)
 ## Related Works
 
 I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl). This package includes spinning progress meters, which must be updated at points within the function being measured.
-In contrast, `Spinners.jl.@spinner` treats the user function as a black box. It can't measure progress, but it receives a signal when the user's function is complete, so the user doesn't need to add breaks to their function.
+In contrast, `Spinners.jl.@spinner` treats the user function as a black box.
+The spinner is controlled by an external process and doesn't measure progress.
+The process receives a signal when the user's function is complete, so the user doesn't need to add breaks to their function.
 
 In Julia:
 - [timholy/ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl)

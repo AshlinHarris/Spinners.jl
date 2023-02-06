@@ -2,7 +2,7 @@ module Spinners
 
 using Unicode: graphemes
 
-export @spinner, spinner
+export @spinner
 
 const default_spinner_animation = ["◒", "◐", "◓", "◑"]
 default_user_function() = sleep(3)

@@ -1,7 +1,7 @@
 """
-Spinners.jl
+`Spinners.jl` provides a single macro (@spinner), which generates a terminal spinner.
 
-See `?@spinner` for more information.
+For user instructions, see the internal documentation (`?@spinner`).
 """
 module Spinners
 
@@ -88,35 +88,6 @@ function __spinner(S)
 	return proc, proc_input
 end
 
-macro spinner()
-	quote
-		@spinner default_spinner_animation default_user_function()
-	end
-end
-macro spinner(x::QuoteNode)
-	quote
-		@spinner $x default_user_function()
-	end
-end
-macro spinner(s::String)
-	quote
-		@spinner string_to_vector($s) default_user_function()
-	end
-end
-function pop_first_by_type!(inputs, type, default)
-	if isempty(inputs)
-		return default
-	end
-
-	location = [isa(x, type) for x in inputs] |> findfirst
-	return isnothing(location) ? default : popat!(inputs, location)
-end
-macro spinner(n::Number)
-	quote
-		@spinner default_spinner_animation $n default_user_function()
-	end
-end
-
 function generate_spinner(inputs)::Spinner
 
 	# The first input must be the style
@@ -147,6 +118,37 @@ function generate_spinner(inputs)::Spinner
 	)
 end
 
+"""
+`@spinner`: Command line spinners with Unicode support
+"""
+macro spinner()
+	quote
+		@spinner default_spinner_animation default_user_function()
+	end
+end
+macro spinner(x::QuoteNode)
+	quote
+		@spinner $x default_user_function()
+	end
+end
+macro spinner(s::String)
+	quote
+		@spinner string_to_vector($s) default_user_function()
+	end
+end
+function pop_first_by_type!(inputs, type, default)
+	if isempty(inputs)
+		return default
+	end
+
+	location = [isa(x, type) for x in inputs] |> findfirst
+	return isnothing(location) ? default : popat!(inputs, location)
+end
+macro spinner(n::Number)
+	quote
+		@spinner default_spinner_animation $n default_user_function()
+	end
+end
 macro spinner(args...)
 	quote
 		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))

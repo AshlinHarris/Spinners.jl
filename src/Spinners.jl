@@ -1,3 +1,8 @@
+"""
+Spinners.jl
+
+See `?@spinner` for more information.
+"""
 module Spinners
 
 using Unicode: graphemes

@@ -21,11 +21,15 @@ Base.@kwdef mutable struct Spinner
 end
 
 include("Definitions.jl")
-# Add dictionaries in the merge process when adding a new set of spinners
-SPINNERS = merge(custom, sindresorhus)
+
 function get_named_string_vector(x::Symbol)::Vector{String}
-	value = get(SPINNERS, x, "? ")
-	return isa(value, String) ? string_to_vector(value) : copy(value)
+	#TODO: Why is a copy required here?
+	# It isn't needed here:
+	# const d=Dict(:a => 1, :b => 2);
+	# x = get(d,:a, 0)
+	# [x] .*= 2
+	# d[:a]
+	return deepcopy(get(SPINNERS, x, ["?"," "]))
 end
 
 string_to_vector(s) = string.(collect(graphemes(s)))

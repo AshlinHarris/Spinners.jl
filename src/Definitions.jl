@@ -1,8 +1,8 @@
 # Design principles
 # Respect the attention and focus of the user
-#	Spinners are designed to grab attention, so use them judiciously.
+#	Spinners are designed to grab attention,so use them judiciously.
 # Animation should begin immediately
-# 	If there is a long pause at the start, the user might think there is an issue.
+# 	If there is a long pause at the start,the user might think there is an issue.
 #	:snail might need to be removed for this reason...
 # Take care not to choose an already existing symbol for a new spinner
 
@@ -10,7 +10,7 @@
 const SPINNERS = Dict(
 
 # Spinners created in this package by contributors
-	:bar => "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁",
+	:bar => ["▁","▂","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃","▂","▁"],
 	:cards => [
 			"🂠🂠🂠🂠🂠",
 			"🂪🂠🂠🂠🂠",
@@ -30,33 +30,33 @@ const SPINNERS = Dict(
 			"🂠🂠🂠🂠🂠",
 			"🂠🂠🂠🂠🂠",
 		],
-	:clock => join([Char(i) for i in 0x1f550:0x1f55b]),
-	:dots => join([Char(i) for i in 0x2800:0x28ff]),
-		#  @show map(Unicode.julia_chartransform, x for x in s)
+	:clock => string.([Char(i) for i in 0x1f550:0x1f55b]),
+	:dots => string.([Char(i) for i in 0x2800:0x28ff]),
+		#  @show map(Unicode.julia_chartransform,x for x in s)
 		# or just collect(s)
 	:loading => [
-			"Loading.    ",
-			"Loading..   ",
-			"Loading...  ",
-			"Loading.... ",
-			"Loading.....",
-			"Loading.....",
-			"Loading.....",
-			"Loading.....",
+			".    ",
+			"..   ",
+			"...  ",
+			".... ",
+			".....",
+			".....",
+			".....",
+			".....",
 		],
-	:pinwheel => "\\|/-",
-	:shutter => "▏▎▍▌▋▊▉▉▊▋▌▍▎▏",
+	:pinwheel => ["\\","|","/","-"],
+	:shutter => ["▏","▎","▍","▌","▋","▊","▉","▉","▊","▋","▌","▍","▎","▏"],
 
 # Spinners from different sources
 # Do not forget to cite the creators and add a reference in the LICENSE file.
 
 # https://github.com/sindresorhus/cli-spinners
 
-	:dots1 => "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏",
-	:dots2 => "⣾⣽⣻⢿⡿⣟⣯⣷",
-	:dots3 => "⠋⠙⠚⠞⠖⠦⠴⠲⠳⠓",
-	:dots4 => "⠄⠆⠇⠋⠙⠸⠰⠠⠰⠸⠙⠋⠇⠆",
-	:dots11 => "⠁⠂⠄⡀⢀⠠⠐⠈",
+	:dots1 => ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"],
+	:dots2 => ["⣾","⣽","⣻","⢿","⡿","⣟","⣯","⣷"],
+	:dots3 => ["⠋","⠙","⠚","⠞","⠖","⠦","⠴","⠲","⠳","⠓"],
+	:dots4 => ["⠄","⠆","⠇","⠋","⠙","⠸","⠰","⠠","⠰","⠸","⠙","⠋","⠇","⠆"],
+	:dots11 => ["⠁","⠂","⠄","⡀","⢀","⠠","⠐","⠈"],
 	:dots12 =>
 		 [
 			"⢀⠀",
@@ -117,33 +117,33 @@ const SPINNERS = Dict(
 			"⠀⡀"
 		]
 	,
-	:sand => "⠁⠂⠄⡀⡈⡐⡠⣀⣁⣂⣄⣌⣔⣤⣥⣦⣮⣶⣷⣿⡿⠿⢟⠟⡛⠛⠫⢋⠋⠍⡉⠉⠑⠡⢁",
-	:pipe => "┤┘┴└├┌┬┐",
-	:star => "✶✸✹✺✹✷",
-	:flip => "___-`'´-__",
-	:balloon => " .oO@* ",
-	:bounce => "⠁⠂⠄⠂",
-	:boxBounce => "▖▘▝▗",
-	:boxBounce2 => "▌▀▐▄",
-	:triangle => "◢◣◤◥",
-	:arc => "◜◠◝◞◡◟",
-	:squareCorners => "◰◳◲◱",
-	:circleQuarters => "◴◷◶◵",
-	:circleHalves => "◐◓◑◒",
-	:toggle => "⊶⊷",
-	:toggle2 => "▫▪",
-	:toggle3 => "□■",
-	:toggle4 => "■□▪▫",
-	:toggle5 => "▮▯",
-	:toggle6 => "ဝ၀",
-	:toggle7 => "⦾⦿",
-	:toggle8 => "◍◌",
-	:toggle9 => "◉◎",
-	:toggle10 => "㊂㊀㊁",
-	:toggle11 => "⧇⧆",
-	:toggle12 => "☗☖",
-	:toggle13 => "=*-",
-	:arrow => "←↖↑↗→↘↓↙",
+	:sand => ["⠁","⠂","⠄","⡀","⡈","⡐","⡠","⣀","⣁","⣂","⣄","⣌","⣔","⣤","⣥","⣦","⣮","⣶","⣷","⣿","⡿","⠿","⢟","⠟","⡛","⠛","⠫","⢋","⠋","⠍","⡉","⠉","⠑","⠡","⢁"],
+	:pipe => ["┤","┘","┴","└","├","┌","┬","┐"],
+	:star => ["✶","✸","✹","✺","✹","✷"],
+	:flip => ["_","_","_","-","`","'","´","-","_","_"],
+	:balloon => [" ",".","o","O","@","*"," "],
+	:bounce => ["⠁","⠂","⠄","⠂"],
+	:boxBounce => ["▖","▘","▝","▗"],
+	:boxBounce2 => ["▌","▀","▐","▄"],
+	:triangle => ["◢","◣","◤","◥"],
+	:arc => ["◜","◠","◝","◞","◡","◟"],
+	:squareCorners => ["◰","◳","◲","◱"],
+	:circleQuarters => ["◴","◷","◶","◵"],
+	:circleHalves => ["◐","◓","◑","◒"],
+	:toggle => ["⊶","⊷"],
+	:toggle2 => ["▫","▪"],
+	:toggle3 => ["□","■"],
+	:toggle4 => ["■","□","▪","▫"],
+	:toggle5 => ["▮","▯"],
+	:toggle6 => ["ဝ","၀"],
+	:toggle7 => ["⦾","⦿"],
+	:toggle8 => ["◍","◌"],
+	:toggle9 => ["◉","◎"],
+	:toggle10 => ["㊂","㊀","㊁"],
+	:toggle11 => ["⧇","⧆"],
+	:toggle12 => ["☗","☖"],
+	:toggle13 => ["=","*","-"],
+	:arrow => ["←","↖","↑","↗","→","↘","↓","↙"],
 	:arrow2 =>
 		 [
 			"⬆️ ",
@@ -311,7 +311,7 @@ const SPINNERS = Dict(
 			"▐/|____________▌"
 		]
 	,
-	:dqpb => "dqpb",
+	:dqpb => ["d","q","p","b"],
 	:weather =>
 		 [
 			"☀️ ",
@@ -403,5 +403,4 @@ const SPINNERS = Dict(
 			"▰▱▱▱▱▱▱"
 		]
 
-
-)
+)::Dict{Symbol, Vector{String}}

@@ -7,6 +7,7 @@
 # Take care not to choose an already existing symbol for a new spinner
 
 # Add dictionaries in the merge process when adding a new set of spinners
+
 const list = Dict(
 
 # Spinners created in this package by contributors
@@ -35,14 +36,14 @@ const list = Dict(
 		#  @show map(Unicode.julia_chartransform,x for x in s)
 		# or just collect(s)
 	:loading => [
-			"Loading.    ",
-			"Loading..   ",
-			"Loading...  ",
-			"Loading.... ",
-			"Loading.....",
-			"Loading.....",
-			"Loading.....",
-			"Loading.....",
+			".    ",
+			"..   ",
+			"...  ",
+			".... ",
+			".....",
+			".....",
+			".....",
+			".....",
 		],
 	:pinwheel => ["\\","|","/","-"],
 	:shutter => ["▏","▎","▍","▌","▋","▊","▉","▉","▊","▋","▌","▍","▎","▏"],
@@ -58,6 +59,7 @@ const list = Dict(
 	:dots4 => ["⠄","⠆","⠇","⠋","⠙","⠸","⠰","⠠","⠰","⠸","⠙","⠋","⠇","⠆"],
 	:dots5 => ["⠁","⠂","⠄","⡀","⢀","⠠","⠐","⠈"],
 	:dots6 =>
+
 		 [
 			"⢀⠀",
 			"⡀⠀",
@@ -379,4 +381,3 @@ const list = Dict(
 		]
 
 )::Dict{Symbol, Vector{String}}
-

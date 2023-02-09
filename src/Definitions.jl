@@ -7,7 +7,8 @@
 # Take care not to choose an already existing symbol for a new spinner
 
 # Add dictionaries in the merge process when adding a new set of spinners
-const SPINNERS = Dict(
+
+const list = Dict(
 
 # Spinners created in this package by contributors
 	:bar => ["▁","▂","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃","▂","▁"],
@@ -56,8 +57,9 @@ const SPINNERS = Dict(
 	:dots2 => ["⣾","⣽","⣻","⢿","⡿","⣟","⣯","⣷"],
 	:dots3 => ["⠋","⠙","⠚","⠞","⠖","⠦","⠴","⠲","⠳","⠓"],
 	:dots4 => ["⠄","⠆","⠇","⠋","⠙","⠸","⠰","⠠","⠰","⠸","⠙","⠋","⠇","⠆"],
-	:dots11 => ["⠁","⠂","⠄","⡀","⢀","⠠","⠐","⠈"],
-	:dots12 =>
+	:dots5 => ["⠁","⠂","⠄","⡀","⢀","⠠","⠐","⠈"],
+	:dots6 =>
+
 		 [
 			"⢀⠀",
 			"⡀⠀",
@@ -130,32 +132,7 @@ const SPINNERS = Dict(
 	:squareCorners => ["◰","◳","◲","◱"],
 	:circleQuarters => ["◴","◷","◶","◵"],
 	:circleHalves => ["◐","◓","◑","◒"],
-	:toggle => ["⊶","⊷"],
-	:toggle2 => ["▫","▪"],
-	:toggle3 => ["□","■"],
-	:toggle4 => ["■","□","▪","▫"],
-	:toggle5 => ["▮","▯"],
-	:toggle6 => ["ဝ","၀"],
-	:toggle7 => ["⦾","⦿"],
-	:toggle8 => ["◍","◌"],
-	:toggle9 => ["◉","◎"],
-	:toggle10 => ["㊂","㊀","㊁"],
-	:toggle11 => ["⧇","⧆"],
-	:toggle12 => ["☗","☖"],
-	:toggle13 => ["=","*","-"],
 	:arrow => ["←","↖","↑","↗","→","↘","↓","↙"],
-	:arrow2 =>
-		 [
-			"⬆️ ",
-			"↗️ ",
-			"➡️ ",
-			"↘️ ",
-			"⬇️ ",
-			"↙️ ",
-			"⬅️ ",
-			"↖️ "
-		]
-	,
 	:arrows =>
 		 [
 			"▹▹▹▹▹",

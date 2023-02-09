@@ -29,7 +29,7 @@ function get_named_string_vector(x::Symbol)::Vector{String}
 	# x = get(d,:a, 0)
 	# [x] .*= 2
 	# d[:a]
-	return deepcopy(get(SPINNERS, x, ["?"," "]))
+	return deepcopy(get(list, x, ["?"," "]))
 end
 
 string_to_vector(s) = string.(collect(graphemes(s)))
@@ -128,7 +128,7 @@ end
 Usage: `@spinner [style] [rate] [message] function`
 
   - `style`: `String`, `Vector{String}`, or `Symbol`
-    - See `Spinners.SPINNERS` for the list of supported symbols
+    - See `Spinners.list` for the list of supported symbols
   - `rate`: seconds per frame
   - `message::String`: text displayed to the right of the spinner
 

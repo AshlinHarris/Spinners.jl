@@ -6,8 +6,10 @@
 #	:snail might need to be removed for this reason...
 # Take care not to choose an already existing symbol for a new spinner
 
+# Add dictionaries in the merge process when adding a new set of spinners
+const SPINNERS = Dict(
+
 # Spinners created in this package by contributors
-custom = Dict(
 	:bar => "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁",
 	:blink => "⊙◡⊙⊙◡⊙⊙⊙⊙⊙⊙⊙",
 	:bouncingBall2 => [
@@ -56,13 +58,11 @@ custom = Dict(
 	:pinwheel => "\\|/-",
 	:shutter => "▉▊▋▌▍▎▏▎▍▌▋▊▉",
 	:snail => ["🐌        🏁"],
-)
 
 # Spinners from different sources
 # Do not forget to cite the creators and add a reference in the LICENSE file.
 
 # https://github.com/sindresorhus/cli-spinners
-sindresorhus = Dict(
 
 	:dots => "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏",
 	:dots2 => "⣾⣽⣻⢿⡿⣟⣯⣷",

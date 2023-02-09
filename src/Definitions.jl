@@ -10,18 +10,8 @@
 const SPINNERS = Dict(
 
 # Spinners created in this package by contributors
-	:bar => "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁",
+	:bar => "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁", # about the same as :growVertical
 	:blink => "⊙◡⊙⊙◡⊙⊙⊙⊙⊙⊙⊙",
-	:bouncingBall2 => [
-			"(●    )"
-			"( ●   )"
-			"(  ●  )"
-			"(   ● )"
-			"(    ●)"
-			"(   ● )"
-			"(  ●  )"
-			"( ●   )"
-		],
 	:cards => [
 			"🂠🂠🂠🂠🂠",
 			"🂪🂠🂠🂠🂠",
@@ -41,8 +31,8 @@ const SPINNERS = Dict(
 			"🂠🂠🂠🂠🂠",
 			"🂠🂠🂠🂠🂠",
 		],
-	:clock2 => join([Char(i) for i in 0x1f550:0x1f55b]),
-	:dots14 => join([Char(i) for i in 0x2800:0x28ff]),
+	#:clock2 => join([Char(i) for i in 0x1f550:0x1f55b]),
+	#:dots14 => join([Char(i) for i in 0x2800:0x28ff]),
 		#  @show map(Unicode.julia_chartransform, x for x in s)
 		# or just collect(s)
 	:loading => [
@@ -55,8 +45,8 @@ const SPINNERS = Dict(
 			"Loading.....",
 			"Loading.....",
 		],
-	:pinwheel => "\\|/-",
-	:shutter => "▉▊▋▌▍▎▏▎▍▌▋▊▉",
+	:pinwheel => "\\|/-", # about the same as :line
+	:shutter => "▉▊▋▌▍▎▏▎▍▌▋▊▉", # about the same as :growHorizontal
 	:snail => ["🐌        🏁"],
 
 # Spinners from different sources

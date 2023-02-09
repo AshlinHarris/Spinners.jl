@@ -7,7 +7,7 @@
 # Take care not to choose an already existing symbol for a new spinner
 
 # Add dictionaries in the merge process when adding a new set of spinners
-const SPINNERS = Dict(
+const list = Dict(
 
 # Spinners created in this package by contributors
 	:bar => ["▁","▂","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃","▂","▁"],
@@ -404,3 +404,4 @@ const SPINNERS = Dict(
 		]
 
 )::Dict{Symbol, Vector{String}}
+

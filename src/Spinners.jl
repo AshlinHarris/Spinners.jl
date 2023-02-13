@@ -66,10 +66,11 @@ function __spinner(S)
 					prev = iterator_to_index(i)
 					i += 1
 					curr = iterator_to_index(i)
-					print("\b"^textwidth(V[prev])*V[curr])
+					clean_up(V[prev])
+					print(V[curr])
 
 					if istaskdone(t)
-						clean_up(V[prev])
+						clean_up(V[curr])
 						keep_going = false
 					end
 

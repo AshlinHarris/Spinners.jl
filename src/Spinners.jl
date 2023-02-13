@@ -15,9 +15,9 @@ default_user_function() = sleep(3)
 Base.@kwdef mutable struct Spinner
 	#status::Status = starting
 	style::Vector{String} = default_spinner_animation
-	mode::Symbol = :none
+	#mode::Symbol = :none
 	seconds_per_frame::Real = 0.15
-	frame::Unsigned = 1
+	#frame::Unsigned = 1
 end
 
 include("Definitions.jl")
@@ -66,10 +66,11 @@ function __spinner(S)
 					prev = iterator_to_index(i)
 					i += 1
 					curr = iterator_to_index(i)
-					print("\b"^textwidth(V[prev])*V[curr])
+					clean_up(V[prev])
+					print(V[curr])
 
 					if istaskdone(t)
-						clean_up(V[prev])
+						clean_up(V[curr])
 						keep_going = false
 					end
 
@@ -99,7 +100,7 @@ function generate_spinner(inputs)::Spinner
 	# Then the first Number must be the rate
 	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.15)
 	# Then the first remaining Symbol must be the mode
-	mode = pop_first_by_type!(inputs, Symbol, :none)
+	#mode = pop_first_by_type!(inputs, Symbol, :none)
 	# The first remaining string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
 
@@ -117,7 +118,7 @@ function generate_spinner(inputs)::Spinner
 
 	return Spinner(
 		style=s,
-		mode=mode,
+		#mode=mode,
 		seconds_per_frame=seconds_per_frame,
 	)
 end

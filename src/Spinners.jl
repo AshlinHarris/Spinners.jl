@@ -29,7 +29,7 @@ function get_named_string_vector(x::Symbol)::Vector{String}
 	# x = get(d,:a, 0)
 	# [x] .*= 2
 	# d[:a]
-	return deepcopy(get(list, x, ["?"," "]))
+	return copy(get(list, x, ["?"," "]))
 end
 
 string_to_vector(s) = string.(collect(graphemes(s)))

@@ -30,6 +30,10 @@ println(x)
 @spinner :shutter
 @spinner :pong
 @spinner :cards
+
+#There is also a random mode:
+@spinner :dots :rand sleep(4)
+@spinner :clock :rand sleep(4)
 ```
 
 ## Related Works

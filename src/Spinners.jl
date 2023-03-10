@@ -20,16 +20,6 @@ end
 
 include("Definitions.jl")
 
-function get_named_string_vector(x::Symbol)::Vector{String}
-	#TODO: Why is a copy required here?
-	# It isn't needed here:
-	# const d=Dict(:a => 1, :b => 2);
-	# x = get(d,:a, 0)
-	# [x] .*= 2
-	# d[:a]
-	return copy(get(list, x, ["?"," "]))
-end
-
 string_to_vector(s) = string.(collect(graphemes(s)))
 
 function __spinner(S)
@@ -101,7 +91,7 @@ function generate_spinner(inputs)::Spinner
 
 	s = 
 		if(isa(raw_s, Symbol))
-			 get_named_string_vector(raw_s)
+			copy(get(list, raw_s::Symbol, ["?"," "]))::Vector{String}
 		elseif(isa(raw_s, String))
 			string_to_vector(raw_s)
 		else

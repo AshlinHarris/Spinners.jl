@@ -48,11 +48,8 @@ function __spinner(S)
 			print("\u001B[?25l", V[1]) # hide cursor
 
 			function clean_up(c) # Erase spinner
-					print(
-						"\b"^textwidth(c),
-						" "^textwidth(c),
-						"\b"^textwidth(c),
-					)
+				w = textwidth(c)
+				print("\b" ^ w, " " ^ w, "\b" ^ w)
 			end
 
 			L = length(V) # declaring this const keeps the spinner from drawing?
@@ -230,11 +227,6 @@ function get_frame(spinner::Spinner)
 	i = spinner.frame
 
 	return s[(i)%length(s)+1]
-end
-
-function clean_up_frame(spinner::Spinner)
-	width = get_frame(spinner) |> textwidth
-	print("\b" ^ width * " " ^ width)
 end
 
 function next_frame!(S::Spinner)

@@ -12,25 +12,13 @@ export @spinner
 const default_spinner_animation = ["◒", "◐", "◓", "◑"]
 default_user_function() = sleep(3)
 
-Base.@kwdef mutable struct Spinner
-	#status::Status = starting
+Base.@kwdef struct Spinner
 	style::Vector{String} = default_spinner_animation
 	#mode::Symbol = :none
 	seconds_per_frame::Real = 0.15
-	#frame::Unsigned = 1
 end
 
 include("Definitions.jl")
-
-function get_named_string_vector(x::Symbol)::Vector{String}
-	#TODO: Why is a copy required here?
-	# It isn't needed here:
-	# const d=Dict(:a => 1, :b => 2);
-	# x = get(d,:a, 0)
-	# [x] .*= 2
-	# d[:a]
-	return copy(get(list, x, ["?"," "]))
-end
 
 string_to_vector(s) = string.(collect(graphemes(s)))
 
@@ -48,11 +36,8 @@ function __spinner(S)
 			print("\u001B[?25l", V[1]) # hide cursor
 
 			function clean_up(c) # Erase spinner
-					print(
-						"\b"^textwidth(c),
-						" "^textwidth(c),
-						"\b"^textwidth(c),
-					)
+				w = textwidth(c)
+				print("\b" ^ w, " " ^ w, "\b" ^ w)
 			end
 
 			L = length(V) # declaring this const keeps the spinner from drawing?
@@ -106,7 +91,7 @@ function generate_spinner(inputs)::Spinner
 
 	s = 
 		if(isa(raw_s, Symbol))
-			 get_named_string_vector(raw_s)
+			copy(get(list, raw_s::Symbol, ["?"," "]))::Vector{String}
 		elseif(isa(raw_s, String))
 			string_to_vector(raw_s)
 		else
@@ -194,82 +179,3 @@ end
 
 end # module Spinners
 
-#= Outdated functions and macros for interactive tasks
-
-@enum Status starting=1 running=2 finishing=3 closing=4 closed=5
-
-# Functions on spinner types
-
-function render(rch, S::Spinner)
-	(timer) -> begin
-		# Stop or print next
-		if(stop_signal_found())
-			S.status=closing
-		end
-
-		if S.status == starting
-			hide_cursor()
-			print(get_frame(S))
-			S.status = running
-		elseif S.status == running
-			next_frame!(S)
-		#elseif S.status == finishing
-			# a final success symbol such as "✅" could be displayed here
-			# failure symbol: ❌
-		elseif S.status == closing
-			# Clean up
-			clean_up_frame(S)
-			show_cursor()
-			S.status = closed
-		end
-	end
-end
-
-function get_frame(spinner::Spinner)
-	s = spinner.style
-	i = spinner.frame
-
-	return s[(i)%length(s)+1]
-end
-
-function clean_up_frame(spinner::Spinner)
-	width = get_frame(spinner) |> textwidth
-	print("\b" ^ width * " " ^ width)
-end
-
-function next_frame!(S::Spinner)
-
-	old = get_frame(S)
-
-	if S.mode == :rand || S.mode == :random
-		S.frame = rand(filter((x) -> x!= S.frame, 1:length(S.style)))
-	else
-		S.frame+=1
-	end
-
-	new = get_frame(S)
-
-	print("\b"^textwidth(old) * new)
-
-end
-
-function timer_spin()
-	timer_spin("◒◐◓◑")
-end
-function timer_spin(parameters...)
-
-	inputs = collect(parameters)
-	my_spinner = generate_spinner(inputs)
-
-	my_timer = Timer(render(rch, my_spinner),
-		0, # Delay
-		interval=my_spinner.seconds_per_frame);
-	
-	while my_spinner.status != closed
-		sleep(0.1)
-	end
-
-	close(my_timer)
-end
-
-=#

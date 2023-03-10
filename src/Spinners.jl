@@ -12,10 +12,10 @@ export @spinner
 const default_spinner_animation = ["◒", "◐", "◓", "◑"]
 default_user_function() = sleep(3)
 
-Base.@kwdef struct Spinner
-	style::Vector{String} = default_spinner_animation
-	#mode::Symbol = :none
-	seconds_per_frame::Real = 0.15
+struct Spinner
+	style::Vector{String}
+	mode::Symbol
+	seconds_per_frame::Real
 end
 
 include("Definitions.jl")
@@ -26,12 +26,14 @@ function __spinner(S)
 
 	s=S.style
 	seconds_per_frame = S.seconds_per_frame
+	if_rand = (S.mode == :rand)
 
 	# Assemble command to produce spinner
 	command = "
 		try
 			V = $s
 			x = $seconds_per_frame
+			r = $if_rand
 	" * raw"""
 			print("\u001B[?25l", V[1]) # hide cursor
 
@@ -48,9 +50,11 @@ function __spinner(S)
 			keep_going = true
 			while keep_going
 				try
+					# Get previous and current frames
 					prev = iterator_to_index(i)
-					i += 1
+					i += r ? rand(1:L-1) : 1
 					curr = iterator_to_index(i)
+
 					clean_up(V[prev])
 					print(V[curr])
 
@@ -74,7 +78,7 @@ function __spinner(S)
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, ), wait = false)
+	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout), wait = false)
 	return proc, proc_input
 end
 
@@ -85,7 +89,7 @@ function generate_spinner(inputs)::Spinner
 	# Then the first Number must be the rate
 	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.15)
 	# Then the first remaining Symbol must be the mode
-	#mode = pop_first_by_type!(inputs, Symbol, :none)
+	mode = pop_first_by_type!(inputs, Symbol, :none)
 	# The first remaining string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
 
@@ -101,11 +105,7 @@ function generate_spinner(inputs)::Spinner
 	# Append messages to each frame
 	s .*= msg
 
-	return Spinner(
-		style=s,
-		#mode=mode,
-		seconds_per_frame=seconds_per_frame,
-	)
+	return Spinner(s, mode, seconds_per_frame)
 end
 
 """

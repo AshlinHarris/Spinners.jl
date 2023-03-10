@@ -93,14 +93,13 @@ function generate_spinner(inputs)::Spinner
 	# The first remaining string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
 
-	s = 
-		if(isa(raw_s, Symbol))
-			copy(get(list, raw_s::Symbol, ["?"," "]))::Vector{String}
-		elseif(isa(raw_s, String))
-			string_to_vector(raw_s)
-		else
-			raw_s
-		end
+	if(isa(raw_s, Symbol))
+		s = copy(get(list, raw_s::Symbol, ["?"," "]))::Vector{String}
+	elseif(isa(raw_s, String))
+		s = string_to_vector(raw_s)::Vector{String}
+	else
+		s = raw_s::Vector{String}
+	end
 
 	# Append messages to each frame
 	s .*= msg

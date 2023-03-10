@@ -8,13 +8,14 @@ Command line spinners in Julia with Unicode support
 
 ## Description
 
-`Spinners.jl` provides a single macro (`@spinner`), which generates a terminal spinner.
+`Spinners.jl` provides a single macro (`@spinner`), which generates a command line spinner for a command.
+The spinner should draw continuously until the command elapses, and the macro should not affect the scope of the command.
 
-Spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
+Command line spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
 
-The API should be considered unstable until v1.0.
+The API for `Spinners.jl` should be considered unstable until v1.0.
 
-## Tutorial:
+## Examples:
 ```
 using Spinners
 
@@ -30,13 +31,18 @@ println(x)
 @spinner :shutter
 @spinner :pong
 @spinner :cards
+
+#There is also a random mode:
+@spinner :dots :rand sleep(4)
+@spinner :clock :rand sleep(4)
 ```
 
 ## Related Works
 
-I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl). This package includes spinning progress meters, which must be updated at points within the function being measured.
-In contrast, `Spinners.jl.@spinner` treats the user function as a black box.
-The spinner is controlled by an external process and doesn't measure progress.
+I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which includes spinners as a flavor of progress meter.
+That is, they're useful tools for measuring the progress of a function,and must be updated at points within the function.
+In contrast, `Spinners.jl` is a useless novelty for drawing command line spinners.
+The spinner is controlled by an external process and doesn't measure progress, which treats the user function as a black box.
 The process receives a signal when the user's function is complete, so the user doesn't need to add breaks to their function.
 
 In Julia:
@@ -57,6 +63,4 @@ In other languages:
 ## Related discussions:
 - https://discourse.julialang.org/t/update-stdout-while-a-function-is-running/86285
 - https://discourse.julialang.org/t/how-to-print-rotating-tick-as-progress-bar-in-terminal/62099
-- https://discourse.julialang.org/t/terminating-a-process-on-windows/87481
-- https://discourse.julialang.org/t/whats-an-interactive-task-does-it-pause-a-running-task/93532
   

@@ -12,7 +12,7 @@ export @spinner
 const default_spinner_animation = ["◒", "◐", "◓", "◑"]
 default_user_function() = sleep(3)
 
-Base.@kwdef mutable struct Spinner
+Base.@kwdef struct Spinner
 	#status::Status = starting
 	style::Vector{String} = default_spinner_animation
 	#mode::Symbol = :none

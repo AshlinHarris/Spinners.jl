@@ -29,18 +29,23 @@ function __spinner(S)
 	if_rand = (S.mode == :rand)
 
 	# Assemble command to produce spinner
-	command = "
+	command = raw"""
+		const ANSI = Dict{Symbol,String}(
+			:hide_cursor => "\u001B[?25l",
+			:show_cursor => "\u001B[0J\u001B[?25h",
+		)
+
+		function clean_up(c) # Erase spinner
+			w = textwidth(c)
+			print("\b" ^ w, " " ^ w, "\b" ^ w)
+		end
+	""" * "
 		try
 			V = $s
 			x = $seconds_per_frame
 			r = $if_rand
 	" * raw"""
-			print("\u001B[?25l", V[1]) # hide cursor
-
-			function clean_up(c) # Erase spinner
-				w = textwidth(c)
-				print("\b" ^ w, " " ^ w, "\b" ^ w)
-			end
+			print(ANSI[:hide_cursor], V[1])
 
 			L = length(V) # declaring this const keeps the spinner from drawing?
 			iterator_to_index(i) = (i - 1) % L + 1
@@ -72,13 +77,15 @@ function __spinner(S)
 				sleep(x)
 			end
 		finally
-			print("\u001B[0J", "\u001B[?25h") # Restore cursor
+			print(ANSI[:show_cursor])
 		end
 	"""
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout), wait = false)
+	# Debugging:
+	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
+	#proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout), wait = false)
 	return proc, proc_input
 end
 

@@ -68,14 +68,15 @@ function __spinner(S)
 						keep_going = false
 					end
 
-				catch InterruptException
-					curr = iterator_to_index(i)
-					clean_up(V[curr])
-					keep_going = false
 				finally
 				end
 				sleep(x)
 			end
+		catch InterruptException
+			#curr = iterator_to_index(i)
+			#clean_up(V[curr])
+			#keep_going = false
+			print(ANSI[:show_cursor])
 		finally
 			print(ANSI[:show_cursor])
 		end
@@ -83,9 +84,7 @@ function __spinner(S)
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	# Debugging:
 	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
-	#proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout), wait = false)
 	return proc, proc_input
 end
 

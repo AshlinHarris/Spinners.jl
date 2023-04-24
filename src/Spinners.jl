@@ -164,17 +164,16 @@ macro spinner(args...)
 		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))
 		#generate_spinner(args[1:end-1])
 		local p, proc_input = __spinner(s)
-		ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, true)
-		#ret == 0 || error("unable to switch to raw mode")
-		function f(proc_input)
+		local t = Base.@async begin
+			ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, true)
+			#ret == 0 || error("unable to switch to raw mode")
 			x = read(stdin, Char)
 			while x != '\x03'
-			x = read(stdin, Char)
+				x = read(stdin, Char)
 			end 
 			write(proc_input,'c')
 			ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, false)
 		end
-		local t = Base.@async f(proc_input)
 		return_value = $(esc(args[end]))
 		if(isinteractive() && !isnothing(return_value))
 			show(return_value)

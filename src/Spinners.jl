@@ -164,45 +164,29 @@ macro spinner(args...)
 		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))
 		#generate_spinner(args[1:end-1])
 		local p, proc_input = __spinner(s)
-#	os = stdout;
-#	(rd, wr) = redirect_stdout();
-           ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, true)
-           #ret == 0 || error("unable to switch to raw mode")
-function f(proc_input)
-x = read(stdin, Char)
-while x != '\x03'
-#println("\n$x\n")
-x = read(stdin, Char)
-end 
-		write(proc_input,'c')
-           ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, false)
-end
-local t = Base.@async f(proc_input)
+		ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, true)
+		#ret == 0 || error("unable to switch to raw mode")
+		function f(proc_input)
+			x = read(stdin, Char)
+			while x != '\x03'
+			x = read(stdin, Char)
+			end 
+			write(proc_input,'c')
+			ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, false)
+		end
+		local t = Base.@async f(proc_input)
 		return_value = $(esc(args[end]))
 		if(isinteractive() && !isnothing(return_value))
 			show(return_value)
 		end
 		write(proc_input,'c')
 	ex = InterruptException()
-!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex)
-#try
-	#@show t
-	#ex = InterruptException()
-	#Base.throwto(t, ex)
-#catch InterruptException
-	#println("hello")
-	#@show t
-#end
-#write(stdin,'\x03')
+	!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex)
 
 	while(process_running(p))
 		sleep(0.1)
 	end
 
-#	redirect_stdout(os);
-#	close(wr);
-#	output = read(rd, String)
-#	print(output)
 	end
 end
 

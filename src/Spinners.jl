@@ -161,10 +161,12 @@ macro spinner(n::Number)
 end
 macro spinner(args...)
 	quote
+		# Draw spinner
 		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))
 		#generate_spinner(args[1:end-1])
 		local p, proc_input = __spinner(s)
 
+		# Block user input other than stop signals
 		local t = Base.@async begin
 			ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, true)
 			#ret == 0 || error("unable to switch to raw mode")
@@ -175,14 +177,19 @@ macro spinner(args...)
 			write(proc_input,'c')
 			ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, false)
 		end
+
+		# Run user's original command
 		return_value = $(esc(args[end]))
 		if(isinteractive() && !isnothing(return_value))
 			show(return_value)
 		end
-		write(proc_input,'c')
+
+		# Stop blocking user input (if not closed by user)
 		ex = InterruptException()
 		!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex)
 
+		# Close spinner
+		write(proc_input,'c')
 		while(process_running(p))
 			sleep(0.1)
 		end

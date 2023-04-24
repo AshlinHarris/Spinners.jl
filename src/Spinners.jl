@@ -55,29 +55,21 @@ function __spinner(S)
 			t=Threads.@async read(stdin, Char)
 			keep_going = true
 			while keep_going
-				try
-					# Get previous and current frames
-					prev = iterator_to_index(i)
-					i += r ? rand(1:L-1) : 1
-					curr = iterator_to_index(i)
+				# Get previous and current frames
+				prev = iterator_to_index(i)
+				i += r ? rand(1:L-1) : 1
+				curr = iterator_to_index(i)
 
-					clean_up(V[prev])
-					print(V[curr])
+				clean_up(V[prev])
+				print(V[curr])
 
-					if istaskdone(t)
-						clean_up(V[curr])
-						keep_going = false
-					end
-
-				finally
+				if istaskdone(t)
+					clean_up(V[curr])
+					keep_going = false
 				end
+
 				sleep(x)
 			end
-		catch InterruptException
-			#curr = iterator_to_index(i)
-			#clean_up(V[curr])
-			#keep_going = false
-			print(ANSI[:show_cursor])
 		finally
 			print(ANSI[:show_cursor])
 		end

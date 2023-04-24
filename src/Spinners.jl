@@ -164,11 +164,12 @@ macro spinner(args...)
 		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))
 		#generate_spinner(args[1:end-1])
 		local p, proc_input = __spinner(s)
+
 		local t = Base.@async begin
 			ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, true)
 			#ret == 0 || error("unable to switch to raw mode")
 			x = read(stdin, Char)
-			while x != '\x03'
+			while x ∉ Set(['\x03', '\x04', '\e'])
 				x = read(stdin, Char)
 			end 
 			write(proc_input,'c')
@@ -179,12 +180,12 @@ macro spinner(args...)
 			show(return_value)
 		end
 		write(proc_input,'c')
-	ex = InterruptException()
-	!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex)
+		ex = InterruptException()
+		!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex)
 
-	while(process_running(p))
-		sleep(0.1)
-	end
+		while(process_running(p))
+			sleep(0.1)
+		end
 
 	end
 end

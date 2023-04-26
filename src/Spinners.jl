@@ -161,31 +161,45 @@ macro spinner(n::Number)
 end
 macro spinner(args...)
 	quote
+		# Draw spinner
 		local s = generate_spinner(collect(eval.([$args[1:end-1]...])))
 		#generate_spinner(args[1:end-1])
 		local p, proc_input = __spinner(s)
-		ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, true)
-		#ret == 0 || error("unable to switch to raw mode")
 
-		function f(proc_input)
+		# Block user input other than stop signals
+		function raw_mode(b)
+			ccall(
+				:jl_tty_set_mode,Int32,
+				(Ptr{Cvoid},Int32),
+				stdin.handle,
+				b)
+		end
+		function take_all_input(proc_input)
+			raw_mode(true)
+		#ret == 0 || error("unable to switch to raw mode")
 			x = read(stdin, Char)
 			while x ∉ Set(['\x03', '\x04', '\e'])
 				x = read(stdin, Char)
 			end 
 			write(proc_input,'c')
-			ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid},Int32), stdin.handle, false)
+			raw_mode(false)
 		end
-		local t = Base.@async f(proc_input)
+		local t = Base.@async take_all_input(proc_input)
+
+		# Run user's original command
 		return_value = $(esc(args[end]))
 		if(isinteractive() && !isnothing(return_value))
 			show(return_value)
 		end
-		write(proc_input,'c')
-		ex = InterruptException()
-		!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex)
 
+		# Stop blocking user input (if not closed by user)
+		ex = InterruptException()
+		!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex) && raw_mode(false)
+
+		# Close spinner
+		write(proc_input,'c')
 		while(process_running(p))
-		sleep(0.1)
+			sleep(0.1)
 		end
 
 	end

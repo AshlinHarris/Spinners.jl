@@ -162,23 +162,16 @@ macro spinner(args...)
 
 		# Block user input other than stop signals
 		function raw_mode(b)
-			ccall(
-				:jl_tty_set_mode,Int32,
-				(Ptr{Cvoid},Int32),
-				stdin.handle,
-				b)
+			ccall(:jl_tty_set_mode,Int32, (Ptr{Cvoid},Int32), stdin.handle, b)
 		end
-		function take_all_input(proc_input)
+		function block_user_input(proc_input)
 			raw_mode(true)
 			#ret == 0 || error("unable to switch to raw mode")
-			x = read(stdin, Char)
-			while x ∉ Set(['\x03', '\x04', '\e'])
-				x = read(stdin, Char)
-			end 
+			while read(stdin, Char) ∉ Set(['\x03', '\x04', '\e']) end
 			write(proc_input,'c')
 			raw_mode(false)
 		end
-		local t = Base.@async take_all_input(proc_input)
+		local t = Base.@async block_user_input(proc_input)
 
 		# Run user's original command
 		return_value = $(esc(args[end]))

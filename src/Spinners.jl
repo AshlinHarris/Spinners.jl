@@ -192,12 +192,13 @@ macro spinner(args...)
 			show(return_value)
 		end
 
+		# Close spinner
+		write(proc_input,'c')
+
 		# Stop blocking user input (if not closed by user)
 		ex = InterruptException()
 		!istaskdone(t) && @test_throws InterruptException Base.throwto(t, ex) && raw_mode(false)
 
-		# Close spinner
-		write(proc_input,'c')
 		while(process_running(p))
 			sleep(0.1)
 		end

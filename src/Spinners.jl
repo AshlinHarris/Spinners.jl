@@ -170,7 +170,7 @@ macro spinner(args...)
 		#ret == 0 || error("unable to switch to raw mode")
 		function f(proc_input)
 			x = read(stdin, Char)
-			while x != '\x03'
+			while x ∉ Set(['\x03', '\x04', '\e'])
 				x = read(stdin, Char)
 			end 
 			write(proc_input,'c')

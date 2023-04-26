@@ -55,28 +55,22 @@ function __spinner(S)
 			t=Threads.@async read(stdin, Char)
 			keep_going = true
 			while keep_going
-				try
-					# Get previous and current frames
-					prev = iterator_to_index(i)
-					i += r ? rand(1:L-1) : 1
-					curr = iterator_to_index(i)
+				# Get previous and current frames
+				prev = iterator_to_index(i)
+				i += r ? rand(1:L-1) : 1
+				curr = iterator_to_index(i)
 
-					clean_up(V[prev])
-					print(V[curr])
+				clean_up(V[prev])
+				print(V[curr])
 
-					if istaskdone(t)
-						clean_up(V[curr])
-						keep_going = false
-					end
-
-				finally
+				if istaskdone(t)
+					clean_up(V[curr])
+					keep_going = false
 				end
+
 				sleep(x)
 			end
 		catch InterruptException
-			#curr = iterator_to_index(i)
-			#clean_up(V[curr])
-			#keep_going = false
 			print(ANSI[:show_cursor])
 		finally
 			print(ANSI[:show_cursor])
@@ -168,23 +162,16 @@ macro spinner(args...)
 
 		# Block user input other than stop signals
 		function raw_mode(b)
-			ccall(
-				:jl_tty_set_mode,Int32,
-				(Ptr{Cvoid},Int32),
-				stdin.handle,
-				b)
+			ccall(:jl_tty_set_mode,Int32, (Ptr{Cvoid},Int32), stdin.handle, b)
 		end
-		function take_all_input(proc_input)
+		function block_user_input(proc_input)
 			raw_mode(true)
-		#ret == 0 || error("unable to switch to raw mode")
-			x = read(stdin, Char)
-			while x ∉ Set(['\x03', '\x04', '\e'])
-				x = read(stdin, Char)
-			end 
+			#ret == 0 || error("unable to switch to raw mode")
+			while read(stdin, Char) ∉ Set(['\x03', '\x04', '\e']) end
 			write(proc_input,'c')
 			raw_mode(false)
 		end
-		local t = Base.@async take_all_input(proc_input)
+		local t = Base.@async block_user_input(proc_input)
 
 		# Run user's original command
 		return_value = $(esc(args[end]))

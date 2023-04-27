@@ -135,6 +135,11 @@ macro spinner(x::QuoteNode)
 		@spinner $x default_user_function()
 	end
 end
+macro spinner(x::QuoteNode, y::QuoteNode)
+	quote
+		@spinner $x $y default_user_function()
+	end
+end
 macro spinner(s::String)
 	quote
 		@spinner string_to_vector($s) default_user_function()

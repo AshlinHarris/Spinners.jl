@@ -10,8 +10,6 @@ using Unicode: graphemes
 
 export @spinner
 
-const default_spinner_animation = ["◒", "◐", "◓", "◑"]
-const set_of_modes = Set([:none, :rand])
 default_user_function() = sleep(3)
 
 struct Spinner
@@ -85,6 +83,9 @@ function __spinner(S)
 end
 
 function generate_spinner(inputs)::Spinner
+
+	default_spinner_animation = ["◒", "◐", "◓", "◑"]
+	set_of_modes = Set([:none, :rand])
 
 	# The user's function is already removed
 	# Pop the first Symbol that matches the set of possible modes

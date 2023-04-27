@@ -11,6 +11,7 @@ using Unicode: graphemes
 export @spinner
 
 const default_spinner_animation = ["◒", "◐", "◓", "◑"]
+const set_of_modes = Set([:none, :rand])
 default_user_function() = sleep(3)
 
 struct Spinner
@@ -85,12 +86,21 @@ end
 
 function generate_spinner(inputs)::Spinner
 
-	# The first input must be the style
+	# The user's function is already removed
+	# Pop the first Symbol that matches the set of possible modes
+	#mode = pop_first_by_type!(inputs, Symbol, :none)
+	mode = :none
+	for i in eachindex(inputs)
+		if inputs[i] ∈ set_of_modes
+			mode = splice!(inputs,i)
+			break
+		end
+	end
+		
+	# The first remaining input must be the style
 	raw_s = isempty(inputs) ? "◒◐◓◑" : popfirst!(inputs)
 	# Then the first Number must be the rate
 	seconds_per_frame = pop_first_by_type!(inputs, Number, 0.15)
-	# Then the first remaining Symbol must be the mode
-	mode = pop_first_by_type!(inputs, Symbol, :none)
 	# The first remaining string must be the message
 	msg = pop_first_by_type!(inputs, String, "")
 

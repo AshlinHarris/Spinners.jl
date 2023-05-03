@@ -11,6 +11,7 @@ using Unicode: graphemes
 export @spinner
 
 default_user_function() = sleep(3)
+const default_spinner_animation = ["◒", "◐", "◓", "◑"]
 
 struct Spinner
 	style::Vector{String}
@@ -84,7 +85,6 @@ end
 
 function generate_spinner(inputs)::Spinner
 
-	default_spinner_animation = ["◒", "◐", "◓", "◑"]
 	set_of_modes = Set([:none, :rand])
 
 	# The user's function is already removed

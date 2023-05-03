@@ -10,6 +10,7 @@ Command line spinners in Julia with Unicode support
 
 `Spinners.jl` provides a single macro (`@spinner`), which generates a command line spinner for a command.
 The spinner should draw continuously until the command elapses, and the macro should not affect the scope of the command.
+All user input is captured while the spinner is running, but the spinner can be stopped prematurely with `Ctrl-C`, `Ctrl-D`, or `Esc` (the user command will keep going).
 
 Command line spinners serve as a visual indicator to the user that a process is ongoing and shouldn't be interrupted (e.g., files are being downloaded or written to disk).
 
@@ -21,7 +22,7 @@ using Spinners
 
 # The @spinner macro shouldn't affect the scope:
 do_some_calculations(x) = sum(map(i -> BigInt(999)^10_000_000 % i, 1:x))
-@spinner "\\|/-" x = do_some_calculations(10);
+@spinner x = do_some_calculations(10);
 println(x)
 
 # You can provide a character set, but many are already built in:
@@ -33,14 +34,14 @@ println(x)
 @spinner :cards
 
 #There is also a random mode:
-@spinner :dots :rand sleep(4)
+@spinner :dots :rand
 @spinner :clock :rand sleep(4)
 ```
 
 ## Related Works
 
 I highly recommend [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl), which includes spinners as a flavor of progress meter.
-That is, they're useful tools for measuring the progress of a function,and must be updated at points within the function.
+That is, they're useful tools for measuring the progress of a function, and they must be updated at points within the function.
 In contrast, `Spinners.jl` is a useless novelty for drawing command line spinners.
 The spinner is controlled by an external process and doesn't measure progress, which treats the user function as a black box.
 The process receives a signal when the user's function is complete, so the user doesn't need to add breaks to their function.

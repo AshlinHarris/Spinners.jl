@@ -79,7 +79,7 @@ function __spinner(S)
 
 	# Display the spinner as an external program
 	proc_input = Pipe()
-	proc = run(pipeline(`julia -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
+	proc = run(pipeline(`$(Base.julia_cmd()) -e $command`, stdin = proc_input, stdout = stdout, stderr = stderr), wait = false)
 	return proc, proc_input
 end
 

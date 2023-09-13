@@ -185,12 +185,12 @@ macro spinner(args...)
 
 			raw_mode(true)
 			#ret == 0 || error("unable to switch to raw mode")
-			while read(stdin, Char) ∉ Set(['\x03', '\x04', '\e']) end
+			while (input = read(stdin, Char)) ∉ Set(['\x03', '\x04', '\e']) end
 			write(proc_input,'c')
 			raw_mode(false)
 			sleep(0.2)
-			@info "Spinner halted by user input"
-			@info "(Escape again to halt user process)"
+			@info "Spinner interrupted by user input:" input
+			@info "The user process is still running (use ctrl+c to halt)"
 
 		end
 		local t = Base.@async handle_user_input(proc_input)

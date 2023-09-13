@@ -176,18 +176,24 @@ macro spinner(args...)
 		#generate_spinner(args[1:end-1])
 		local p, proc_input = __spinner(s)
 
-		# Block user input other than stop signals
-		function raw_mode(b)
-			ccall(:jl_tty_set_mode,Int32, (Ptr{Cvoid},Int32), stdin.handle, b)
-		end
-		function block_user_input(proc_input)
+		# Hide all user input, but process stop signals (ctrl+c, ctrl+d, esc)
+		function handle_user_input(proc_input)
+
+			function raw_mode(b)
+				ccall(:jl_tty_set_mode,Int32, (Ptr{Cvoid},Int32), stdin.handle, b)
+			end
+
 			raw_mode(true)
 			#ret == 0 || error("unable to switch to raw mode")
 			while read(stdin, Char) ∉ Set(['\x03', '\x04', '\e']) end
 			write(proc_input,'c')
 			raw_mode(false)
+			sleep(0.2)
+			@info "Spinner halted by user input"
+			@info "(Escape again to halt user process)"
+
 		end
-		local t = Base.@async block_user_input(proc_input)
+		local t = Base.@async handle_user_input(proc_input)
 
 		# Run user's original command
 		return_value = $(esc(args[end]))

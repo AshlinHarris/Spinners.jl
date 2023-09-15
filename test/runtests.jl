@@ -2,6 +2,9 @@ using Random
 using Spinners
 using Test
 
+# Tests will stall on 1.7
+@assert VERSION ≥ v"1.8"
+
 #usleep(usecs) = ccall(:usleep, Cint, (Cuint,), usecs)
 
 function get_stdout(command::Expr)
